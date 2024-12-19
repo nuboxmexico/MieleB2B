@@ -1,0 +1,56 @@
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="secondary-text bold">Información</p>
+			<%if current_user.is_finance? || current_user.is_finance_manager? %>
+			<%= form_for(@quotation, html: {multipart: true}) do |f| %>
+			<div class="row padding-row">
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<%= f.label :so_code, 'SO',  class:'bold title-input' %>
+					<p>
+						<%= f.text_field :so_code, class: "field-bordered", required: (@quotation.paid_ammount == '100' ? true : false) ,placeholder: "Escriba aquí", value: @quotation.so_code %>
+						<label id="quotation_so_code-error-out" class="error-out <%= (@quotation.paid_ammount == '100' ? '' : 'hidden') %>" for="quotation_so_code">Este campo es obligatorio.</label>
+					</p>
+				</div>
+			</div>
+			<div class="line-row-info"></div>
+			<div class="row padding-row">
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 top-both">
+					<label for="credit_note_documents[]" class="title-input">Documento Nota de Crédito</label>
+					<div class="file-field input-field">
+						<div class="file-drop-area dashed-border">
+							<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+							<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+							<input type="file" name="credit_note_documents[]" multiple="true" id="credit_note_documents" class="file-input" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf">
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-both">
+					<%= f.label :credit_note, 'Nota de crédito',  class:'bold title-input' %>
+					<p>
+						<%= f.text_field :credit_note, class: "field-bordered", placeholder: "Escriba aquí", value: @quotation.credit_note %>
+					</p>
+				</div>
+				<div class="col-md-6 col-xs-12 top-space text-right">
+					<p class="top-mobile">
+						<button type="submit" class="btn btn-miele" id="save_changes">Guardar <span class="hidden-xs">Cambios</span></button>
+					</p>
+				</div>
+			</div>
+			<% end %>
+			<%else%>
+			<div class="row padding-row">
+				<div class="col-md-3 col-xs-12">
+					<p class="bold title-input">SO</p>
+					<p class="content-input"><%= @quotation.try(:so_code)%></p>
+				</div>
+				<div class="col-md-3 col-xs-12">
+					<p class="bold title-input">Nota de crédito</p>
+					<p class="content-input"><%= @quotation.try(:credit_note)%></p>
+				</div>
+			</div>
+			<%end%>
+			<%= render 'quotations/credit_notes' %>
+		</div>
+	</div>
+</div>

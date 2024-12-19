@@ -1,0 +1,7 @@
+$('#add-dispatch-group').remove();
+$('#new_dispatch_group_box')
+  .append('<%= j render partial: 'quotations/show/preparation_project', locals: {dispatch_group: @dispatch_group, technicians_new: @technicians_new, submit_label: "Guardar", dispatch_group_counter: @dispatch_groups_quantity-1, dispatch_group_iteration_last: true, id: "dispatch-in-dispatch-tab-#{@dispatch_groups_quantity-1}"} %>');
+displayDatePicker('.date-picker');
+setDropAreaFile();
+$(".loader-page").fadeOut();
+$('#dispatch .collapse-dispatch-group-link').last().click();

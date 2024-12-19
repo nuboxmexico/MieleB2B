@@ -1,0 +1,77 @@
+@import "variables";
+
+.progressbar {
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+.progressbar li {
+  list-style-type: none;
+  flex: 1;
+  font-size: 12px;
+  position: relative;
+  text-align: center;
+  color: $brand-primary;
+  cursor: default;
+}
+
+.progressbar li a{
+  list-style-type: none;
+  flex: 1;
+  font-size: 14px;
+  color: #262626!important;
+  position: relative;
+  text-align: center;
+  cursor: default;
+}
+
+.progressbar li:before {
+  width: 40px;
+  height: 40px;
+  font-family: 'Font Awesome 5 Free';
+  content: '';
+  font-size: 16px;
+  padding-top: 4px;
+  font-weight: 900;
+  line-height: 30px;
+  border: 2px solid $brand-primary;
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  border-radius: 50%;
+  background-color: white;
+}
+.progressbar li:after {
+  width: 100%;
+  height: 2px;
+  content: '';
+  position: absolute;
+  background-color: $brand-primary;
+  top: 15px;
+  left: -50%;
+  z-index: -1;
+}
+.progressbar li:first-child:after {
+  content: none;
+}
+.progressbar li.active {
+  color: $brand-primary;
+}
+.progressbar li.active:before {
+  border-color: $brand-primary;
+  content: '\f00c';
+}
+.progressbar li.active + li:after {
+  background-color: $brand-primary;
+}
+
+.progressbar li.passed {
+  color: $brand-primary;
+}
+.progressbar li.passed:before {
+  border-color: $brand-primary;
+  content: '\f00c';
+}
+.progressbar li.passed + li:after {
+  background-color: $brand-primary;
+}

@@ -1,0 +1,17 @@
+@import "variables";
+
+.top-space-home{
+	margin-top: 40px;
+}
+
+.highcharts-drilldown-data-label text{
+	color: $brand-primary!important;
+	fill: $brand-primary!important;
+	text-decoration: none!important;
+}
+
+#chart-channels .highcharts-xaxis-labels text{
+	color: $brand-primary!important;
+	fill: $brand-primary!important;
+	text-decoration: none!important;
+}

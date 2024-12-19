@@ -1,0 +1,70 @@
+<p class="dashboard-title">Ventas por Canal y Tipo de producto</p>
+<figure class="highcharts-figure">
+	<div id="sales-per-channel-and-product-type"></div>
+</figure>
+
+<script>
+	var data = <%= @quotations_per_channel_and_product_type.to_json.html_safe %>;
+	Highcharts.chart('sales-per-channel-and-product-type', {
+		chart: {
+			type: 'column'
+		},
+		title: {
+			text: ''
+		},
+		xAxis: {
+			categories: data.categories
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: 'Monto $'
+			},
+			stackLabels: {
+				enabled: true,
+				style: {
+					fontWeight: 'bold',
+					color: ( // theme
+						Highcharts.defaultOptions.title.style &&
+						Highcharts.defaultOptions.title.style.color
+						) || 'gray'
+            	},
+				format: '$ {total:,.0f}'
+        	}
+    	},
+    legend: {
+    	align: 'right',
+    	x: -30,
+    	verticalAlign: 'top',
+    	y: -10,
+    	floating: true,
+    	backgroundColor:
+    	Highcharts.defaultOptions.legend.backgroundColor || 'white',
+    	borderColor: '#CCC',
+    	borderWidth: 1,
+    	shadow: false
+    },
+    tooltip: {
+    	headerFormat: '<b>{point.x}</b><br/>',
+    	pointFormat: '{series.name}: $ {point.y:,.0f}<br/>Total: $ {point.stackTotal:,.0f}'
+    },
+    plotOptions: {
+    	column: {
+    		stacking: 'normal',
+    		dataLabels: {
+    			enabled: true,
+				formatter: function () {
+					let column_total = this.point.y/ 1000000.0;
+					let formatted_total = column_total < 1.0 ? column_total.toFixed(2) : Math.round(column_total); 
+                	return "$ " + formatted_total + " MM";
+            	}
+
+    		}
+    	}
+    },
+    credits: {
+        enabled: false
+    },
+    series: data.data
+});
+</script>

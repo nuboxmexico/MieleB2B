@@ -1,0 +1,53 @@
+<% if current_user.is_finance_manager? or current_user.is_finance? 
+  title_section = 'Mis ventas'
+elsif current_user.is_dispatch? or current_user.is_manager_dispatch?
+  title_section = 'Mis despachos'
+elsif current_user.is_instalation? or current_user.is_manager_instalation? 
+  title_section = 'Mis instalaciones'
+elsif current_user.is_retail? 
+  title_section = 'Mis OC'
+else 
+  title_section = 'Mis cotizaciones'
+  end %>
+  <style>
+    .select2-selection__choice{
+      display: none!important;
+    }
+
+    .select2-selection--single{
+      background: #f6f6f6!important; 
+    }
+
+    @media(max-width: 992px){
+      .select2-selection--single{
+        background: #EEEEEE!important; 
+      }
+    }
+
+    .select2-container--default .select2-selection--single{
+      border: 2px solid #B3B3B3!important;
+    }
+
+    .select2-selection__rendered{
+      padding-left: 10px!important;
+    }
+
+    .select2-miele .select2-container {
+      width: calc(100% - 60px) !important;
+    }
+  </style>
+  <div class="row">
+    <div class="col-lg-12">
+      <% if current_user.manager? or current_user.administrator? %>
+      <ol class="breadcrumb">
+        <li><a href="<%= root_path %>">Inicio</a></li>
+        <li><a href="<%= quotations_path %>"><%= title_section%></a></li>
+        <li>Búsqueda</li>
+      </ol>
+      <% end %>
+      <h1 class="title-section bold">
+        Resultados para la búsqueda de "<%= params[:search_quotation] %>"
+      </h1>
+    </div>
+  </div>
+  <%= render 'quotations/quotations' %>

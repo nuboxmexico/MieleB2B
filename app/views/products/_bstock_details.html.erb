@@ -1,0 +1,59 @@
+<div class="col-md-5 col-md-offset-1 col-xs-12 col-sm-5">
+	<h4 class="title-mobile pt14mobile"><b><%= @product.name %></b></h4>
+	<p class="product-sku">TNR <%= @product.sku %></p>
+	<% if @bstocks.first %>
+		<p class="product-from">
+			Desde <%= number_to_currency(@bstocks.first.bstock_price(@product)) %>
+		</p>
+	<% end %>
+	<% if @bstocks.where.not(id: current_user.cart.cart_items.pluck(:product_id)).any? %>
+		<% @bstocks.each do |bstock| %>
+			<div id="price<%= bstock.id %>" class="striked-price <%= @bstocks.first != bstock ? 'hidden' : '' %>">
+				<p class="no-bottom"><span class="new-price"><%= number_to_currency(bstock.bstock_price(@product)) %></span></p>
+				<p><span class="old-price strikediag"><%= number_to_currency(@product.price) %></span></p>
+			</div>
+		<% end %>
+	<% end %>
+	<% if can? :add_product_bstock, Cart %>
+		<% if @bstocks.where.not(id: current_user.cart.cart_items.pluck(:product_id)).any? && any_bstock(@product) %>
+			<div class="row full-width" id="form-add-bstock">
+				<div class="col-xs-12">
+					<%= form_tag add_product_bstock_path(@product), remote: true, class:'inlineb full-width', method: :post do %>
+					<%= hidden_field_tag 'quantity', 1 %>
+					<div class="width-select-70 inlineb">
+						<%= select_tag :bstock_id, options_for_select(@bstocks.where.not(id: current_user.cart.cart_items.pluck(:product_id)).collect{ |bstock| [bstock.category+' - '+bstock.ean+' - '+bstock.discount.to_s+'%', bstock.id] }, 0), { required: true, class:'inlineb width-select-70' } %>
+					</div>
+					<button type="submit" class="btn btn-miele hidden-xs hidden-sm hidden-md" id="add-to-cart">Cotizar</button>
+					<div class="button-submit-bstock hidden-lg">
+						<button type="submit" class="btn btn-miele" id="add-to-cart">Cotizar</button>
+					</div>
+					<% end %>
+				</div>
+			</div>
+		<% end %>
+	<% end %>
+	<p class="title-description top-both">Descripción</p>
+	<% if @bstocks.where.not(id: current_user.cart.cart_items.pluck(:product_id)).size > 0 %>
+		<% @bstocks.each do |bstock| %>
+			<div id="condition-bstock<%= bstock.id %>" class="miele-text condition-bstock-p <%= @bstocks.first != bstock ? 'hidden' : '' %>">
+				<p><%= "Categoría #{bstock.category} - #{bstock.state}" %></p>
+				<p><%= "Disponible en #{bstock.cost_center.try(:name)}" %></p>
+			</div>
+		<% end %>
+	<% end %>
+	<% if @product.description %>
+		<p class="product-description"><%= @product.description %></p>
+	<% else %>
+		<p class="product-description">Sin descripción disponible</p>
+	<% end %>
+</div>
+
+<script>
+	$("#bstock_id").select2();
+	$("#bstock_id").change(function(){
+		$(".condition-bstock-p").addClass("hidden");
+		$("#condition-bstock"+$(this).val()).removeClass("hidden");
+		$(".striked-price").addClass("hidden");
+		$("#price"+$(this).val()).removeClass("hidden");
+	});
+</script>

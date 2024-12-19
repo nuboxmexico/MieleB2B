@@ -1,0 +1,148 @@
+<% if @quotation.can_watch_dispatch? and (current_user.is_dispatch? or current_user.is_manager_dispatch?) %>
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="bold secondary-text">Información Despacho</p>
+		</div>
+	</div>
+	<div class="row top-separation-data">
+		<%= form_tag update_custom_quotation_path(@quotation), method: :post, remote: true do %>
+		<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+			<label class="title-input" for="quotation_estimated_dispatch_date">Fecha estimada Despacho</label>
+			<input required="required" class="form-control field-bordered inlineb" placeholder="DD/MM/AAAA" onkeydown="return false;" value="<%= @quotation.try(:estimated_dispatch_date).try(:strftime, "%d/%m/%Y") %>" type="text" name="quotation[estimated_dispatch_date]" id="quotation_estimated_dispatch_date" data-bv-field="quotation[estimated_dispatch_date]">
+		</div>
+		<div class="col-lg-2 col-md-4 col-sm-8 col-xs-12 top-save">
+			<button type="submit" class="btn btn-miele inlineb">Guardar</button>
+		</div>
+		<% end %>
+	</div>
+	<%= form_tag dispatch_quotation_path(@quotation), method: :post, multipart: true, id: 'dispatch-form' do %>
+	<div class="row top-both">
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+			<label for="dispatch_guide_documents[]" class="title-input">Guía de Despacho</label>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="dispatch_guide_documents[]" required="true" multiple="true" accept="application/pdf" id="dispatch_guide_documents" class="file-input">
+				</div>
+				<label id="dispatch_guide_documents-error-out" class="error-out" for="dispatch_guide_documents">Este campo es obligatorio.</label>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+			<label for="quotation[dispatch_guide]" class="title-input">N° Guía de despacho</label>
+			<p><input type="text" name="quotation[dispatch_guide]" class="field-bordered" id="quotation_dispatch_guide" required="required" placeholder="Escribe aquí ..." value="<%= @quotation.dispatch_guide %>"></p>
+		</div>
+		<% if @quotation.quotation_products.to_install.size > 0 %>
+		<%= hidden_field_tag 'quotation[dispatch_type]', 'dispatch+instalation' %>
+		<% else %>
+		<%= hidden_field_tag 'quotation[dispatch_type]', 'dispatch' %>
+		<%= hidden_field_tag 'not_save', 'true' %>
+		<% end %>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-6 col-xs-12 top-space text-right">
+			<p class="top-mobile">
+				<button type="submit" class="btn btn-miele" id="send-dispatch" disabled>Guardar</button>
+			</p>
+		</div>
+	</div>
+	<% if @quotation.dispatch_guides.size > 0 %>
+	<div class="line-row-info"></div>
+	<div class="row padding-row">
+		<div class="col-md-12 col-xs-12">
+			<p class="bold title-input"><b>Guía de Despacho</b></p>
+			<% @quotation.dispatch_guides.each do |dispatch_doc| %>
+			<%= link_to dispatch_doc.document.url(:original), class: 'btn btn-miele mini-top-space', target: "_blank" do %>
+			<i class="fa fa-file-image"></i> <%= truncate(dispatch_doc.document_file_name, length: 15) %>
+			<% end %>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+	<% end %>
+</div>
+
+<script>
+	$('#dispatch-form input').on('change', function() {
+		if ($("#dispatch-form").valid()) {
+			$('#send-dispatch').prop('disabled', false);  
+			$("#dispatch_guide_documents-error-out").addClass("hidden");
+		} else {
+			$('#send-dispatch').prop('disabled', 'disabled');
+			if(($("#dispatch_guide_documents").get(0).files.length === 0)) {
+				$("#dispatch_guide_documents-error").addClass("hidden");
+				$("#dispatch_guide_documents-error-out").removeClass("hidden");
+			}
+		}
+	});
+	$(document).ready(function(){
+		$('#quotation_estimated_dispatch_date').daterangepicker({
+			singleDatePicker   : true,
+			showDropdowns      : true,
+			autoUpdateInput    : true,
+			drops              : "up",
+			applyButtonClasses : "btn btn-small",
+			cancelClass        : "btn btn-flat btn-small",
+			locale: {
+				format      : 'DD/MM/YYYY',
+				applyLabel  : "Aplicar",
+				cancelLabel : "Limpiar",
+				daysOfWeek  : [
+				"Do",
+				"Lu",
+				"Ma",
+				"Mi",
+				"Ju",
+				"Vi",
+				"Sa"
+				],
+				monthNames  : [
+				"Enero",
+				"Febrero",
+				"Marzo",
+				"Abril",
+				"Mayo",
+				"Junio",
+				"Julio",
+				"Agosto",
+				"Septiembre",
+				"Octubre",
+				"Noviembre",
+				"Diciembre"
+				]
+			}
+		});
+	});
+</script>
+<% else %>
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="bold secondary-text">Información Despacho</p>
+		</div>
+	</div>
+	<div class="row padding-row">
+		<div class="col-xs-4">
+			<p class="bold title-input"><b>N° Guía de Despacho</b></p>
+			<p class="content-input"><%= @quotation.try(:dispatch_guide)%></p>
+		</div>
+		<div class="col-xs-4">
+			<p class="bold title-input"><b>Fecha de Despacho</b></p>
+			<p class="content-input"><%= @quotation.try(:estimated_dispatch_date).try(:strftime, "%d/%m/%Y") %></p>
+		</div>
+	</div>
+	<div class="row padding-row">
+		<% if @quotation.dispatch_guides.size > 0 %>
+		<div class="col-md-6 col-xs-12">
+			<p class="bold title-input"><b>Guía de Despacho</b></p>
+			<% @quotation.dispatch_guides.each do |dispatch_doc| %>
+			<%= link_to dispatch_doc.document.url(:original), class: 'btn btn-miele mini-top-space', target: "_blank" do %>
+			<i class="fa fa-file-image"></i> <%= truncate(dispatch_doc.document_file_name, length: 15) %>
+			<% end %>
+			<% end %>
+		</div>
+		<% end %>
+	</div>
+</div>
+<% end %>

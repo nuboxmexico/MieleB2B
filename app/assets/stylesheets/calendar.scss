@@ -1,0 +1,72 @@
+@import "variables";
+
+.daterangepicker {
+  th.month { cursor: default !important; }
+  .drp-buttons {
+    text-align:  center            !important;
+    .cancelBtn { margin: 0         !important; }
+    .applyBtn  { margin-left: 14px !important; }
+  }
+  td.active       { background-color: $brand-primary !important; }
+  td.active:hover { background-color: $grey-selection !important; }
+  td:hover        { background-color: $grey-selection !important; }
+  -webkit-box-shadow: 3px 3px 8px 0 rgba(0, 0, 0, 0.1);
+          box-shadow: 3px 3px 8px 0 rgba(0, 0, 0, 0.1);
+  select.monthselect { margin-left: -1.40% !important; }
+  select.monthselect, select.yearselect, select.hourselect, select.minuteselect {
+    width: auto !important;
+    background-color: $grey-selection;
+    border: none;
+    padding: 4px !important;
+    font-weight: 400;
+    color: black;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    outline: none;
+  }
+}
+
+.ticket-calendar-small{
+  padding-right: 15px;
+  float: left;
+  width: 93px;
+  .icon-google-calendar{
+    color: $brand-primary;
+    font-size: 3.5rem;
+    line-height: 0;
+  }
+}
+
+.scheduled-visit{
+  width: calc(100% - 93px);
+  float: right;
+  input{
+    height: 40px;
+    width: 100%;
+  }
+}
+
+.calendar-label{ display: block; }
+.calendar-label-mini{ display: none; }
+
+@media screen and (max-width:490px){
+  .daterangepicker{ left: 12% !important; }
+  .daterangepicker.opensright:before { left: 119px !important; }
+  .daterangepicker.opensright:after  { left: 120px !important; }
+  .ticket-calendar-small{ width: 64px !important; }
+  .scheduled-visit{ width: calc(100% - 64px) !important; }
+  .calendar-label{ display: none; }
+  .calendar-label-mini{ display: block; }
+}
+
+@media screen and (max-width:382px){
+  .daterangepicker{ left: 6% !important; }
+}
+
+@media screen and (max-width:767px){
+  .ticket-calendar-small{ margin-bottom: 15px !important; }
+}
+
+.daterangepicker td.active:hover{
+  background: $brand-primary!important;
+}

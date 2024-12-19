@@ -1,0 +1,55 @@
+<% if @quotation.delivery_type == 'dispatch'%>
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> deben ser despachados en su totalidad.
+</p>
+<ul>
+	<% @quotation.quotation_products.availables.each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>
+<p>
+	Puedes revisar los comprobantes de pago y rendiciones en el <%= link_to 'siguiente enlace.', quotation_url(@quotation) %>
+</p>
+<% elsif @quotation.delivery_type == 'retirement'%>
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron retirados el día <%= Date.today.strftime("%d/%m/%Y") %> en su totalidad.
+</p>
+<ul>
+	<% @quotation.quotation_products.availables.each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>
+<p><b>N° de V1: </b><%= @quotation.v1 %></p>
+<p>
+	Puedes revisar los comprobantes de pago en el <%= link_to 'siguiente enlace.', quotation_url(@quotation) %>
+</p>
+<% else %>
+<p>
+	Los siguientes artículos: 
+</p>
+<ul>
+	<% @quotation.quotation_products.to_retire.each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>
+<p>
+	Pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron retirados el día <%= Date.today.strftime("%d/%m/%Y") %> en su totalidad.
+</p>
+<p>
+	<ul>
+		<li>N° de V1 correspondiente: <b><%= @quotation.v1 %></b></li>
+	</ul>
+</p>
+<p>Y los siguientes productos:</p>
+<ul>
+	<% @quotation.quotation_products.to_dispatch.each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>
+<p>
+	Deben ser despachados.
+</p>
+<p>
+	Puedes revisar los comprobantes de pago y nota de venta en el <%= link_to 'siguiente enlace.', quotation_url(@quotation) %>
+</p>
+<% end %>

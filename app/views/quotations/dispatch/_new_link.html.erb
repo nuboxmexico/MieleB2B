@@ -1,0 +1,24 @@
+<% if @detail_quotation_products.length > 0 %>
+  <div class="add-dispatch-group-container">
+      <%= link_to new_dispatch_group_path(@quotation, detail_quotation_products:""), id: 'add-dispatch-group', :onclick => "setDisabled()", remote: true, method: :post do %>
+          <i class="fa fa-plus"></i> Nuevo envío
+      <% end %>
+  </div>
+<% end %>
+
+
+<script>
+
+function setDisabled(){
+  var old = document.getElementById('add-dispatch-group').href;
+  var inputs = document.getElementsByClassName("input-checkBox");
+  var ids = ""
+  for (var i = 0;i<inputs.length;i++) {
+    if(inputs[i].checked){
+      ids = ids + inputs[i].value+",";
+    }
+    inputs[i].disabled = true;
+  }
+  document.getElementById('add-dispatch-group').href=old+ids; 
+} 
+</script> 

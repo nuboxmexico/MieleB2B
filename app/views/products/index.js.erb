@@ -1,0 +1,27 @@
+<% if @products.any? %>
+  <% if @destroy %>
+    $('#products').html("");
+  <% end %>
+  <% @products.each do |product| %>
+    $('#products').append("<%= j render partial: 'products/product', locals: { product: product } %>");
+  <% end %>
+<% else %>
+  $('#products').html("");
+<% end %>
+
+$('#catalog-preloader').addClass("hidden");
+<% if @products.next_page %>
+  $('#infinite-scrolling').html("");
+  $('#infinite-scrolling').append("<%= j will_paginate @products %>");
+<% else %>
+  $('.pagination').remove();
+<% end %>
+homologateBoxHeights(".card");
+
+$(".check-item").change(function(){
+	if($(this).prop('checked')){
+		$.post('/comparator/add/'+$(this).val()+'.js');
+	} else{
+		$.post('/comparator/remove/'+$(this).val()+'.js');
+	}
+});

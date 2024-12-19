@@ -1,0 +1,34 @@
+<div class="product-inputs row">
+  <h4>Producto <%= tag_id + 1 %></h4>
+  <div class="form-group col-xs-12">
+    <%= label_tag :name, 'Nombre' %>
+    <%= text_field_tag "lead[products_attributes][#{tag_id}][name]", product.name, class: 'field-bordered', required: true %>
+  </div>
+  <div class="form-group col-xs-12 col-sm-4">
+    <%= label_tag :sku, 'TNR' %>
+    <%= text_field_tag "lead[products_attributes][#{tag_id}][sku]", product.sku, class: 'field-bordered', required: true %>
+  </div>
+  <div class="form-group col-xs-12 col-sm-4">
+    <%= label_tag :quantity, 'Cantidad' %>
+    <%= number_field_tag "lead[products_attributes][#{tag_id}][quantity]", product.quantity, class: 'field-bordered product-quantity', min: 1 %>
+  </div>
+  <div class="form-group col-xs-12 col-sm-4">
+    <%= label_tag :unit_price, 'Precio' %>
+    <%= text_field_tag "lead[products_attributes][#{tag_id}][unit_price]", number_with_delimiter(product.unit_price), class: 'field-bordered product-price' %>
+  </div>
+  <%= hidden_field_tag "lead[products_attributes][#{tag_id}][id]", product.id %>
+
+  <div class="form-group col-xs-12 col-sm-4">
+    <label>Total Neto</label>
+    <p class="currency total-net-price" data-currency="<%= currency %>"></p>
+  </div>
+  <div class="form-group col-xs-12 col-sm-4">
+    <label>Total IVA</label>
+    <p class="currency total-tax-value" data-currency="<%= currency %>"></p>
+  </div>
+  <div class="form-group col-xs-12 col-sm-4">
+    <label>Total IVA + Total neto</label>
+    <p class="currency total-price" data-currency="<%= currency %>"></p>
+  </div>
+</div>
+<div class="row line-hr"></div>

@@ -1,0 +1,125 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html class="ie ie6" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if gt IE 9]><!--><html lang="<%= I18n.locale %>"><!--<![endif]-->
+<head>
+  <% if Rails.env.staging? %>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WQV4LNK');</script>
+<!-- End Google Tag Manager -->
+<% elsif Rails.env.production? %>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P96XJCC');</script>
+<!-- End Google Tag Manager -->
+<% end %>
+<%= csrf_meta_tags %>
+<%= csp_meta_tag %>
+<meta charset="utf-8">
+<title>Miele</title>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />  
+<%= stylesheet_link_tag    'application', media: 'all' %>
+<%= javascript_include_tag 'application' %>
+<% if !Rails.env.production? %>
+  <meta name="robots" content="noindex">
+<% end%>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://miele-assets.s3.amazonaws.com/highcharts/highcharts.js"></script>
+<script src="https://miele-assets.s3.amazonaws.com/highcharts/drilldown.js"></script>
+<script src="https://miele-assets.s3.amazonaws.com/highcharts/exporting.js"></script>
+<script src="https://miele-assets.s3.amazonaws.com/highcharts/export-data.js"></script>
+<script src="https://miele-assets.s3.amazonaws.com/highcharts/accessibility.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<%= favicon_link_tag asset_path('favicon.ico') %>
+</head>
+
+<% if user_signed_in? and session[:can_navigate] %>
+<body class="hold-transition sidebar-mini sidebar-mini-expand-feature sidebar-collapse">
+  <% if Rails.env.staging? %>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQV4LNK"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <% elsif Rails.env.production? %>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P96XJCC"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+      <!-- End Google Tag Manager (noscript) -->
+      <% end %>
+      <% if !Rails.env.test? %>
+      <section class="loader-page" align="center">
+        <div class="gif-loader">
+          <p class="miele-loader">Miele. Immer Besser</p> 
+        </div>
+      </section> 
+      <% end %>
+      <% unless flash.empty? %>
+      <script type="text/javascript">
+        <% flash.each do |f| %>
+        <% type = f[0].to_s.gsub('alert', 'error').gsub('notice', 'info') %>
+        $(".toast-bottom-right-custom").remove();
+        toastr['<%= type %>']('<%= f[1] %>').attr('style', 'width: 400px; font-size: 1.7rem;');
+        <% end %>
+      </script>
+      <% end %>
+      <!--p class="notice"><%= notice %></p>
+        <p class="alert"><%= alert %></p-->
+          <div class="wrapper">
+            <%= render 'layouts/header' %>
+            <%= render 'layouts/sidebar' %>
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper <%= (params[:controller] == 'products' and params[:action] == 'show') ? 'white-background' : '' %>">
+              <main class="container"><%= yield %>
+              </main>
+            </div>
+            <!-- /.content-wrapper -->  
+          </div>
+          <!-- ./wrapper -->
+        </body>
+        <% else %>
+        <body class="hold-transition">
+          <% if Rails.env.staging? %>
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQV4LNK"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <!-- End Google Tag Manager (noscript) -->
+            <% elsif Rails.env.production? %>
+            <!-- Google Tag Manager (noscript) -->
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P96XJCC"
+              height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+              <!-- End Google Tag Manager (noscript) -->
+              <% end %>
+              <% unless flash.empty? %>
+              <script type="text/javascript">
+                <% flash.each do |f| %>
+                <% type = f[0].to_s.gsub('alert', 'error').gsub('notice', 'info') %>
+                $(".toast-bottom-right-custom").remove();
+                toastr['<%= type %>']('<%= f[1] %>').attr('style', 'width: 400px; font-size: 1.7rem;');
+                <% end %>
+              </script>
+              <% end %>
+              <!-- login -->
+              <div class="row main-login fade-in">
+                <div class="col-md-7 col-lg-8 hidden-xs hidden-sm login-image"></div>
+                <div class="col-md-5 col-lg-4 text-center">
+                  <%= image_tag('logo.png', alt: 'miele', class: 'logo-miele')%>
+                  <%= yield %>
+                </div>
+              </div>
+            </body>
+            <% end %>
+            </html>

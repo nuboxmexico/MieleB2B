@@ -1,0 +1,361 @@
+<div class="quotation-box text-center">
+	<div class="row hidden-xs hidden-sm text-center">
+		<div class="col-md-2 title-products title-input">
+			Imagen
+		</div>
+		<div class="col-md-2 title-products title-input">
+			Nombre
+		</div>
+		<div class="col-md-1 title-products title-input">
+			TNR
+		</div>
+		<div class="col-md-1 title-products title-input">
+			Cantidad
+		</div>
+		<div class="col-md-2 title-products title-input">
+			Precio Lista
+		</div>
+		<div class="col-md-1 title-products title-input">
+			Precio Propuesto
+		</div>
+		<div class="col-md-1 title-products title-input">
+			Margen
+		</div>
+		<div class="col-md-2 title-products title-input">
+			Sub Total
+		</div>
+	</div>
+	<div class="line-row hidden-xs hidden-sm"></div>
+
+	<% @quotation.quotation_products.availables.order(is_service: :asc, id: :asc).each_with_index do |item, counter| %>
+		<div class="row text-center product-row">
+			<%= hidden_field_tag "id", item.id %>
+			<div class="col-md-2 col-xs-12 title-products">
+				<%= image_tag(item.product.get_product_photo, alt: 'producto', class:'image-cart') %>
+			</div>
+			<div class="col-md-2 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">Nombre</p>
+				<p class="content-input"><%= item.product.name %></p>
+			</div>
+			<div class="col-md-1 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">TNR</p>
+				<p class="content-input"><%= item.product.sku %></p>
+			</div>
+			<div class="col-md-1 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">Cantidad</p>
+				<% if can? :create_new_version, @quotation  and !item.is_service%>
+					<%= render 'quotations/products/edit_quantity', item: item %>
+				<% else %>
+					<p class="content-input cart-item-quantity"><%= item.quantity %></p>
+					<%= hidden_field_tag "quantity", item.quantity %>
+				<% end %>
+			</div>
+			<div class="col-md-2 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">Precio Lista</p>
+				<p class="content-input">
+					<span class="currency-change" data-currency="uf">
+						<%= number_with_delimiter(euro_to_UF(item.product.price_eur).round(2)) %>
+					</span>
+				</p>
+			</div>
+			<div class="col-md-1 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">Precio Propuesto</p>
+				<p class="content-input">
+					<% if can? :create_new_version, @quotation  and !item.is_service%>
+						<span id="span_price_<%= item.id %>"> 
+							<%= text_field_tag "price", number_with_delimiter(item.price), class: "item-price-input field-bordered", onblur: "updatePrice(#{item.id})" %>
+						</span>
+					<% else %>
+						<span class="price-quotation currency-change" data-currency="uf">
+							<%= number_with_delimiter(item.price.round(2)) %>
+						</span>
+						<%= hidden_field_tag 'price', item.price %>
+					<% end %>
+				</p>
+			</div>
+
+			<div class="col-md-1 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">Margen</p>
+				<p class="content-input">
+					<span id="quotation_product_margen_<%= item.id %>">
+						<% if @quotation.for_project? %>
+							<%= number_with_delimiter(@quotation.calculate_margen_percent(item).round(2)) %>%
+						<% end %>
+					</span>
+				</p>
+			</div>
+
+			<div class="col-md-2 col-xs-6 title-products">
+				<p class="hidden-lg hidden-md bold title-input">Sub Total</p>
+				<p class="content-input">
+					<span class="price-quotation currency-change" data-currency="uf">
+						<%= number_with_delimiter((item.price * item.quantity).round(2)) %>
+					</span>
+
+					<% if can? :create_new_version, @quotation %>
+						<%= link_to 'X', remove_quotation_product_path(item, in_current_version: "true"), method: :delete, class: "miele-gray-text remove-product no-loader" %>
+					<% end %>
+				</p>
+			</div>
+			<% if can? :create_new_version, @quotation %>
+				<div class="col-xs-12 hidden-md hidden-lg">
+					<%= link_to 'Eliminar', remove_quotation_product_path(item, in_current_version: "true"), method: :delete, class: "miele-gray-text btn btn-miele no-loader" %>
+				</div>
+			<% end %>
+		</div>
+		<div class="line-row hidden-lg hidden-md"></div>
+	<% end %>
+
+	<% if @quotation.quotation_products.availables.empty?  %>
+		<div class="mtop-3">
+			<h5>A&uacute;n no tienes productos asociados a tu cotizaci&oacute;n</h5>
+		</div>
+	<% end %>
+
+	<% if can? :create_new_version, @quotation %>
+		<div class="row">
+			<div class="col-xs-12 add-product-link">
+				<a role="button" data-toggle="collapse" href="#add-product-form" aria-expanded="false" aria-controls="add-product-form">
+					<i class="fa fa-plus"></i> Nuevo Producto
+				</a>
+			</div>
+		</div>
+	<% end %>	
+</div>
+
+<% if can? :create_new_version, @quotation %>
+	<div class="collapse quotation-box" id="add-product-form">
+		<%= form_for QuotationProduct.new, html: {id: 'new-product-to-project-quotation-form'} do |f| %>
+			<div class="form-inputs">
+				<div class="form-group">
+					<%= f.label :name, 'Nombre' %>
+					<%= f.text_field :name, class: 'field-bordered', required: true %>
+					<p class="invalid-alert hidden">Se debe indicar el nombre del nuevo producto</p>
+				</div>
+				<div class="form-group">
+					<%= f.label :sku, 'TNR' %>
+					<%= f.text_field :sku, class: 'field-bordered', id: 'new-quotation-product-tnr', required: true, data: {quotation_id: @quotation.id} %>
+					<p class="invalid-alert hidden">Se debe indicar el sku del nuevo producto</p>
+				</div>
+				<div class="form-group">
+					<%= f.label :quantity, 'Cantidad' %>
+					<%= f.number_field :quantity, class: 'field-bordered', required: true %>
+				</div>
+				<div class="form-group">
+					<%= f.label :price, 'Precio' %>
+					<%= f.text_field :price, class: 'field-bordered item-price-input', required: true %>
+				</div>
+			</div>
+
+			<div class="form-actions">
+				<%= hidden_field_tag :quotation_id, @quotation.id %>
+
+				<%= f.submit 'Agregar Producto', class: 'btn btn-miele', id: 'new-product-to-project-quotation-submit' %>
+			</div>
+		<% end %>
+	</div>
+<% end %>
+<!-- Nueva zona --->
+	
+	<div id="installation_box_zone">
+		<%= render partial: 'quotations/show/instalation_box', locals: { quotation: @quotation } %>
+	</div>
+
+	<!-- Unidades inmobiliarias -->
+	<div id="instalation-div" >
+		<div id="new_link_button">
+			<br>
+			<%= render 'quotations/show/new_link' %>
+		</div>
+	<br>
+		<div id="all_new_unit_real_state" value="0">
+		</div>
+		
+		<div id="all_unit_real_state" value="0">
+			<%= render partial: 'quotations/show/all_unit_real_state', locals: { quotation: @quotation } %>
+		</div>
+
+	</div>
+	 <!-- Grupos de envío -->
+	<br>
+	<div class="row">
+		<div class="col-md-6 col-xs-12">
+			<p class="title-box-checkout dispatch-group-title">Grupos de envío</p>
+		</div>
+
+		<div class="col-md-6 col-xs-12">
+			<div id="dispatch_stats_partial">
+				<%= render partial: 'quotations/show/dispatch_stats', locals: {quotation: @quotation} %>
+			</div>
+		</div>
+	</div>
+	<br>
+	<div id="dispatch-groups-project-container">
+		<%= render partial: 'quotations/show/dispatch_groups_project_container', locals: {quotation: @quotation} %>		
+	</div>
+	<div id="new_dispatch_group_box">
+	</div>
+
+	<div>
+		<%= render 'quotations/show/modal_dispatch_project' %>
+	</div> 
+
+	<div id="new_dispatch_group_button">
+		<%= render 'quotations/show/new_link_project' %>
+	</div>
+<!-- FIn nueva zona -->
+<div class="row">
+	<div class="col-md-7 col-xs-12">
+		<br>
+		<div style="display: flex; justify-content: space-between; align-items: center;">
+        	<p class="title-box-checkout" style="font-size: 20px !important;">Configurar Unidades Inmobiliarias</p> 
+            
+			<div id="new_link_button">
+            	<%= render 'quotations/show/new_config_link' %>
+            </div>
+
+		</div>
+		<br>
+        
+
+		<div id="all_new_config_unit_real_state" value="0">
+		</div>
+
+		<div id="all_config_unit_real_state" value="0">
+			<%= render partial: 'quotations/show/all_config_unit_real_state', locals: { quotation: @quotation } %>
+		</div>
+
+		<div>
+			<%= render 'quotations/modal_config_unit_real_state' %>
+		</div>
+
+    </div>
+
+    <div class="col-md-5 col-xs-12 bot-detail">
+		<div class="row detail-quotation">
+			
+			<div class="col-md-12 col-xs-12">
+				<div id="glosa_project">
+					<%= render partial: 'quotations/totals_project', locals: { quotation: @quotation } %>
+				</div>
+			</div>
+
+		</div>
+	
+		<br>
+		<div class="row">
+			<% if can? :delete_version, @quotation and !@quotation.valid_quotation %>
+				<div class="col-xs-12 bot-detail">
+					<button id="delete-version" class="btn btn-miele pull-right" data-url="<%= delete_version_path(@quotation) %>">
+						Eliminar
+					</button>
+				</div>
+			<% end %>
+			
+			<% if can? :create_new_version, @quotation %>
+				<div class="col-xs-12 bot-detail">
+					<button id="save-product-changes" class="btn btn-miele pull-right" data-url="<%= new_version_path(@quotation) %>">
+						Crear nueva versi&oacute;n
+					</button>
+				</div>
+			<% end %>
+		</div>
+	
+	</div>
+
+</div>
+
+<script>
+
+// Clone Config Unit Real States
+async function clone(unitId) {
+	const timesToCloneElem = document.querySelector(`#clonetimes_${unitId}`);
+	const timesToClone = parseInt(timesToCloneElem.value);
+
+	if (!isNaN(timesToClone)) {
+		if (await allowClone(unitId, timesToClone)) {
+			const data = { config_unit_id: unitId, times_to_clone: timesToClone };
+			$.ajax({
+				url: "/clone_unit",
+				type : 'post',
+				data: data
+			}).done(function (data) {
+			})
+		} else {
+			swal({
+				title: "Alerta",
+				text: 'No es posible clonar esta unidad inmobiliaria debido a que uno o más productos ya no tienen más unidades por asignar.',
+				type: "warning",
+				showCancelButton: false,
+				confirmButtonText: "Cerrar",
+				cancelButtonText: "Cancelar"
+			});
+		}
+	} else {
+		swal({
+			title: "Datos insuficientes",
+			text: 'Es necesario que ingrese el número de veces que desea clonar la unidad inmobiliaria.',
+			type: "warning",
+			showCancelButton: false,
+			confirmButtonText: "Cerrar",
+			cancelButtonText: "Cancelar"
+		});
+	}
+}
+
+async function allowClone(unitId, timesToClone) {
+	const quantityOriginElems = document.querySelectorAll(`.quantityorigin_${unitId}`);
+	let isAllowed = true;
+
+	await asyncForEach(quantityOriginElems, async (item) => {
+		const htmlId = item.id
+		const quotProdId = parseInt(htmlId.split('_')[1]);
+		const quantityOrigin = parseInt(item.innerText);
+		const quantityNeeded = quantityOrigin * timesToClone;
+		const response = await getToAssignQuant(quotProdId);
+		if (response) {
+			const quantityAvailable = response.quantity;
+			if (quantityNeeded > quantityAvailable) {
+				isAllowed = false;
+			}
+		}
+	})
+	return isAllowed;
+}
+
+async function getToAssignQuant(quotProdId) {
+	const result = await fetch(`${window.location.origin}/get_updated_to_assign_quantity/${quotProdId}`)
+		.then(response => response.json())
+		.then(data => {
+			return data;
+		})
+		.catch(error => { return null });
+	return result;
+	}
+
+async function asyncForEach(array, callback) {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index, array);
+	}
+}
+
+
+// Quotation Products
+function updatePrice(quotProdId) {
+  var priceElem = document.querySelector(`#span_price_${quotProdId} #price`);
+  var price = Number(priceElem.value).toFixed(2);
+
+  if (!isNaN(price) && price > 0) {
+    var data = { new_price: price };
+
+    $.ajax({
+      url: `/quotation_products/${quotProdId}/update_price`,
+      type: 'patch',
+      data: data
+    })
+    .done(function (data) {
+    });
+  }  
+}
+
+</script>

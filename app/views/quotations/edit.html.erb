@@ -1,0 +1,161 @@
+<script>
+	<% if Product.where(id: @cart.cart_items.pluck(:product_id)).where(built_in: true).size > 0 %>
+	var start_calendar = moment('<%= (Date.today + 60.days).strftime("%d/%m/%Y") %>', 'DD/MM/YYYY');
+	<% else %>
+	var start_calendar = moment();
+	<% end %>
+</script>
+<div class="row">
+	<div class="col-xs-12 top-both">
+		<%= link_to '<i class="fa fa-chevron-left"></i>Volver'.html_safe, cart_path, class: 'btn-goback top-space' %>
+	</div>
+	<div class="col-xs-12 bot-space no-left">
+		<h1 class="bold">Editar cotización <%= @quotation.code %></h1>
+	</div>
+
+	<%= form_for(@quotation, html: { class: 'bform'}) do |form| %>
+	<%= hidden_field_tag 'edit', true %>
+	<div class="col-lg-12 col-xs-12 no-right no-left">
+		<div class="card-shadow">
+			<div class="card-shadow-head">
+				<div class="row">
+					<div class="col-sm-2 col-xs-6">
+						<p class="title-data"><b>Fecha</b></p>
+						<p class="text-data"><%= Time.now.strftime('%d/%m/%Y') %></p>
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<p class="title-data"><b>ID Rol</b></p>
+						<p class="text-data"><%= current_user.miele_role.try(:code) %></p>
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<p class="title-data"><b>Nombre Completo</b></p>
+						<p class="text-data"><%= current_user.try(:fullname)%></p>
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<p class="title-data"><b>Rol</b></p>
+						<p class="text-data"><%= current_user.try(:role_name)%></p>
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<p class="title-data"><b>Correo Contacto</b></p>
+						<p class="text-data"><%= current_user.try(:email)%></p>
+					</div>
+					<div class="col-sm-2 col-xs-6">
+						<p class="title-data"><b>Teléfono Contacto</b></p>
+						<p class="text-data"><%= current_user.try(:phone)%></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-8 col-xs-12 no-pad bot-space">
+		<div class="box-cart-left pad-box no-right-box">
+			<%= render quotation_form_by_role, form: form %>
+		</div>
+	</div>
+	<!-- TOTAL -->
+	<div class="col-lg-4 col-xs-12 no-pad">
+		<%= render 'totals', currency: @quotation.currency %>
+		<div class="col-xs-12">
+			<div class="text-left top-both text-light bot-space" data-toggle='tooltip' title='Al seleccionar esta opción estarás creando una nueva cotización.'>
+				<p>Duplicar cotización <i class="fa fa-question-circle"></i></p>
+				OFF 
+				<label class="switch" id="toggle-duplicate">
+					<input type="checkbox" name="duplicate_quotation">
+					<span class="slider round"></span>
+				</label>
+				ON
+				<br>
+			</div>
+		</div>
+		<div class="row top-space text-right bot-space top-space">
+			<div class="col-xs-12">
+				<%= button_tag(type: "submit", id: "submit-quotation", class: 'btn btn-miele', disabled: true) do %>
+				Generar
+				<% end %>
+			</div>
+		</div>
+	</div>
+	<% end %>
+</div>
+</div>
+
+<script type="text/javascript">
+	var is_rm = true;
+	$(document).ready(function(){
+		$("#show_installation_price").addClass("hidden")
+		$("#show_dispatch_price").addClass("hidden")
+
+		$('#quotation_estimated_dispatch_date').datetimepicker({
+			format      : 'DD/MM/YYYY',
+			minDate: start_calendar,
+			locale: 'es'
+		});
+		$('#quotation_installation_date').datetimepicker({
+			format      : 'DD/MM/YYYY',
+			minDate: start_calendar.add(3, 'days'),
+			locale: 'es'
+		});
+		$('#quotation_retirement_date').datetimepicker({
+			format      : 'DD/MM/YYYY',
+			minDate: moment(),
+			locale: 'es'
+		});
+		$("#quotation_estimated_dispatch_date").on("dp.change", function (e) {
+			$('#quotation_installation_date').data("DateTimePicker").minDate(e.date.add((is_rm ? 3 : 5), 'days'));
+		});
+		$('#quotation_dispatch_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+		$('#quotation_personal_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+		$('#quotation_instalation_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+		$('#quotation_billing_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+		$("#quotation_partner_referred_id").select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+
+		$('#quotation_dispatch_commune_id').trigger('change');
+		$('#quotation_personal_commune_id').trigger('change');
+		$('#quotation_instalation_commune_id').trigger('change');
+		$('#quotation_billing_commune_id').trigger('change');
+		$("#quotation_partner_referred_id").trigger('change');
+	});
+
+	function ValidateSelec2(field) {
+		if ($('#quotation_' + field + '_commune_id').val() ==  "") {
+			$('#submit-quotation').prop("disabled", true);
+			$('#' + field + '-commune-content').find('.selec2-error').addClass('show');
+			$('#' + field + '-commune-content').children('.form-group').addClass('has-error');
+			$('#' + field + '-commune-content').children('.form-group').removeClass('has-success');
+		} else {
+			$('#' + field + '-commune-content').find('.selec2-error').removeClass('show');
+			$('#' + field + '-commune-content').children('.form-group').addClass('has-success');
+			$('#' + field + '-commune-content').children('.form-group').removeClass('has-error');
+			$('#submit-quotation').prop("disabled", false);
+		}
+	}
+
+	$(".bform").change(function(){
+		ValidateSelec2('dispatch');
+		ValidateSelec2('personal');
+		ValidateSelec2('instalation');
+		if($("#document-type").val() == 'factura'){
+			ValidateSelec2('billing');
+		}
+		if($(this).valid() && ($('.bform').find('.has-error').length == 0)){
+			$('#submit-quotation').prop("disabled", false);
+		} else {
+			$('#submit-quotation').prop("disabled", true);
+		}
+	});
+
+	$(".bform").submit(function(e){
+		ValidateSelec2('dispatch');
+		ValidateSelec2('personal');
+		ValidateSelec2('instalation');
+		if($("#document-type").val() == 'factura'){
+			ValidateSelec2('billing');
+		}
+		if ($('.bform').valid() && ($('.bform').find('.has-error').length == 0)) {
+		} else {
+			$('#submit-quotation').prop("disabled", true);
+			e.preventDefault();
+		}
+	});
+
+</script>

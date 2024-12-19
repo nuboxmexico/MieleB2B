@@ -1,0 +1,92 @@
+<div class="row">
+  <%= form_for @lead, html: { class: 'lead-form normal-alert panel-heading' } do |f| %>
+    <div class="form-group col-sm-6 col-xs-12">
+      <%= f.label :name, 'Nombre del Lead', class: 'required' %>
+      <%= f.text_field :name, class: 'field-bordered', required: true %>
+    </div>
+    <div class="form-group col-sm-6 col-xs-12">
+      <%= f.label :real_state_name, 'Nombre Inmobiliaria' %>
+      <%= f.text_field :real_state_name, class: 'field-bordered' %>
+    </div>
+    <div class="form-group col-sm-6 col-xs-12">
+      <%= f.label :project_address, 'Dirección del proyecto' %>
+      <%= f.text_field :project_address, class: 'field-bordered' %>
+    </div>
+    <div class="form-group col-sm-6 col-xs-12">
+      <%= f.label :start_date_estimated, 'Fecha estimada de inicio' %>
+      <%= f.text_field :start_date_estimated, class: 'field-bordered date-picker', value: (@lead.start_date_estimated.strftime('%d/%m/%Y') if @lead.start_date_estimated) %>
+    </div>
+    <div class="form-group col-sm-6 col-xs-12">
+      <%= f.label :contacts, 'Contactos' %>
+      <%= f.text_area :contacts, rows: 10, class: 'field-bordered full-width padding-text-area tinymce' %>
+    </div>
+    <div class="form-group col-sm-6 col-xs-12">
+      <%= f.label :observations, 'Observaciones' %>
+      <%= f.text_area :observations, rows: 10, class: 'field-bordered full-width padding-text-area tinymce' %>
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-4">
+      <%= f.label :status, 'Estado' %>
+      <%= f.select :status, Lead.status_options.except(:in_negotiation).to_a.map{|c| c.reverse}, {}, { class: 'field-bordered form-control' } %>
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6 col-sm-offset-2">
+      <%= f.label :attachments, 'Adjuntos' %>
+      <div class="file-field backup-images input-field">
+        <div class="file-drop-area dashed-border">
+          <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+          <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+          <input type="file" name="backup_images[]" multiple="true" accept="image/jpeg, image/png, image/jpg" class="file-input">
+          <%= f.file_field :attachments, multiple: true, class: 'file-input' %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row line-hr"></div>
+
+    <div class="products">
+      <h3>Productos</h3>
+      <div class="row">
+        <div class="form-group col-xs-12 col-sm-4">
+          <%= f.label :currency, 'Moneda' %>
+          <%= f.select :currency, Lead.currency_options.to_a.map{|c| c.reverse}, { }, { class: 'field-bordered form-control', id: 'lead-currency' } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row line-hr"></div>
+    
+    <div class="products">
+      <div id="product-inputs-container">
+        <% @lead.products.each_with_index do |product, counter| %>
+          <%= render partial: 'product_inputs', locals: {product: product, tag_id: counter, currency: @lead.currency} %>
+        <% end %>
+      </div>
+      <%= link_to '#', id: 'add-product' do %>
+        <i class="fas fa-plus"></i> Agregar producto
+      <% end %>
+    </div>
+
+    <div id="lead-totals">
+      <div class="form-group col-xs-12 col-sm-4">
+        <label>Total Neto</label>
+        <p class="currency net-price" data-currency="<%= @lead.currency %>"></p>
+      </div>
+      <div class="form-group col-xs-12 col-sm-4">
+        <label>Total IVA</label>
+        <p class="currency tax-value" data-currency="<%= @lead.currency %>"></p>
+      </div>
+      <div class="form-group col-xs-12 col-sm-4">
+        <label>Total IVA + Total neto</label>
+        <p class="currency price" data-currency="<%= @lead.currency %>"></p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <%= f.submit 'Guardar', class: 'btn btn-miele' %>
+    </div>
+  <% end %>
+
+</div>
+
+<%= tinymce %>

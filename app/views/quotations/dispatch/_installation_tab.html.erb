@@ -1,0 +1,73 @@
+<div class="quotation-box padding-box products-pending-of-dispatch-container dispatch-group-container">
+  <%# <h4>Productos pendientes de envío</h4> %>
+  
+
+  <% if @installation_sheets.length > 0 %>
+    <div class="row">
+      <div class="col-xs-12">
+        <p class="title-input">Se ha creado un servicio de instalación por cada envío en Tickets con los siguientes Folios:
+        <% @installation_sheets.each do |sheet| %>
+          <span class="state-label expired-state"><%= sheet %></span> 
+        <% end %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="border-container mtop-3">
+  <div class=" row">
+    <div class="col-xs-12 col-md-4 text-center">
+      <p class="title-input">
+        Nombre
+      </p>
+    </div>
+    <div class="col-xs-12  col-md-2 text-center">
+      <p class="title-input">
+        TNR
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-1 text-center">
+      <p class="title-input">
+        ID
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-2 text-center">
+      <p class="title-input">
+        Estado
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-2 text-center">
+      <p class="title-input">
+        Fecha de Instalación
+      </p>
+    </div>
+    </div>
+    
+    <div class="product">
+      <% @to_install_detail_quotation_products.each do |detail, index| %>
+        <div class=" row">
+          <div class="col-xs-12 col-md-4 table-item-span">
+            <p><%= detail.name %></p>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <p><%= detail.tnr %></p>
+          </div>
+          <div class="col-xs-12 col-md-1 text-center table-item-span">
+            <p><%= detail.serial_id %></p>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <span><%= detail.state %></span>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <span><%= detail.instalation_date.blank? ? "no" : detail.instalation_date %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+    <div class=" row">
+    <div class="col-xs-12">
+      <p class="title-input" style="margin-top:20px;">¿Requiere activación? <%= @quotation.activation_confirm ? "Sí" : "No" %> </p>
+    </div>
+  </div>
+</div>

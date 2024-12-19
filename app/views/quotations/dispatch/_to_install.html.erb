@@ -1,0 +1,93 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id %>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4>
+        Instalación #<%= dispatch_group_counter + 1 %>
+        <%= get_state_label(dispatch_group.state, 'full') %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    <div class="collapse dispatch-to-install" id="<%= id %>" data-type="dispatch">
+      <%= form_for dispatch_group, url: dispatch_group_installation_path(dispatch_group), html: {multipart: true} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-sm-4">
+            <%= f.label :installation_date, 'Fecha estimada Instalación', class: 'full-width' %>
+            <%= f.text_field :installation_date, class: 'form-control field-bordered width-instalation inlineb date-picker', value: (dispatch_group.installation_date ? dispatch_group.installation_date.strftime('%d/%m/%Y') : nil), required: true, placeholder: 'DD/MM/AAAA' %>
+          </div>
+
+          <div class="col-xs-12 col-sm-8">
+            <label for="quotation[dispatch_type]" class="title-input">Tipo de Despacho</label>
+            <div class="less-bot">
+              <label class="thin-text radio-button" id="confirm">
+                <%= f.radio_button :installation_confirm, 'confirm', required: true, class: 'installation-confirm-option', data: {container_id: id} %>
+                <span class="label-visible space-radio-button">
+                  <span class="fake-radiobutton"></span>
+                  Instalación realizada conforme a cliente
+                </span>
+              </label>
+            </div>
+            <div>
+              <label class="thin-text radio-button" id="pending">
+                <%= f.radio_button :installation_confirm, 'pending', required: true, class: 'installation-confirm-option', data: {container_id: id} %>
+                <span class="label-visible space-radio-button">
+                  <span class="fake-radiobutton"></span>
+                  Instalación con observaciones
+                </span>
+              </label>
+            </div>
+
+          </div>
+
+          <div class="<%= dispatch_group.state.try(:name) == 'Instalación Pendiente' ? '' : 'hidden' %> pending-installation-note">
+            <div class="col-xs-12 col-sm-6">
+              <div class="form-group">
+                <%= f.fields_for :notes, dispatch_group.notes.instalation.last do |note_form| %>
+                  <%= note_form.label :observation, 'Observaciones', class: 'title-input' %>
+                  <%= note_form.text_area :observation, class: 'field-bordered full-width padding-text-area' %>
+                  <%= note_form.hidden_field :user_id, value: current_user.id %>
+                <% end %>
+              </div>
+              <%= render partial: 'quotations/dispatch/notes', locals: { notes: dispatch_group.notes, id: "to-install-note-#{dispatch_group_counter}" } %>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+              <label for="backup_images[]" class="title-input">Imágenes de respaldo</label>
+              <div class="file-field backup-images input-field">
+                <div class="file-drop-area dashed-border">
+                  <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+                  <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+                  <input type="file" name="backup_images[]" multiple="true" accept="image/jpeg, image/png, image/jpg" class="file-input">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+
+        <div class="products-container">
+          <div class="row">
+            <div class="col-xs-12">
+              <h5>Productos</h5>
+            </div>
+            <% dispatch_group.products_in_dispatch.order(product_id: :asc).each do |item| %>
+              <div class="col-xs-12 col-md-4">
+                <div class="product">
+                  <label><%= item.product.name_and_sku %></label>
+                  <span><%= item.quantity %></span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group actions-container text-right">
+              <% if (current_user.is_instalation? or current_user.is_manager_instalation?) %>
+                <%= f.submit 'Enviar', class: 'btn btn-miele inlineb top-save-instalation' %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

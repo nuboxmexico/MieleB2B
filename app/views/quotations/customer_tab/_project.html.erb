@@ -1,0 +1,5 @@
+<% if can? :create_new_version, @quotation %>
+  <%= render 'quotations/customer_tab/project/edit' %>
+<% else %>
+  <%= render 'quotations/customer_tab/project/show' %>
+<% end %>

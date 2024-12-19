@@ -1,0 +1,68 @@
+<div id="business-data" class="<%= 'hidden' unless @quotation.try(:document_type) %>">
+  <div id="bill-address-container" class="<%= 'hidden' if @quotation.document_type != 'factura' %>">
+    <div class="col-md-4 col-xs-12">
+      <%= form.label :business_name, 'Razón social', class: 'control-label' %>
+      <%= form.text_field :business_name, class: "field-bordered", placeholder: "Nombre" %>
+    </div>
+    <div class="col-md-4 col-xs-12">
+      <%= form.label :business_sector, 'Giro Comercial', class: 'control-label' %>
+      <%= form.text_field :business_sector, class: "field-bordered", placeholder: "Giro Comercial" %>
+    </div>
+    <div class="col-md-4 col-xs-12">
+      <%= form.label :business_rut, 'RUT Empresa', class: 'control-label' %>
+      <%= form.text_field :business_rut, class: "field-bordered", placeholder: "11111111-1" ,pattern: "[0-9]{1,2}[0-9]{3}[0-9]{3}-[0-9Kk]{1}", 'data-bv-regexp-message': 'RUT Inválido', oninput: "checkRut(this);" %>
+    </div>
+  </div>
+
+  <div class="col-md-2 col-xs-12">
+    <%= form.label :billing_address_street_type, 'Tipo', class: 'control-label' %>
+    <%= form.select :billing_address_street_type, options_for_select([ "Calle", "Avenida", "Pasaje", "Diagonal"]), { include_blank: 'Seleccione...' },  class: "select2-input" %>
+  </div>
+  <div class="col-md-3 col-xs-12">
+    <%= form.label :billing_address, 'Dir. Facturación', class: 'control-label' %>
+    <%= form.text_field :billing_address, required: true, class: "field-bordered", placeholder: "Dirección", label: "Direccion" %>
+  </div>
+  <div class="col-md-2 col-xs-12">
+    <%= form.label :billing_address_number, 'N°', class: 'control-label' %>
+    <%= form.text_field :billing_address_number, required: true, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+  </div>
+  <div class="col-md-2 col-xs-12">
+    <%= form.label :billing_dpto_number, 'Dpto', class: 'control-label' %>
+    <%= form.text_field :billing_dpto_number, class: "field-bordered", placeholder: "123" %>
+  </div>
+  <div class="col-md-3 col-xs-12">
+    <div class="select2-full-border" id="billing-commune-content">
+      <%= form.label :billing_commune_id, 'Comuna', class: 'control-label' %>
+      <%= form.select :billing_commune_id, options_for_select(Commune.all.collect{ |commune| [commune.name_with_region, commune.id] }, (@quotation ? @quotation.billing_commune_id : 0)), { include_blank: 'Seleccione una ...', required: true }, OnChange: "ValidateSelec2('billing')" %>
+      <small class="selec2-error help-block mtop-0">No puede estar vacío</small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div class="col-md-5 col-xs-12 text-light pt11">
+        <div class="checkbox no-top">
+          <label for="repeat-personal-billing" class="label-repeat">
+            <input type="checkbox" value="1" name="repeat" class="repeat-value" data-value="billing" data-from="personal" id="repeat-personal-billing"> 
+            <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+            Usar dirección personal
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% if @cart.cart_items.where(dispatch: true).size > 0 %>
+  <div class="row">
+    <div class="col-md-12 col-xs-12">
+      <div class="col-md-5 col-xs-12 text-light pt11">
+        <div class="checkbox no-top">
+          <label for="repeat-dispatch-billing" class="label-repeat">
+            <input type="checkbox" value="1" name="repeat" class="repeat-value" data-value="billing" data-from="dispatch" id="repeat-dispatch-billing"> 
+            <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+            Usar dirección de despacho
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>

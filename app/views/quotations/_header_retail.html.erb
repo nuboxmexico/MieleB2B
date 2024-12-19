@@ -1,0 +1,26 @@
+<div class="row">  
+	<div class="col-lg-12 col-xs-12 no-right no-left">
+		<div class="card-shadow margin-plus">
+			<div class="card-shadow-head" role="tab">
+				<div class="row">
+					<div class="col-sm-3 col-xs-3">
+						<p class="title-data"><b>Retail</b></p>
+						<p class="text-data"><%= @quotation.retail.name %></p>
+					</div>
+					<div class="col-sm-3 col-xs-3">
+						<p class="title-data"><b>Número F12</b></p>
+						<p class="text-data"><%= @quotation.try(:f12_number)%></p>
+					</div>
+					<div class="col-sm-3 col-xs-3">
+						<p class="title-data"><b>Fecha Emisión OC</b></p>
+						<p class="text-data"><%= @quotation.created_at.strftime("%d/%m/%Y") %></p>
+					</div>
+					<div class="col-sm-3 hidden-3s">
+						<p class="title-data"><b>Fecha Pactada Despacho</b></p>
+						<p class="text-data"><%= @quotation.try(:agreed_dispatch_date).try(:strftime, "%d/%m/%Y") %></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

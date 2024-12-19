@@ -1,0 +1,49 @@
+<div class="col-sm-6 col-md-4 col-lg-3 col-xs-6 text-center product-item">
+	<div class="card">
+		<% if product.display_price(current_user)[0] and !product.outlet and (product.ean != nil) %>
+			<span class="red-card-name left-card">
+				-<%= product.display_price(current_user)[2].try(:round) %>%
+			</span>
+		<% end %>
+		<% if !@bstock and (can? :add_product, Cart) %>
+			<div class="card-head">
+				<%= link_to '<i class="fas fa-cart-plus"></i>'.html_safe, add_product_to_cart_path(product), class: "product-add-icon transition #{!current_user.foreign? and product.can_supply? ? '' : 'custom-height-whitespace'}", method: :post, remote: true %>
+			</div>
+		<% end %>
+
+		<%= link_to (@bstock ? bstock_product_path(sku: product.sku) : product_path(sku: product.sku)), class: (@bstock ? (any_bstock(product) ? '' : 'not-available') :(product.can_supply? ? '' : 'not-available')) do %>
+			<div class="card-image"><%= image_tag(product.get_product_photo , alt: 'producto', class: 'product-img') %>
+			</div>
+			<p class="product-card-title"><%= product.name %></p>
+			<p class="product-card-title"><b>TNR <%= product.sku %></b></p>
+			<% if @bstock %>
+				<%= from_price_bstock(product).html_safe %>
+			<% else %>
+				<%= check_offer(product).html_safe %>
+			<% end %>
+			<% if !@bstock %>
+				<% if !product.can_supply? %>
+					<p class="available-soon">Próximamente disponible</p>
+				<% elsif product.stock <= 2 && product.stock > 0  %>
+					<span class="miele-text pt10-mobile left-space"><%= t("last_products_label") %></span>
+				<% elsif product.stock == 0 && product.stock_break %>
+					<span class="miele-text pt10-mobile left-space"><%= t("backorderable_label") %></span>
+				<% end %>	
+			<% else %>
+				<% if !any_bstock(product) %>
+					<p class="available-soon">Próximamente disponible</p>
+				<% end %>	
+			<% end %>
+		<% end %>
+		<% if product.product_attributes.any? and !@bstock %>
+			<p class="checkbox checkbox<%= product.id %> fixed-to-bot">
+				<label class="product-add-comparator">
+					<input type="checkbox" class="check-item" name="comparator<%= product.id %>" id="comparator<%= product.id %>" value="<%= product.id %>" <%= @comparator.products.include?(product) ? 'checked' : ''%>>
+					<span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+					<span class="hidden-xs">Agregar al comparador </span>
+					<span class="hidden-lg hidden-md hidden-sm">Comparar</span>
+				</label>
+			</p>
+		<% end %>
+	</div>
+</div>

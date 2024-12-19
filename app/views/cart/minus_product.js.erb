@@ -1,0 +1,9 @@
+<% if @success == true %>
+  $('<%= ".cart-quantity-#{@cart_item.id}" %>').text("<%= @cart_item.quantity - 1 %>");
+  $('<%= ".cart-item-cost-#{@cart_item.id}" %>').text("<%= current_user.is_project_manager? ? number_with_delimiter((@cart_item.price * (@cart_item.quantity-1)).round(2)) : number_with_delimiter((@cart_item.price * (@cart_item.quantity-1)).to_i) %>");
+  <% @cart.reload %>
+  <%= render :partial => 'cart/update_totals.js.erb' %>
+<% else %>
+  $(".toast-bottom-right-custom").remove();
+  toastr['error']('No es posible quitar más productos');
+<% end %>

@@ -1,0 +1,21 @@
+<% if notes.to_display.any? %>
+  <div class="notes-container" data-type="note">
+    <a class="collapse-note-link" role="button" data-toggle="collapse" href="#<%= id %>" aria-expanded="false" aria-controls="<%= id %>">
+      <h5>
+        Observaciones anteriores 
+        <span class="badge"><%= notes.to_display.count %></span>
+        <i class="fa fa-chevron-down"></i>
+      </h5>
+    </a>
+    <div class="collapse" id="<%= id %>" data-type="note">
+      <% notes.to_display.each do |note| %>
+        <div class="note">
+          <p class="title">
+            Observación de <%= note.user.try(:fullname) %> el día <%= note.created_at.strftime("%d/%m/%Y")%>
+          </p>
+          <p class="content"><%= note.observation %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

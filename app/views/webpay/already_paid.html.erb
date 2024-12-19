@@ -1,0 +1,19 @@
+<div class="row alert-row">
+	<i class="fa fa-exclamation-circle"></i>
+</div>
+<div class="row title-webpay">
+	Ya has realizado esta acción previamente
+</div>
+<div class="row">
+	<p class="content-webpay separate-webpay">Al parecer ya haz pagado esta cotización.</p>
+	<p class="content-webpay">Si tienes dudas, contáctate con tu vendedor.</p>
+</div>
+
+<div class="line-webpay"></div>
+<p class="ammount-payment">Monto: <%= number_to_currency(@quotation.total) %></p>
+<p class="quotation-code-webpay">Código de cotización: <%= @quotation.code %></p>
+<div class="line-webpay"></div>
+<div class="contact-box-webpay">
+	<p><%= @quotation.user.try(:fullname) %></p>
+	<p><%= @quotation.user.try(:email) %></p>
+</div>

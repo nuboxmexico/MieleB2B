@@ -1,0 +1,39 @@
+<div class="row row-content">
+	<div class="col-xs-12">
+		<ol class="breadcrumb">
+			<% if current_user.manager? or current_user.administrator? %>
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<% end %>
+			<li><a href="<%= users_path %>">Usuarios</a></li>
+			<li>Editar Usuario</li>
+		</ol>
+	</div>
+	<div class="col-xs-12">
+		<h1 class="bold">Editar usuario <%= @user.list_fullname %></h1>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-12 bot-space">
+		<div class="box-content">
+			<%= bv_form_for(@user, url: {action: 'update'}, html: { class: 'bform'}) do |form| %>
+			<div class="card-shadow-body">
+				<%= render 'form', form: form %>
+			</div>
+			<div class="text-right">
+				<%= button_tag(type: "submit", id: "submit-user", class: 'btn btn-miele', disabled: true) do %>
+				Actualizar Usuario
+				<% end %>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function(){
+		if($(".bform").valid()){
+			$("#submit-user").attr('disabled', false);
+		}
+	});
+</script>

@@ -1,0 +1,484 @@
+<% states =  (current_user.is_project? ? QuotationState.project : QuotationState.all)%>
+
+<div class="row">
+  <div class="hidden-xs hidden-sm">
+    <%= form_tag(quotations_path, method: :get, id: 'filter-date-form', class: 'no-loader') do %>
+      <% if can? :download_quotations, Quotation %>
+        <div class="col-lg-1 col-md-1 col-sm-2 col-xs-12 top-filter-quotations">
+          <button type="button" class="btn btn-miele" id="download-quotations">
+            <%= current_user.is_project? ? "Descargar proyectos" : current_user.is_mca? ? "Descargar comisiones" : "Descargar cotizaciones" %>
+          </button>
+        </div>
+      <% end %>
+      <div class="col-md-5 col-sm-2 <%= current_user.administrator? ? 'col-md-offset-3 col-md-offset-2' : (current_user.seller? ? 'col-md-offset-2 col-md-offset-2' : (current_user.is_project? ? 'col-md-offset-2' : 'col-lg-offset-1')) %> filter-select2-desktop top-filter-quotations text-right">
+        <% if can? :filter_by_cost_center, Quotation %>
+          <div class="input-group-btn filter-align right-space-filter-left">
+            <button type="button" class="btn btn-default btn-filter dropdown-toggle toggle-cost-center" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="cost-centers-button">
+              Centros Costo
+              <i class="fa fa-angle-down tertiary-color"></i>
+            </button>
+            <ul class="dropdown-menu drop-cost-center">
+              <li>
+                <div class="checkbox">
+                  <label class="check-filter">
+                    <input type="checkbox" class="check-item" name="all" value="Todos" id="all-cost-centers">
+                    <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                    Todos
+                  </label>
+                </div>
+              </li>
+              <li role="separator" class="divider"></li>
+              <% CostCenter.all.each do |cost_center| %>
+                <li>
+                  <div class="checkbox">
+                    <label class="check-filter">
+                      <%= check_box_tag 'cost_centers[]', cost_center.id, (params[:cost_centers].present? and params[:cost_centers].include?(cost_center.id.to_s)), class: 'check-item cost-center-item' %>
+                      <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                      <%= cost_center.name %>
+                    </label>
+                  </div>
+                </li>
+              <% end %>
+              <div class="text-right">
+                <button type="button" class="btn btn-small-custom btn-miele" id="save-cost-centers-desktop">
+                  Guardar
+                </button>
+              </div>
+            </ul>
+          </div>
+        <% end %>
+        <% if can? :filter_by_channel, Quotation %>
+          <div class="input-group-btn filter-align right-space-filter-left">
+            <button type="button" class="btn btn-default btn-filter dropdown-toggle toggle-channel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="channels-button">
+              Canales
+              <i class="fa fa-angle-down tertiary-color"></i>
+            </button>
+            <ul class="dropdown-menu drop-channel">
+              <li>
+                <div class="checkbox">
+                  <label class="check-filter">
+                    <input type="checkbox" class="check-item" name="all" value="Todos" id="all-channels">
+                    <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                    Todos
+                  </label>
+                </div>
+              </li>
+              <li role="separator" class="divider"></li>
+              <% SaleChannel.all.each do |channel| %>
+                <li>
+                  <div class="checkbox">
+                    <label class="check-filter">
+                      <%= check_box_tag 'sale_channels[]', channel.id, (params[:sale_channels].present? and params[:sale_channels].include?(channel.id.to_s)), class: 'check-item channel-item' %>
+                      <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                      <%= channel.name %>
+                    </label>
+                  </div>
+                </li>
+              <% end %>
+              <div class="text-right">
+                <button type="button" class="btn btn-small-custom btn-miele" id="save-channels-desktop">Guardar</button>
+              </div>
+            </ul>
+          </div>
+        <% end %>
+        <% if can? :filter_by_state, Quotation %>
+          <div class="input-group-btn filter-align">
+            <button type="button" class="btn btn-default btn-filter dropdown-toggle toggle-state" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="states-button">
+              Estados
+              <i class="fa fa-angle-down tertiary-color"></i>
+            </button>
+            <ul class="dropdown-menu drop-state">
+              <li>
+                <div class="checkbox">
+                  <label class="check-filter">
+                    <input type="checkbox" class="check-item" name="all" value="Todos" id="all-states">
+                    <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                    Todos
+                  </label>
+                </div>
+              </li>
+              <li role="separator" class="divider"></li>
+              <% states.each do |state| %>
+                <li>
+                  <div class="checkbox">
+                    <label class="check-filter">
+                      <%= check_box_tag 'states[]', state.id, (params[:states].present? and params[:states].include?(state.id.to_s)), class: 'check-item state-item'  %>
+                      <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                      <%= state.name %>
+                    </label>
+                  </div>
+                </li>
+              <% end %>
+              <div class="text-right">
+                <button type="button" class="btn btn-small-custom btn-miele" id="save-states-desktop">Guardar</button>
+              </div>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+      <% if can? :filter_by_date, Quotation %>
+        <div class="col-md-2 searcher-div">
+          <label for="filter" class="label-text">Modificado Desde-Hasta</label>
+          <%= text_field_tag :date_range, params[:date_range], class: 'inlineb date-range gray-background', id: 'date_range' %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="col-md-3 col-xs-12 <%= (can? :filter_by_date, Quotation) ? '' : 'col-md-offset-9' %> searcher-div top-space-searcher bot-space">
+    <%= form_tag(search_quotations_path, method: :get, id:'searcher-form') do %>
+      <% if can? :search_quotations, Quotation %>
+        <span class="hidden-lg hidden-md" id="filter-icon"><i class="fa fa-filter"></i></span>
+      <% end %>
+      <span class="input-group-addon inlineb"><i class="fa fa-search"></i></span>
+      <input type="text" name="search_quotation" id="search_quotations" class="inlineb custom-searcher-bar" autocomplete="true" placeholder="Buscar...">
+    <% end %>
+  </div>
+  
+</div>
+
+<div class="row hidden-lg hidden-md hidden bot-space" id="filter-box-quotations">
+  <div class="col-xs-12 col-sm-12">
+    <p class="filter-quotation-title">Filtros</p>
+  </div>
+  <div class="col-xs-12 col-sm-12">
+    <p class="search-by">Buscar por</p>
+  </div>
+  <%= form_tag(quotations_path, method: :get, id: 'filter-date-form-mobile', class: 'no-loader') do %>
+    <% if can? :filter_by_channel, Quotation %>
+      <div class="col-xs-12 col-sm-12">
+        <div class="input-group-btn filter-align right-space-filter-left full-width">
+          <button type="button" class="btn btn-default btn-filter dropdown-toggle toggle-channel full-width filter-back" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="channels-button-mobile">Canales <i class="fa fa-angle-down tertiary-color pull-right top-icon-move"></i></button>
+          <ul class="dropdown-menu drop-channel">
+            <li>
+              <div class="checkbox">
+                <label class="check-filter">
+                  <input type="checkbox" class="check-item" name="all" value="Todos" id="all-channels-mobile">
+                  <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                  Todos
+                </label>
+              </div>
+            </li>
+            <li role="separator" class="divider"></li>
+            <% SaleChannel.all.each do |channel| %>
+              <li>
+                <div class="checkbox">
+                  <label class="check-filter">
+                    <%= check_box_tag 'sale_channels[]', channel.id, (params[:sale_channels].present? and params[:sale_channels].include?(channel.id.to_s)), class: 'check-item channel-item-mobile' %> 
+                    <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                    <%= channel.name %>
+                  </label>
+                </div>
+              </li>
+            <% end %>
+            <div class="text-right">
+              <button type="button" class="btn btn-small-custom btn-miele" id="save-channels-mobile">Guardar</button>
+            </div>
+          </ul>
+        </div><!-- /btn-group -->
+      </div>
+    <% end %>
+    <% if can? :filter_by_state, Quotation %>
+      <div class="col-xs-12 col-sm-12 top-both">
+        <div class="input-group-btn filter-align right-space-filter-left full-width">
+          <button type="button" class="btn btn-default btn-filter dropdown-toggle toggle-state full-width filter-back" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="states-button-mobile">
+            Estados
+            <i class="fa fa-angle-down tertiary-color pull-right top-icon-move"></i>
+          </button>
+          <ul class="dropdown-menu drop-state">
+            <li>
+              <div class="checkbox">
+                <label class="check-filter">
+                  <input type="checkbox" class="check-item" name="all" value="Todos" id="all-states-mobile">
+                  <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                  Todos
+                </label>
+              </div>
+            </li>
+            <li role="separator" class="divider"></li>
+            <% states.each do |state| %>
+            <li>
+              <div class="checkbox">
+                <label class="check-filter">
+                  <%= check_box_tag 'states[]', state.id, (params[:states].present? and params[:states].include?(state.id.to_s)), class: 'check-item state-item-mobile'  %>
+                    
+                  <span class="c-filter"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                  <%= state.name %>
+                </label>
+              </div>
+            </li>
+            <% end %>
+            <div class="text-right">
+              <button type="button" class="btn btn-small-custom btn-miele" id="save-states-mobile">Guardar</button>
+            </div>
+          </ul>
+        </div><!-- /btn-group -->
+      </div>
+    <% end %>
+
+    <% if can? :filter_by_date, Quotation %>
+      <div class="col-xs-12 col-sm-12 top-both">
+        <%= text_field_tag :date_range, params[:date_range], class: 'inlineb date-range gray-background', id: 'date_range_mobile' %>
+      </div>
+    <% end %>
+
+    <% if can? :download_quotations, Quotation %>
+      <div class="col-xs-12 top-both text-right">
+        <button type="button" class="btn btn-miele" id="download-quotations">
+          <%= current_user.is_project? ? "Descargar proyectos" : current_user.is_mca? ? "Descargar comisiones" : "Descargar cotizaciones" %>
+        </button>
+      </div>
+    <% end %>
+
+  <% end %>
+</div>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <%= render 'quotations/list_quotations' %>
+</div>
+
+<script>
+  $(".row-toggle-quotation").click(function(){
+    if($(this).hasClass('open-quotation')){
+      $(this).removeClass('open-quotation');
+    } else {
+      $(this).addClass('open-quotation');
+    }
+  });
+
+  $("#filter-icon").click(function(){
+    $("#filter-box-quotations").toggleClass("hidden");
+  });
+
+  $(document).ready(function(){
+
+    $("#save-states-mobile").click(function(){
+      $("#filter-date-form-mobile").submit();
+      $(".loader-page").fadeIn();
+      $('.drop-state').slideUp();
+      event.stopPropagation();
+    });
+
+    $("#save-states-desktop, #save-channels-desktop, #save-cost-centers-desktop").click(function() {
+      $("#filter-date-form").submit();
+      $(".loader-page").fadeIn();
+      $('.drop-state').slideUp();
+      event.stopPropagation();
+    });
+
+    $("#save-channels-mobile").click(function(){
+      $("#filter-date-form-mobile").submit();
+      $(".loader-page").fadeIn();
+      $('.drop-channel').slideUp();
+      event.stopPropagation();
+    });
+
+    $('.toggle-cost-center').on('click', function(event) {
+      $('.drop-cost-center').slideToggle();
+      event.stopPropagation();
+    });
+
+    $('.toggle-state').on('click', function(event) {
+      $('.drop-state').slideToggle();
+      event.stopPropagation();
+    });
+    $('.toggle-channel').on('click', function(event) {
+      $('.drop-channel').slideToggle();
+      event.stopPropagation();
+    });
+
+    $("#date_range").change(function(){
+      $("#filter-date-form").submit();
+      $(".loader-page").fadeIn();
+      $('.drop-state').slideUp();
+      event.stopPropagation();
+    });
+
+    $("#date_range_mobile").change(function(){
+      $("#filter-date-form-mobile").submit();
+      $(".loader-page").fadeIn();
+      $('.drop-state').slideUp();
+      event.stopPropagation();
+    });
+
+  });
+
+
+
+  $(".select2").select2();  
+
+  $("#search_quotations").autocomplete({
+    source: function( request, response ) {
+      $.ajax( {
+        url: "/quotations/search.json",
+        dataType: "json",
+        data: {
+          search_quotation: $("#search_quotations").val()
+        },
+        success: function( data ) {
+          if(!data.length){
+            var result = [
+            {
+              id: '-1', 
+              code: null,
+              name: null,
+              created_at: null,
+              commune: null
+            }
+            ];
+            response(result);
+          } else {
+            response( data );
+          }
+        }
+      } );
+    },
+    minLength: 3
+  }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+    if(item.id == '-1') {
+      return $( "<li>" )
+      .append("<div class='row'>"
+        +  '<div class="col-lg-12 space-no-result">'
+        +    '<p>No se encontraron resultados</p>'
+        +  '</div>'
+        +'</div>')
+      .appendTo( ul );
+    } else {
+      return $( "<li>" )
+      .append("<a href='/quotations/"+item.id+"' ><div class='row select2-row'>"
+        +  '<div class="col-lg-12 selec2-descriptions"' 
+        <% if current_user.try(:sale_channel).try(:name) == 'Retail' %>
+        +    '<p>Número OC: <b>'+(item.oc_number ? item.oc_number : '-')+ '</b></p>'
+        +    '<p>Número F12: ' +(item.f12_number ? item.f12_number : '-')+ '</p>'  
+        +    '<p>Nombre Cliente: ' +(item.name ? item.name : '-')+ '</p>'  
+        +    '<p>Fecha emisión: '+ (item.created_at ? item.created_at : '-') +'</p>' 
+        <% else %>
+        +    '<p>Código cotización: <b>'+(item.code ? item.code : '-')+ '</b></p>'
+        +    '<p>Nombre Cliente: '+(item.name ? item.name : '-')+ '</p>'  
+        +    '<p>Comuna: '      +(item.commune ? item.commune : '-')+ '</p>'  
+        +    '<p>Fecha creación: '+(item.created_at ? item.created_at : '-')+ '</p>' 
+        <% end %>
+        +  '</div>'
+        +'</div></a>')
+      .appendTo( ul );
+    }
+  };
+
+  $('.panel-collapse').on('show.bs.collapse', function () {
+    $(this).siblings('.panel-heading').addClass('active');
+  });
+
+  $('.panel-collapse').on('hide.bs.collapse', function () {
+    $(this).siblings('.panel-heading').removeClass('active');
+  });
+
+  $('.drop-cost-center, .drop-state, .drop-channel').on('click', function(event) {
+    event.stopPropagation();
+  });
+
+  $(window).on('click', function() {
+    $('.drop-cost-center').slideUp();
+  });
+
+  $(window).on('click', function() {
+    $('.drop-state').slideUp();
+  });
+
+  $(window).on('click', function() {
+    $('.drop-channel').slideUp();
+  });
+
+  $("#all-cost-centers").change(function(){
+    if($(this).is(":checked")){
+      $(".cost-center-item").prop('checked', true);
+    } else {
+      $(".cost-center-item").prop('checked', false);
+    }
+    $("#cost-centers-button").html($('.cost-center-item:checked').length+" Canales <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $(".cost-center-item").change(function(){
+    if($('.cost-center-item:checked').length == $('.cost-center-item').length){
+      $("#all-cost-centers").prop('checked', true);
+    } else {
+      $("#all-cost-centers").prop('checked', false);
+    }
+    $("#cost-centers-button").html($('.cost-center-item:checked').length+" Canales <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+  
+  $("#all-channels").change(function(){
+    if($(this).is(":checked")){
+      $(".channel-item").prop('checked', true);
+    } else {
+      $(".channel-item").prop('checked', false);
+    }
+    $("#channels-button").html($('.channel-item:checked').length+" Canales <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $(".channel-item").change(function(){
+    if($('.channel-item:checked').length == $('.channel-item').length){
+      $("#all-channels").prop('checked', true);
+    } else {
+      $("#all-channels").prop('checked', false);
+    }
+    $("#channels-button").html($('.channel-item:checked').length+" Canales <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $("#all-states").change(function(){
+    if($(this).is(":checked")){
+      $(".state-item").prop('checked', true);
+    } else {
+      $(".state-item").prop('checked', false);
+    }
+    $("#states-button").html($('.state-item:checked').length+" Estados <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $(".state-item").change(function(){
+    if($('.state-item:checked').length == $('.state-item').length){
+      $("#all-states").prop('checked', true);
+    } else {
+      $("#all-states").prop('checked', false);
+    }
+    $("#states-button").html($('.state-item:checked').length+" Estados <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+
+
+  $("#all-channels-mobile").change(function(){
+    if($(this).is(":checked")){
+      $(".channel-item-mobile").prop('checked', true);
+    } else {
+      $(".channel-item-mobile").prop('checked', false);
+    }
+    $("#channels-button-mobile").html($('.channel-item-mobile:checked').length+" Canales <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $(".channel-item-mobile").change(function(){
+    if($('.channel-item-mobile:checked').length == $('.channel-item-mobile').length){
+      $("#all-channels-mobile").prop('checked', true);
+    } else {
+      $("#all-channels-mobile").prop('checked', false);
+    }
+    $("#channels-button-mobile").html($('.channel-item-mobile:checked').length+" Canales <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $("#all-states-mobile").change(function(){
+    if($(this).is(":checked")){
+      $(".state-item-mobile").prop('checked', true);
+    } else {
+      $(".state-item-mobile").prop('checked', false);
+    }
+    $("#states-button-mobile").html($('.state-item-mobile:checked').length+" Estados <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+  $(".state-item-mobile").change(function(){
+    if($('.state-item-mobile:checked').length == $('.state-item-mobile').length){
+      $("#all-states-mobile").prop('checked', true);
+    } else {
+      $("#all-states-mobile").prop('checked', false);
+    }
+    $("#states-button-mobile").html($('.state-item-mobile:checked').length+" Estados <i class='fa fa-angle-down tertiary-color'></i>");
+  });
+
+
+</script>

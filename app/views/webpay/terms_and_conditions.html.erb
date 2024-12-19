@@ -1,0 +1,67 @@
+<div class="container-terms">
+	<div class="row alert-row">
+		<%= image_tag('file-alt.svg')%>
+	</div>
+	<div class="row title-webpay title-webpay-terms">
+		A continuación se realizará el pago de cotización #<%= @quotation.code %>
+	</div>
+
+	<div class="line-webpay"></div>
+	<p class="ammount-payment ammount-separation-webpay">Monto: <%= number_to_currency(@payment.ammount) %></p>
+	<p class="quotation-code-webpay payment-method-separation">Medio de pago</p>
+	<%= image_tag('webpay_transparent.png', class: 'webpay-icon') %>
+	<div class="line-webpay"></div>
+	<%= render 'webpay/text_terms_and_conditions' %>
+	<p class="terms-and-conditions-alert">
+		<div class="checkbox">
+			<label class="terms-and-conditions-alert">
+				<input type="checkbox" class="check-item" name="check_terms" required="required" id="check-term">
+				<span class="cr webpay-cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+				<span class="separation-left-check">He leído y acepto los <%= link_to 'Términos y Condiciones de Venta de Miele Chile', download_terms_path, class: 'bold-terms', target: '_blank' %></span>
+			</label>
+		</div>
+	</p>
+	<p>
+		<button class="btn btn-miele btn-terms" id="terms-btn" disabled="true">Aceptar</button>		
+	</p>
+
+</div>
+
+<script>
+	$('#global').on('scroll', function() {
+		console.log("aaaa")
+		var button = $('#terms-btn')
+		button.attr('disabled', true);
+		if($(this).scrollTop() + $(this).innerHeight() >= ($(this)[0].scrollHeight-1)) {
+			if($("#check-term").prop('checked')){
+				button.attr('disabled', false);
+			}
+			else {
+			button.attr('disabled', true);
+			}
+		}
+		else{
+			button.attr('disabled', true);
+		}
+	})
+
+	$("#check-term").click(function(){
+		var button = $('#terms-btn')
+		if($(this).prop('checked')){
+			console.log($('#global').scrollTop() + $('#global').innerHeight())
+			console.log(($('#global')[0].scrollHeight-1))
+			if($('#global').scrollTop() + $('#global').innerHeight() >= ($('#global')[0].scrollHeight-1)) {
+				button.attr('disabled', false);
+			}
+		} else {
+			button.attr('disabled', true);
+		}
+	});
+	$("#terms-btn").click(function(){
+		if($("#check-term").prop('checked')){
+			window.location.replace("<%= pay_debt_path(@quotation) %>");
+		} else {
+			event.preventDefault();
+		}
+	})
+</script>

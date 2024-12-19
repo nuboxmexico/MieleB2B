@@ -1,0 +1,33 @@
+<% if @is_for_miele %>
+  <p>
+    Los siguientes artículos pertenecientes a cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron entregados en su totalidad y están listos para ser instalados el día <%= @quotation.installation_date.strftime("%d/%m/%Y") %>.
+    <ul>
+      <% @dispatch_group.available_products.each do |product| %> 
+        <li>
+          <%= "<b>#{product.sku}</b> #{product.name}".html_safe %> 
+        </li>
+      <% end %>
+    </ul>
+  </p>
+  <p>
+    Puedes ver todos los detalles en la pestaña "Instalación" de tu cotización <%= link_to 'aquí.', quotation_url(@quotation) %>
+  </p>
+<% else %>
+  <p>
+    Estimado(a) <%= @quotation.name %>, 
+  </p>
+  <p>
+    Los siguientes artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron entregados en su totalidad y están listos para ser instalados el día <%= @quotation.installation_date.strftime("%d/%m/%Y") %>.
+    <ul>
+      <% @dispatch_group.available_products.each do |product| %> 
+        <li>
+          <%= "<b>#{product.sku}</b> #{product.name}".html_safe %> 
+        </li>
+      <% end %>
+    </ul>
+  </p>
+  <p>
+    Se contactarán contigo vía telefónica para confirmar la fecha pactada de instalación.
+  </p>
+  <p>#LifeBeyondOrdinary.</p>
+<% end %>

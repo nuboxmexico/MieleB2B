@@ -1,0 +1,31 @@
+<% if what_refresh[:all_unit_real_states] %>
+    $("#all_unit_real_state").html("<%= escape_javascript(render partial: 'quotations/show/all_unit_real_state', locals: { quotation: quotation }) %> ");
+<% end %>
+
+<% if what_refresh[:installation_box] %>
+    $("#installation_box_zone").html("<%= escape_javascript(render partial: 'quotations/show/instalation_box', locals: { quotation: quotation }) %> ");
+<% end %>
+
+<% if what_refresh[:dispatch_groups_container] %>
+    $("#dispatch-groups-project-container").html("<%= escape_javascript(render partial: 'quotations/show/dispatch_groups_project_container', locals: {quotation: quotation}) %> ");
+<% end %>
+
+<% if what_refresh[:dispatch_stats] %>
+    $("#dispatch_stats_partial").html("<%= escape_javascript(render partial: 'quotations/show/dispatch_stats', locals: { quotation: quotation }) %> ");
+<% end %>
+
+<% if what_refresh[:glosa] %>
+    $("#glosa_project").html("<%= escape_javascript(render partial: 'quotations/totals_project', locals: { quotation: quotation }) %> ");
+<% end %>
+
+<% if what_refresh[:all_config_unit_real_states] %>
+    $("#all_config_unit_real_state").html("<%= escape_javascript(render partial: 'quotations/show/all_config_unit_real_state', locals: { quotation: quotation }) %> ");
+<% end %>
+
+<% if what_refresh[:margin] %>
+    $("#<%= escape_javascript("quotation_product_margen_#{quotation_product.id}") %>").html("<%= escape_javascript(number_with_delimiter(quotation.calculate_margen_percent(quotation_product).round(2))) %> %")
+<% end %>
+
+<% if what_refresh[:amount].present? && what_refresh[:amount] %>
+    $("#activation_tab_normal_and_project").html("<%= escape_javascript(render partial: 'quotations/activation_tab', locals: { quotation: quotation }) %> ");
+<% end %>

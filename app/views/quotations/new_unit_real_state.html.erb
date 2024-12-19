@@ -1,0 +1,3 @@
+$('#all_unit_real_state')
+  .append('<%= j render partial: 'quotations/checkout/new_unit_real_state_box', locals: {total_cost: @total_cost, project_installation_values: @project_installation_values, project_installation_discounts: @project_installation_discounts, id: "real_state_"+@unit_real_states.to_s, value: @unit_real_states.to_s}%>');
+  $(".loader-page").fadeOut();

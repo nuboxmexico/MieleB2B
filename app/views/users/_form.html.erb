@@ -1,0 +1,63 @@
+<div class="row label-bold">
+  <!-- DUE DATA-->
+  <div class="col-xs-12">
+    <div class="row">
+      <!-- nombre -->
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :name, required: true, class: "field-bordered", placeholder: "Nombre" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :lastname, required: true, class: "field-bordered", placeholder: "Apellido Paterno" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :second_lastname, required: true, class: "field-bordered", placeholder: "Apellido Materno" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.email_field :email, required: true, class: "field-bordered", 'data-bv-emailAddress-message': 'correo inválido', placeholder: "correo@mail.cl" %>
+      </div>
+
+      
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :phone, required: true, class: "field-bordered", placeholder: "111111111", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :shop, class: "field-bordered", placeholder: "Nueva costanera", required: true %>
+      </div>
+      
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="row">
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.select :miele_role_id, options_for_select(MieleRole.all.collect{ |mr| [mr.code.to_s+' - '+mr.name, mr.id] }, (@user.miele_role ? @user.miele_role_id : MieleRole.first.try(:id))), { include_blank: 'Seleccione una ...', required: true } %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.select :workday, options_for_select([["Full Time","Full Time"],["Part Time","Part Time"]], (@user.workday ? @user.workday : "Full Time")), { include_blank: 'Seleccione una ...' }, required: true %>
+      </div>
+      
+      
+    </div>
+  </div>
+  <div id="custom_roles">
+    <%= form.fields_for :custom_roles, (params[:action] == 'new' ? CustomRole.new : [*@user.custom_roles.select{|r|r.role_id == @user.role_id},*@user.custom_roles.reject{|r|r.role_id == @user.role_id}]) do |custom_role| %>
+      <%= render partial: 'users/custom_role_fields', locals: {f: custom_role, first: (params[:action] == 'new' || custom_role.object.role_id == @user.role_id )} %>
+    <% end %>
+  </div>
+  <div class="links">
+    <%= link_to_add_association '<div class="col-lg-6 col-xs-12 text-right"><span class="miele-text">Agregar Rol </span><i class="fa fa-plus-circle miele-text"></i></div>'.html_safe, form, :custom_roles, render_options:  {locals: { first: false }} %>
+  </div>
+</div>
+
+<script>
+  $('#user_workday').select2();
+  $("#user_miele_role_id").select2();
+</script>

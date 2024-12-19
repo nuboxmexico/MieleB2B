@@ -1,0 +1,59 @@
+<div class="col-md-5 col-md-offset-1 col-xs-12 col-sm-5">
+	<% if current_user.administrator? %>
+		<%= form_tag synchronize_one_product_with_miele_core_path(sku:@product.sku), method: :patch do %>
+			<button type="submit" class='btn btn-miele-synchronize' >
+				Sincronizar Producto con Miele Core
+			</button>
+		<% end %>
+	<% end %>
+	<h4 class="title-mobile pt14mobile"><b><%= @product.name %></b></h4> 
+	<p class="product-sku">TNR <%= @product.sku %></p>
+	<p class="product-sku"><%= @product.stock %> Unidades <%= !@product.stock_break ? '<span class="miele-text">(Descontinuado)</span>'.html_safe : '' %></p>
+	<%= check_offer_show(@product).html_safe%>
+	<% if can? :add_product, Cart %>
+		<% if @product.can_supply? %>
+			<div class="row inlineb">
+				<%= form_tag add_product_to_cart_path(@product), remote: true, class:'inlineb', method: :post do %>
+				<% if @product.is_service %>
+				<%= hidden_field_tag 'quantity', 1 %>
+				<% else %>
+				<div class="text-center cart-stepper-container inlineb left-move-quantity">
+					<div class="cart-stepper" onclick="increaseValue()" id="increase">
+						<i class="fa fa-angle-up row-angle-after"></i>
+					</div>
+					<div class="item-quantity">
+						<input type="number" name="quantity" id="number" value="1" min="1" class="transparent-back" />
+					</div>
+					<div class="cart-stepper" onclick="decreaseValue()" id="decrease">
+						<i class="fa fa-angle-down row-angle-after"></i>
+					</div>
+				</div>
+				<% end %>
+				<div class="<%= !@product.is_service ? 'inlineb align-up' : 'align-service-button' %>">
+					<button type="submit" class="btn btn-miele" id="add-to-cart">Cotizar<%= ((@product.stock == 0 && @product.stock_break ) ? " sin Stock" : "")%></button>
+					<% if @product.stock <= 2 && @product.stock > 0  %>
+						<span class="last-stock hidden-xs hidden-sm left-space"><%= t("last_products_label") %></span>
+					<% elsif (@product.stock == 0 && @product.stock_break )  %>
+						<span class="last-stock hidden-xs hidden-sm left-space"><%= t("backorderable_label")%></span>
+					<% end %>
+				</div>
+				<% end %>
+			</div>
+			<% if @product.stock <= 2 && @product.stock > 0  %>
+				<p class="last-stock hidden-lg hidden-md"><%= t("last_products_label") %></p>
+			<% elsif @product.stock == 0 && @product.stock_break %>
+				<p class="last-stock hidden-lg hidden-md"><%= t("backorderable_label")%></p>
+			<% end %>	
+		<% else %>
+			<p class="top-space bot-space">
+				<span class="no-stock-card">Sin Stock</span>
+			</p>
+		<% end %>
+	<% end %>
+	<p class="title-description">Descripción</p>
+	<% if @product.description %>
+		<p class="product-description"><%= @product.description %></p>
+	<% else %>
+		<p class="product-description">Sin descripción disponible</p>
+	<% end %>
+</div>

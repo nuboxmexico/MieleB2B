@@ -1,0 +1,11 @@
+<%= render :partial => 'cart/update_totals.js.erb' %>
+
+<% if @cart.apply_discount %>
+$("#section").removeClass("hidden");
+$("#section-tab").removeClass("hidden");
+$("#section-tab").click();
+<% else %>
+$("#section").addClass("hidden");
+$("#section-tab").addClass("hidden");
+$("#promotional-tab").click();
+<% end %>

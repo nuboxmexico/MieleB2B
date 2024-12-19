@@ -1,0 +1,434 @@
+<style>
+  hr{
+    border-top: 2px solid #F6F6F6!important;
+  }
+</style>
+<!-- HEAD -->
+<div class="top-page">
+  <div class="row">
+    <h3 class="pdf-title">Resumen de cotización</h3>
+    <p class="title-text">
+      <% if quotation.channel == 'Retail' %>
+      <b>Número de OC:</b> <span class="lighter-color"><%= quotation.oc_number %></span>
+      <% else %>
+      <b>Código de cotización:</b> <span class="lighter-color"><%= quotation.code %></span>
+      <% end %>
+    </p>
+  </div>
+</div>
+
+<% if quotation.channel == 'Retail' %>
+<div class="row">
+  <div class="col-xs-3 bot-space-pdf row-space resume-text">
+    <p class="no-margin-pdf">Retail:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.retail.try(:name) %> </span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf row-space resume-text">
+    <p class="no-margin-pdf">Número F12:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.f12_number %> </span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf row-space resume-text">
+    <p class="no-margin-pdf">Fecha de Emisión:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.created_at.strftime("%d/%m/%Y") %> </span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf row-space resume-text">
+    <p class="no-margin-pdf">Fecha Despacho Pactada:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.agreed_dispatch_date.try(:strftime, "%d/%m/%Y") %> </span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf resume-text">
+    <p class="no-margin-pdf">Rut cliente:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.rut %></span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf resume-text">
+    <p class="no-margin-pdf">Nombre cliente:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.customer_name %> </span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf resume-text">
+    <p class="no-margin-pdf">Teléfono:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.phone %></span></p>
+  </div>
+  <div class="col-xs-6 bot-space-pdf resume-text">
+    <p class="no-margin-pdf">Dirección de Despacho:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.full_dispatch_address %></span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf resume-text">
+    <p class="no-margin-pdf">Comuna de Despacho:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.dispatch_commune.try(:name_with_region) %></span></p>
+  </div>
+  <div class="col-xs-3 bot-space-pdf resume-text">
+    <p class="no-margin-pdf">Ciudad de Despacho:</p>
+    <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.dispatch_city %></span></p>
+  </div>
+</div>
+<% else %>
+<div class="box-pdf less-padding">
+  <div class="row">
+    <div class="col-xs-4 bot-space-pdf row-space resume-text">
+      <p class="no-margin-pdf">Rol:</p> 
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.user.role_name %> </span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf row-space resume-text">
+      <p class="no-margin-pdf">Teléfono:</p> 
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.user.phone %> </span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf row-space resume-text">
+      <p class="no-margin-pdf">ID Rol:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.user.miele_role.try(:code) %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Nombre cliente:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.customer_name %> </span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Rut cliente:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.rut %>  </span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Fecha emisión:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.created_at.strftime("%d/%m/%Y") %>  </span></p>
+    </div>
+    <% if quotation.expiration_date %>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Valida hasta:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.expiration_date.strftime("%d/%m/%Y") %></span></p>
+    </div>
+    <% end %>
+    <div class="col-xs-4 bot-space-pdf row-space resume-text">
+      <p class="no-margin-pdf">Correo:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.user.email %> </span></p>
+    </div>
+  </div>
+  <% if quotation.estimated_dispatch_date or quotation.channel == 'Proyectos' %>
+  <div class="row">
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Dirección de Despacho:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:dispatch_address) ? quotation.try(:dispatch_address) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">N°:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:dispatch_address_number) ? quotation.try(:dispatch_address_number) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Depto:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.dispatch_dpto_number.present? ? quotation.try(:dispatch_dpto_number) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Comuna de Despacho:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.dispatch_commune.try(:name_with_region) %></span></p>
+    </div>
+    <% if quotation.estimated_dispatch_date %>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Fecha de Despacho:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.estimated_dispatch_date.strftime("%d/%m/%Y") %></span></p>
+    </div>
+    <% end %>
+  </div>
+  <% end %>
+  <% if quotation.installation_date %>
+  <div class="row">
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Dirección de Instalación:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:instalation_address) ? quotation.try(:instalation_address) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">N°:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:instalation_address_number) ? quotation.try(:instalation_address_number) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Depto:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:instalation_dpto_number) ? quotation.try(:instalation_dpto_number) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Comuna de Instalación:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.instalation_commune.try(:name_with_region) %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Fecha de Instalación:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.installation_date.strftime("%d/%m/%Y") %></span></p>
+    </div>
+  </div>
+  <% end %>
+  <div class="row">
+    <% if quotation.project_name and !quotation.project_name.empty? %>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Nombre Proyecto:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.project_name %></span></p>
+    </div>
+    <% end %>
+    <% if quotation.retirement_date %>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Fecha de Retiro:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.retirement_date.strftime("%d/%m/%Y") %></span></p>
+    </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row top-pdf-space">
+  <p class="title-text">
+    <b>Datos de Facturación</b>
+  </p>
+</div>
+<div class="box-pdf less-padding">
+  <% if quotation.try(:document_type) == 'factura' %>
+    <div class="row">
+      <div class="col-xs-4 bot-space-pdf row-space resume-text">
+        <p class="no-margin-pdf">Razón Social:</p> 
+        <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:business_name) %> </span></p>
+      </div>
+      <div class="col-xs-4 bot-space-pdf row-space resume-text">
+        <p class="no-margin-pdf">Giro Comercial:</p>
+        <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:business_sector) %> </span></p>
+      </div>
+      <div class="col-xs-4 bot-space-pdf row-space resume-text">
+        <p class="no-margin-pdf">RUT Empresa:</p> 
+        <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:business_rut) %> </span></p>
+      </div>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">
+        Dirección<%= 'de Facturación' if quotation.try(:document_type) == 'factura'%>:
+      </p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:billing_address) ? quotation.try(:billing_address) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">N°:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:billing_address_number) ? quotation.try(:billing_address_number) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">Depto:</p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.try(:billing_dpto_number) ? quotation.try(:billing_dpto_number) : '-' %></span></p>
+    </div>
+    <div class="col-xs-4 bot-space-pdf resume-text">
+      <p class="no-margin-pdf">
+        Comuna<%= 'de Facturación' if quotation.try(:document_type) == 'factura'%>:
+      </p>
+      <p class="no-margin-pdf"><span class="lighter-color"><%= quotation.billing_commune.try(:name_with_region) %></span></p>
+    </div>
+  </div>
+</div>
+<% end %>
+<br><br>
+<div class="row">
+  <p class="title-text bold">Detalle de tu pedido:</p>
+</div>
+<br>
+<% if quotation.channel == 'Retail' %>
+  <%= render 'quotations/retail_list_products_pdf', locals: { quotation: quotation } %>
+<% elsif quotation.channel == 'Proyectos' %>
+  <%= render 'quotations/project_list_products_pdf', locals: { quotation: quotation } %>
+<% else %>
+  <%= render 'quotations/list_products_pdf', locals: { quotation: quotation } %>
+<% end %>
+<!-- DETAILS -->
+<br>
+<% if quotation.quotation_products.availables.size == 5 %>
+<div class="page-break"></div>
+<% end %>
+<div class="row">
+  <div class="col-xs-6 col-xs-offset-6">
+    <div class="row light-text">
+      <% if quotation.try(:installation_value).to_i > 0 %>
+        <div class="warning-msg">Los equipos instalados por Miele tendrán garantía de 2 años</div>
+      <% else %>
+        <div class="warning-msg">Los equipos instalados por terceros tendrán garantía de 3 meses</div>
+      <% end %>
+
+      <div class="col-xs-6 no-sides-pdf">
+            
+        
+        <p>Sub Total:        </p>
+        <% if quotation.try(:dispatch_value).to_i > 0 %>
+          <p>Despacho</p>
+        <% end %>
+        <% if quotation.try(:installation_value).to_i > 0 %>
+          <p>Instalación</p>
+        <% end %>
+        <% if quotation.channel != 'Retail' %>
+        <% if !quotation.bstock %>
+        <% if quotation.total_section_discount > 0 and quotation.apply_discount %>
+        <p>Dcto. por Tramo -<%= (Quotation.cost_next_section(quotation.quotation_products, quotation.quotation_products.where(discount_type: 'miele'))[2]*100).to_i %>%</p> 
+        <% end %>
+        <% if quotation.total_miele_discount > 0 and quotation.apply_discount %>
+        <p>Dcto. Politica Comercial de Lavadoras, Secadoras y Sistemas de Planchado -<%= Quotation.discount_miele(quotation.quotation_products)[0] %>%</p> 
+        <% end %>
+        <% end %>
+        <% if quotation.promotional_code %> 
+        <p>Código descuento <%= quotation.promotional_code.code %> (-<%= quotation.promotional_code.percent%>%)</p>
+        <% end %>
+        <% if quotation.dispatch_code %> 
+        <p>Dcto. Despacho <%= quotation.dispatch_code.code %> (-<%= quotation.dispatch_code.percent%>%)</p>
+        <% end %>
+        <% if quotation.channel != 'Proyectos' %>
+        <p>Porcentaje a pagar:</p>
+        <% end %>
+        <% if quotation.pay_percent == 50 %>
+        <p>Saldo</p>
+        <% end %>
+        <% end %>
+      </div>
+      <div class="col-xs-6 text-right no-sides-pdf">
+        <p><%= number_to_currency(quotation.total_cost, locale: (quotation.currency.try(:downcase) == 'uf' ? :uf : :es )) %></p>
+        <% if quotation.try(:dispatch_value).to_i > 0 %>
+          <p><%= number_to_currency(quotation.dispatch_value) %></p>
+        <% end %>
+        <% if quotation.try(:installation_value).to_i > 0 %>
+          <p><%= number_to_currency(quotation.installation_value) %></p>
+        <% end %>
+        
+        <% if quotation.channel != 'Retail' %>
+        <% if !quotation.bstock %>
+        <% if quotation.total_section_discount > 0 and quotation.apply_discount %>
+        <p class="miele-text"><%= number_to_currency(quotation.total_section_discount * -1 ) %></p>
+        <% end %>
+        <% if quotation.total_miele_discount > 0 and quotation.apply_discount %>
+        <p class="miele-text"><%= number_to_currency(quotation.total_miele_discount * -1 ) %></p>
+        <% end %>
+        <% end %>
+        <% if quotation.promotional_code %> 
+        <p class="miele-text"> - <%= number_to_currency(quotation.discount_per_code) %></p>
+        <% end %>
+        <% if quotation.dispatch_code %> 
+        <p class="miele-text"> - <%= number_to_currency(quotation.discount_code_dispatch) %></p>
+        <% end %>
+        <% if quotation.channel != 'Proyectos' %>
+        <p><%= quotation.pay_percent %>%</p>
+        <% end %>
+        <% if quotation.pay_percent == 50 %>
+        <p><%= number_to_currency(quotation.total - quotation.total_per_pay.to_i) %></p>
+        <% end %>
+        <% end %>
+      </div>
+      <div class="row bot-border"></div>
+      <div class="col-xs-6 no-sides-pdf more-size bold">
+        <% if quotation.channel == 'Retail' or quotation.channel == 'Proyectos' %>
+        Total Neto
+        <% else %>
+        Total
+        <% end %>
+      </div>
+      <div class="col-xs-6 text-right no-sides-pdf more-size">
+        <% if quotation.channel == 'Retail' %>
+        <%= number_to_currency(quotation.total_retail) %>
+        <% elsif quotation.channel == 'Proyectos' %>
+        <%= number_to_currency(quotation.total_retail, locale: (quotation.currency.try(:downcase) == 'clp' ? :es : :uf )) %>
+        <% else %>
+        <% #$number_to_currency(quotation.total_per_pay + quotation.dispatch_value + quotation.installation_value) %>  
+        <%= number_to_currency(quotation.total_per_pay) %> <span class="min-text">(IVA Incluído)</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if !["Retail", "Proyectos"].include?(quotation.channel) %>
+<% if !quotation.bstock %>
+<hr>
+<div class="row inlineb">
+  <div class="col-xs-12">
+    <p class="title-text bold">Metodos de pago:</p >
+  </div>
+  <div class="col-xs-6 inlineb">
+    <br>
+    <p class="gray-text bold">
+      Transferencia electrónica
+    </p>
+    <p class="gray-text">
+      Banco: Scotiabank - Cuenta corriente
+      <br>
+      Titular: MIELE ELECTRODOMESTICOS LIMITADA
+      <br>
+      Rut: 76.740.630-4
+      <br>
+      N° Cuenta: 97-02540-21
+      <br>
+      Correo: <%= quotation.user.email %> . Agregar <b>N° de código de cotización</b> en el correo que se adjunta el comprobante de pago.
+    </p>
+    <p class="gray-text bold">
+      Pagos mixtos
+    </p>
+    <p class="gray-text">
+      Estimado Cliente, si desea pagar la totalidad de su compra con diferentes medios de pago, favor contactarse con su ejecutivo de ventas o diríjase a la tienda donde cotizó
+    </p>
+  </div>
+  
+  <div class="col-xs-6 box-pdf text-center">
+    <p>
+      <%= wicked_pdf_image_tag asset_url('transbank-12-cuotas.png'), class:'cuotas-logo' %>
+      <%= wicked_pdf_image_tag asset_url('webpay.jpg'), class:'webpay-logo' %>
+    </p>
+    <p>
+      <%= link_to "#{Rails.application.secrets.BASE_APP}/webpay/terms_and_conditions/#{quotation.id.to_s}", class:'btn btn-miele more-top-space', target: '_blank' do %>
+      Pagar
+      <% end %>
+    </p>
+  </div>
+</div>
+<% end %>
+
+
+<br><br>
+
+<div class="row text-center sign-text">
+  <p>
+    Miele Electrodomésticos
+    <br>
+    76.740.630-4
+  </p>
+</div>
+
+
+<% quotation.quotation_products.availables.each do |product| %>
+<% if product.product.technical_images.size > 0 %>
+<div class="page-break"></div>
+<div class="row top-space">
+  <div class="col-xs-12">
+    <div class="row bold text-center">
+      <div class="col-pdf-20 pdf-item">Imagen</div>
+      <div class="col-pdf-30 pdf-item">Nombre del Producto</div>
+      <div class="col-pdf-20 pdf-item">TNR</div>
+      <div class="col-pdf-10 pdf-item">Mandatorio</div>
+      <div class="col-pdf-10 pdf-item">Despacho</div>
+      <div class="col-pdf-10 pdf-item">Cantidad</div>
+    </div>
+  </div>
+  <br><br>
+  <div class="col-xs-12 box-pdf">
+    <div class="col-pdf-20 pdf-item">
+      <% if Rails.env.production? || Rails.env.staging? %>
+        <% if quotation.bstock %>
+          <%= image_tag image_pdf(product.product.try(:original_product)), class: "pdf-product-img" %>
+        <% else %>
+          <%= image_tag image_pdf(product.product), class: "pdf-product-img" %>
+        <% end %>
+      <% else %>
+        <% if quotation.bstock %>
+          <%= wicked_pdf_image_tag product.product.try(:original_product).try(:get_product_photo), class: "pdf-product-img" %>
+        <% else %>
+          <%= wicked_pdf_image_tag product.product.get_product_photo, class: "pdf-product-img" %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="col-pdf-30 pdf-item text-space-card"><p><%= product.name %>                     </p></div>
+    <div class="col-pdf-20 pdf-item text-space-card"><p><%= product.sku %>                      </p></div>
+    <div class="col-pdf-10 pdf-item text-space-card"><p><%= product.mandatory ? "Sí" : "No" %>  </p></div>
+    <div class="col-pdf-10 pdf-item text-space-card"><p><%= product.dispatch  ? "Sí" : "No" %>  </p></div>
+    <div class="col-pdf-10 pdf-item text-space-card"><p><%= product.quantity %>                 </p></div>
+  </div>
+
+  <br>
+  <% product.product.technical_images.each do |image| %>
+  <div class="text-center">
+    <% if Rails.env.production? || Rails.env.staging? %>
+    <%= image_tag embed_remote_image(image.image.url(:original), image.image_content_type), class: "move-down-technical" %>
+    <% else %>
+    <%= wicked_pdf_image_tag image.image, class: 'move-down-technical' %>
+    <% end %>
+  </div>
+  <% end %>
+  <% end %>
+  <% end %>
+
+  <% end %>

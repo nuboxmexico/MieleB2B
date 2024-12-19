@@ -1,0 +1,80 @@
+ 
+    <div class="box-cart-left pad-box no-right-box margin-bottom-box">
+        <div class="row">   
+            <div class="col-md-12 col-xs-12 text-left">
+                <p class="title-box-checkout" style="font-size: 18px !important;">Unidad inmobiliaria</p>
+            </div>
+        </div>
+        <div class="row">
+            <br> 
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Nombre</p>
+                <input class="input-real_state update_validation" onchange="validateInputsUpdateNewRealState(<%=unit_real_state.id%>)" type="text" multiple="true" id=<%="name_unit_"+unit_real_state.id.to_s%> value="<%=unit_real_state.name%>">
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Cant. de unidades</p>
+                <input class="input-real_state" onchange="validateInputsUpdateNewRealState(<%=unit_real_state.id%>)" type="number" name="u_tit" multiple="true" id=<%="quantity_unit_"+unit_real_state.id.to_s%>  value="<%=unit_real_state.quantity%>">
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Prod. por unidad</p>
+                <input onchange="validateInputsUpdateNewRealState(<%=unit_real_state.id%>)" id=<%="products_quantity_unit_"+unit_real_state.id.to_s%> min="1" class="input-real_state" type="number"  multiple="true"  value="<%=unit_real_state.products_quantity%>">
+            </div>
+    
+        </div>
+        <div class="row">
+            <br>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Total de productos de unidad</p>
+                <input id=<%="total_product_unit_"+unit_real_state.id.to_s%> class="input-real_state field-bordered" type="text" name="u_tit" multiple="true"  value="<%= (!unit_real_state.quantity.nil? && !unit_real_state.products_quantity.nil?) ? (unit_real_state.quantity * unit_real_state.products_quantity) : nil %>" disabled>
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Valor por unidad inmobiliaria</p>
+                <input id=<%="value_unit_"+unit_real_state.id.to_s%> class="input-real_state field-bordered" type="text" name="u_tit" multiple="true" value="<%=unit_real_state.unit_value%>" disabled>
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Valor total de unidades</p>
+                <input id=<%="total_value_unit_"+unit_real_state.id.to_s%> class="input-real_state field-bordered" type="text" name="u_tit" multiple="true" value="<%=unit_real_state.total_value%>" disabled>
+            </div>
+        </div>
+        <div class="row">
+        <br>
+        <div class="col-xs-12">
+            <div class="form-group actions-container text-right">
+            <a  class="btn btn-flat" onclick="deleteUnit(<%=unit_real_state.id%>)">
+                Eliminar
+            </a>
+            
+            
+            <a  class="btn btn-miele save-dispatch" id=<%="btn_update_new_real_state_"+unit_real_state.id.to_s%> onclick="updateUnit(<%=unit_real_state.id%>)">
+                Guardar
+            </a>
+                
+                </div>
+            </div>
+            </div>
+    </div>
+
+<script>
+
+   //var inputs = document.getElementsByClassName("update_validation");
+   var inputs = $(".update_validation")
+
+   for(input of inputs){
+        input.classList.remove('update_validation');
+        input.classList.add('update_validation_'+ <%=unit_real_state.id%>);      
+   }
+  function validateInputsUpdateNewRealState(unit_real_state_id){
+    var inputs = document.getElementsByClassName('update_validation_'+unit_real_state_id);
+    var i = 0
+    while (i<inputs.length){
+      if (inputs[i].value == ""){
+        $("#btn_update_new_real_state_"+unit_real_state_id).attr("disabled", true);
+        return false
+      }
+      i++;
+    }
+    $("#btn_update_new_real_state_"+unit_real_state_id).removeAttr("disabled", false);
+    return true
+  } 
+  validateInputsUpdateNewRealState(<%=unit_real_state.id%>) 
+</script>

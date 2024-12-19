@@ -1,0 +1,15 @@
+<div id="collapse" class="panel-collapse collapse always-top-up-space" role="tabpanel" aria-labelledby="headingTwo">
+	<i class="fa fa-ticket-alt tertiary-color pt20 hidden-xs"></i>
+	<input type="text" name="code" class="no-borders width-code" placeholder="#DESPACHO10" id="dispatch-code">
+	<%= button_tag(type: "button", id: "submit-code", class: 'btn btn-miele pull-right') do %>
+	Aplicar
+	<% end %>
+	<div class="row mini-miele-text left-space top-code" id="error-message-coupon"></div>
+</div>
+
+<script>
+	$("#submit-code").click(function(e){
+		e.preventDefault();
+		$.post('/apply_promotion/dipatch/'+<%= @cart.id.to_s %>+'.js?code='+$("#dispatch-code").val());		
+	})
+</script>

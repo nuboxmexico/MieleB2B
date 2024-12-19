@@ -1,0 +1,345 @@
+<div class="row row-content fix-bot">
+	<div class="col-md-12 col-xs-12">
+		<ol class="breadcrumb">
+			<% if current_user.manager? or current_user.administrator? %>
+				<li><a href="<%= root_path %>">Inicio</a></li>
+			<% end %>
+			<li><a href="<%= quotations_path %>"><%= get_title(current_user) %></a></li>
+			<% if @quotation.channel == 'Retail' %>
+				<li>OC <%= @quotation.oc_number%></li>
+			<% else %>
+				<li><%= @quotation.code %></li>
+			<% end %>
+		</ol>
+	</div>
+	<div class="col-md-5 col-xs-12">
+		<h1 class="bold no-bot no-top h4-mobile">
+			Detalles de <%= get_name_quotation(current_user) %> 
+		</h1>
+		<p class="quotation-subtitle">
+			<%= (@quotation.channel == 'Retail') ? "N° #{@quotation.oc_number}" : @quotation.code %> <span class="hidden-xs hidden-sm"><%= get_state_label(@quotation.quotation_state, 'full') %></span>
+		</p>
+		<p>
+			<span class="hidden-lg hidden-md"><%= get_state_label(@quotation.quotation_state, 'full') %></span>
+		</p>
+		<% if @versions and @versions.any? %>
+			<%= render 'versions_sidebar' %>
+		<% end %>
+	</div>
+	<div class="col-md-7 col-xs-12 text-right">
+		<p>
+			<% if can? :lead_quotation, @quotation %>
+				<%= link_to (@quotation.get_state == 'Lead' ? 'Ingresar <span class="hidden-xs">Cotización</span>'.html_safe : '<span class="hidden-xs">Ingresar </span>Lead'.html_safe), lead_quotation_path(@quotation), id: 'lead-quotation', method: :post, class: 'btn btn-miele btn-mobile top-quotation-buttons' %>
+			<% end %>
+			<% if current_user.can_manage_project_quotations? %>
+				<spam> Fecha </spam>
+				<%= text_field_tag :exchange_rate_date, (@quotation.exchange_rate_date.strftime("%d/%m/%Y") rescue nil), class: "date-picker", style: "width: 12rem;" %>
+				<!--
+				<spam> T/C </spam>
+				<%= number_field_tag :exchange_rate, @quotation.exchange_rate, class: "field-bordered", step: 2, style: "width: 12rem;" %>
+				<%= select_tag :currency, options_for_select(Lead.currency_options.to_a.map{|c| c.reverse!; [c[0].prepend("CLP/"),c[1]]}, @quotation.currency), { class: 'btn btn-default', id: 'cart-currency-selector' } %>
+				-->
+			<% end %>
+			<% if can? :close_quotation, @quotation %>
+				<!--<%= link_to 'Finalizar cotización', cancel_quotation_path(@quotation), id: 'finish-quotation', method: :post, class: 'btn btn-miele btn-mobile top-quotation-buttons', data: 
+				{ confirm: '¿Estás seguro de que quieres cancelar esta Cotización?',
+					'confirm-button-text': 'Sí',
+					'cancel-button-text': 'Cancelar'} %>-->
+				<%= link_to (@quotation.get_state == 'En Negociación' ? '<span class="hidden-xs">Volver a </span>Ingresada'.html_safe : 'En negociación'.html_safe), negotiation_quotation_path(@quotation), id: 'negotiation-quotation', method: :post, class: 'btn btn-miele btn-mobile top-quotation-buttons' %>
+				<%= link_to 'Venta realizada', close_quotation_path(@quotation), id: 'close-quotation', method: :post, class: 'btn btn-miele btn-mobile top-quotation-buttons' %>
+			<% end %>
+			
+			<% if can? :show, @quotation.lead %>
+				<%= link_to 'Ver lead', lead_path(@quotation.lead), class: 'btn btn-miele top-quotation-buttons' %>
+			<% end %>
+		</p>
+		<!--<% if can? :cancel_quotation, @quotation %>
+			<p>
+				<%= link_to "Finalizar #{@quotation.channel == 'Retail' ? 'OC' : 'Cotización'}", cancel_quotation_path(@quotation), id: 'finish-quotation', method: :post, class: 'btn btn-miele double-top-space', data: 
+				{ confirm: '¿Estás seguro de que quieres cancelar esta Cotización?',
+					'confirm-button-text': 'Sí',
+					'cancel-button-text': 'Cancelar'} %>
+			</p>
+		<% end %>-->
+		<% if can? :reactivate, @quotation %>
+			<p><%= link_to 'Reactivar', reactivate_for_project_path(@quotation), id: 'reactivate-quotation', method: :post, class: 'btn btn-miele double-top-space', data: 
+			{ confirm: '¿Está seguro que desea reactivar esta cotización?',
+				'text': 'Los precios y promociones serán actualizados al día de hoy',
+				'image-url': 'https://icons-for-free.com/iconfiles/png/512/refresh+reload+update+icon-1320191166843452904.png',
+				'image-width': 50,
+				'image-height': 50,
+				'image-alt': 'icono',
+				'confirm-button-text': 'Aceptar',
+				'cancel-button-text': 'Cancelar'} %>
+			</p>
+		<% end %>
+
+		<br /><br /><br />
+
+		<% if @quotation.for_project? %>
+			<div id="day_uf">
+				<p>Valor UF: <%= @quotation.uf_day.nil? ? "Sin información" : "$#{number_with_delimiter(@quotation.uf_day)}" %> </p>
+			</div>
+		<% end %>
+	</div>
+</div>
+
+<% if @quotation.channel == 'Retail' %>
+	<%= render 'quotations/header_retail' %>
+<% else %>
+	<%= render 'quotations/header_normal' %>
+<% end %>
+
+<% 
+if (current_user.is_finance? or current_user.is_finance_manager?) and (@quotation.get_state == 'En curso' or @quotation.get_state == 'Pendiente')
+	active_tab = 'finances-tab'
+elsif current_user.is_project?
+	active_tab = 'products-tab'
+elsif (current_user.manager? or current_user.seller? or current_user.administrator?) and (@quotation.get_state == 'Enviada' or @quotation.get_state == 'Ingresada')
+	active_tab = 'activation-tab'
+elsif (current_user.is_dispatch? or current_user.is_manager_dispatch?)
+	active_tab = 'dispatch-tab'
+elsif current_user.seller? and (@quotation.get_state == 'Por activar' or @quotation.get_state == 'Productos activados')
+	active_tab = 'home-program-tab'
+elsif (current_user.is_instalation? or current_user.is_manager_instalation?)
+	active_tab = 'instalation-tab'
+else 
+	active_tab = 'activation-tab'
+end 
+%>
+
+<% if @quotation.customer.try(:core_id).nil? %>
+	<p class="bold miele-text">
+		<%= image_tag('warning.svg', class: 'file-icon inlineb miele-text', style: 'margin: 0 auto !important;') + " No se pudo crear Cliente en Core" %>
+	</p>
+<% end %>
+<% unless @not_found_skus_in_core.empty? %>
+	<p class="bold miele-text">
+		<%= image_tag('warning.svg', class: 'file-icon inlineb miele-text', style: 'margin: 0 auto !important;') + " Los siguientes Productos no existen en Core: " + @not_found_skus_in_core.join(", ")  %>
+	</p>
+<% end %>
+<% if ['En preparación','Por instalar','Por activar'].include? @quotation.quotation_state.try(:name) && @not_found_skus_in_quotation_in_core.empty? %>
+	<p class="bold miele-text">
+		<%= image_tag('warning.svg', class: 'file-icon inlineb miele-text', style: 'margin: 0 auto !important;') + " Los siguientes Productos no existen dentro de la Cotizacion en el Core: " + @not_found_skus_in_quotation_in_core.join(", ")  %>
+	</p>
+<% end %>
+
+<% if current_user.can_manage_project_quotations? %>
+	<div class="quotation-box text-center">
+		<%= form_for @quotation do |f|%>
+			<%= f.label :valid_quotation, "Cotización vigente: " %>	
+			<%= f.check_box :valid_quotation, onchange: "$(this.form).submit()" %>
+		<% end %>
+	</div>
+<% end %>
+
+<div class="row hidden-xs">
+	<ul class="nav nav-tabs" id="myTab" role="tablist">
+		<% if @quotation.channel != 'Retail' %>
+			<li class="nav-item">
+				<a class="nav-link tab-quotation active" id="products-tab" data-toggle="tab" href="#products" role="tab" aria-controls="products" aria-selected="true">Productos</a>
+			</li>
+		<% end %>
+		<li class="nav-item">
+			<a class="nav-link tab-quotation" id="customer-tab" data-toggle="tab" href="#customer" role="tab" aria-controls="customer" aria-selected="false">
+				<%= customer_tab_label_by_channel(@quotation.channel) %>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link tab-quotation" id="activation-tab" data-toggle="tab" href="#activation" role="tab" aria-controls="activation" aria-selected="false">Activación</a>
+		</li>
+
+		<!--
+		<% if current_user.can_manage_project_quotations? and @quotation.can_configure_dispatch? %>
+			<li class="nav-item">
+				<a class="nav-link tab-quotation" id="dispatch-configuration-tab" data-toggle="tab" href="#dispatch-configuration" role="tab" aria-controls="dispatch-configuration" aria-selected="false">Configuración de Despacho</a>
+			</li>
+		<% end %>
+		-->
+		
+		<% if @quotation.can_watch_finance? %>
+			<li class="nav-item">
+				<a class="nav-link tab-quotation" id="finances-tab" data-toggle="tab" href="#finances" role="tab" aria-controls="finances" aria-selected="false">Finanzas</a>
+			</li>
+		<% end %>
+		<% if @quotation.can_watch_dispatch? %>
+			<li class="nav-item">
+				<a class="nav-link tab-quotation" id="dispatch-tab" data-toggle="tab" href="#dispatch" role="tab" aria-controls="dispatch" aria-selected="false">Despacho</a>
+			</li>
+		<% end %>
+		<% if @quotation.can_watch_instalation? %>
+			<li class="nav-item">
+				<a class="nav-link tab-quotation" id="instalation-tab" data-toggle="tab" href="#instalation" role="tab" aria-controls="instalation" aria-selected="false">Instalaciones</a>
+			</li>
+		<% end %>
+		<% if @quotation.can_watch_home_program? %>
+			<li class="nav-item">
+				<a class="nav-link tab-quotation" id="home-program-tab" data-toggle="tab" href="#home-program" role="tab" aria-controls="home-program" aria-selected="false">Home Program</a>
+			</li>
+		<% end %>
+	</ul>
+</div>
+<div class="row hidden-lg hidden-md hidden-sm bot-space">
+	<div class="col-xs-12 text-center">
+		<% 
+		if @quotation.channel == 'Retail'
+			tabs_list = [["Datos Cliente", "customer-tab"], ["Activación", "activation-tab"], ["Finanzas", "finances-tab"]]
+		elsif @quotation.channel == 'Proyectos'
+			tabs_list = [["Productos","products-tab"], ["Datos Cliente", "customer-tab"], ["Activación", "activation-tab"],["Finanzas", "finances-tab"]]
+		else
+			tabs_list = [["Productos","products-tab"],["Datos Cliente", "customer-tab"],["Activación", "activation-tab"],["Finanzas", "finances-tab"]]
+		end
+		if @quotation.can_watch_dispatch?
+			tabs_list.push(["Despacho","dispatch-tab"])
+		end
+		if @quotation.can_watch_instalation? and @quotation.quotation_products.to_install.size > 0
+			tabs_list.push(["Instalación","instalation-tab"])
+		end
+		if @quotation.can_watch_home_program?
+			tabs_list.push(["Home Program","home-program-tab"])
+		end
+		%>
+		<%= select_tag :tab_selector, options_for_select(tabs_list, active_tab), autofocus: true, class: 'inlineb' %>
+	</div>
+</div>
+<div class="tab-content" id="quotation-content">
+	<% if @quotation.channel != 'Retail' %>
+		<div class="tab-pane fade active" id="products" role="tabpanel" aria-labelledby="products-tab">
+			<% if @quotation.channel == 'Proyectos' %>
+				<%= render 'quotations/products_tab_project' %>
+			<% else %>
+				<%= render 'quotations/products_tab' %>
+			<% end %>
+		</div>
+	<% end %>
+	<div class="tab-pane fade" id="customer" role="tabpanel" aria-labelledby="customer-tab">
+		<%= render customer_tab_by_channel(@quotation.channel) %>
+	</div>
+	<div class="tab-pane fade" id="activation" role="tabpanel" aria-labelledby="activation-tab">
+		<% if @quotation.channel == 'Retail' %>
+			<%= render 'quotations/activation_tab_retail' %>
+		<% elsif @quotation.channel == 'Proyectos' %>
+			<div id="activation_tab_normal_and_project">
+				<%= render partial: 'quotations/activation_tab', locals: { quotation: @quotation } %>
+			</div>
+		<% else %>
+			<div id="activation_tab_normal_and_project">
+				<%= render partial: 'quotations/activation_tab', locals: { quotation: @quotation } %>
+			</div>
+		<% end %>
+	</div>
+	
+	<!--
+	<div class="tab-pane fade" id="dispatch-configuration" role="tabpanel" aria-labelledby="dispatch-configuration-tab">
+		<% if current_user.can_manage_project_quotations? and @quotation.can_configure_dispatch? %>
+			<div class="text-right">
+				<%= link_to 'Enviar', send_dispatch_configuration_alert_path(@quotation), class: 'btn btn-miele' %>
+			</div>
+		<% end %>
+		<%= render 'quotations/dispatch_configurations_tab' %>
+	</div>
+	-->
+
+	<div class="tab-pane fade" id="finances" role="tabpanel" aria-labelledby="finances-tab">
+		<% if @quotation.channel == 'Retail' %>
+			<%= render 'quotations/finance_tab_retail' %>
+		<% elsif @quotation.channel == 'Proyectos' %>
+			<%= render 'quotations/finance_tab' %>
+		<% else %>
+			<%= render 'quotations/finance_tab' %>
+		<% end %>
+	</div>
+	<% if @quotation.can_watch_dispatch? %>
+		<div class="tab-pane fade" id="dispatch" role="tabpanel" aria-labelledby="dispatch-tab">
+			<%= render 'quotations/dispatch/pending_products' %>
+			<% if can? :dispatch_confirm, @quotation %>
+				<%= render 'quotations/dispatchs_tab' %>
+			<% else %>
+				<%= render 'quotations/activate_dispatch', tab: 'dispatch-tab' %>
+			<% end %>
+		</div>
+	<% end %>
+	<% if @quotation.can_watch_instalation? %>
+		<div class="tab-pane fade" id="instalation" role="tabpanel" aria-labelledby="instalation-tab">
+			<%= render 'quotations/instalation' %>
+		</div>
+	<% end %>
+	<% if @quotation.can_watch_home_program? %>
+		<div class="tab-pane fade" id="home-program" role="tabpanel" aria-labelledby="home-program-tab">
+			<%= render 'quotations/home_program' %>
+		</div>
+	<% end %>
+</div>
+
+<script>
+	$(document).ready(function(){
+		$('#tab_selector').select2();
+		$("#<%= active_tab %>").click();
+		$('#tab_selector').on('select2:select', function() {
+			$("#"+$(this).val()+"").click();
+		});
+		$(".collapsed .fa-angle-down").click(function(){
+			if($(this).hasClass('open-tab')){
+				$(this).removeClass('open-tab');
+			} else {
+				$(this).addClass('open-tab');
+			}
+		})
+	})
+
+	$( document ).ready(function() {
+		$("#exchange_rate_date").daterangepicker({
+		  singleDatePicker   : true,
+		  showDropdowns      : true,
+		  autoUpdateInput    : false,
+		  drops              : "down",
+		  applyButtonClasses : "btn btn-small btn-miele",
+		  cancelClass        : "btn btn-flat btn-small",
+		  locale: {
+			format      : 'DD/MM/YYYY',
+			applyLabel  : "Aplicar",
+			cancelLabel : "Limpiar",
+			daysOfWeek  : [
+			  "Do",
+			  "Lu",
+			  "Ma",
+			  "Mi",
+			  "Ju",
+			  "Vi",
+			  "Sa"
+			],
+			monthNames  : [
+			  "Enero",
+			  "Febrero",
+			  "Marzo",
+			  "Abril",
+			  "Mayo",
+			  "Junio",
+			  "Julio",
+			  "Agosto",
+			  "Septiembre",
+			  "Octubre",
+			  "Noviembre",
+			  "Diciembre"
+			]
+		  }
+		});
+		$("#exchange_rate_date").on('apply.daterangepicker', function(ev, picker) {
+		  $(this).val(picker.startDate.format('DD/MM/YYYY'));
+		  let currency = $('#cart-currency-selector').val();
+		  let exchange_rate_date = $("#exchange_rate_date").val()
+		  let exchange_rate = $("#exchange_rate").val()
+		  $('.link-to-new-quotation').attr("href", "/quotations/new?currency="+currency+"&exchange_rate_date="+exchange_rate_date+"&exchange_rate="+exchange_rate);
+		});
+	  
+		$("#exchange_rate_date").on('cancel.daterangepicker', function(ev, picker) {
+		  let current_date = new Date().getDate().toString().padStart(2,"0") + "/" +  (new Date().getMonth()+1).toString().padStart(2,"0") + "/" + new Date().getFullYear().toString();
+		  $(this).val(current_date);
+		  let currency = $('#cart-currency-selector').val();
+		  let exchange_rate_date = $("#exchange_rate_date").val()
+		  let exchange_rate = $("#exchange_rate").val()
+		  $('.link-to-new-quotation').attr("href", "/quotations/new?currency="+currency+"&exchange_rate_date="+exchange_rate_date+"&exchange_rate="+exchange_rate);
+		});
+	});
+
+</script>

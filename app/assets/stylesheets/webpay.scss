@@ -1,0 +1,188 @@
+@import "variables";
+
+.alert-row{
+	font-size: 80px;
+	color: #fff;
+}
+
+.title-webpay{
+	font-weight: 500;
+	font-size: 28px;
+	color: #fff
+}
+
+.content-webpay{
+	font-size: 21px;
+	font-weight: 300;
+	color: #fff;
+}
+
+.line-webpay{
+	border-bottom: 1px solid #fff;
+	margin-top: 40px;
+	margin-bottom: 15px;
+}
+
+.ammount-payment{
+	font-size: 18px;
+	font-weight: 700;
+	color: #fff;
+}
+
+.payment-data{
+	font-size: 18px;
+	color: #fff;
+	font-weight: 300;
+}
+
+.quotation-code-webpay{
+	font-size: 18px;
+	font-weight: 300;
+	color: #fff;
+}
+
+.contact-box-webpay{
+	margin-top: 25%;
+	font-size: 14px;
+	font-weight: 300;
+	color: #fff;
+}
+
+.webpay-div{
+	padding: 8% 35% 0% 35%;
+}
+
+.separate-webpay{
+	margin-top: 20px;
+}
+
+.webpay-explanation{
+	font-weight: 300;
+	font-size: 12px;
+	color: #fff;
+	margin-top: 30px;
+}
+
+@media(max-width: 992px){
+	.webpay-div{
+		padding: 20% 10% 0% 10%;
+	}
+}
+
+.padding-sides-webpay{
+	padding: 0px 30px;
+}
+
+.first-row-webpay{
+	margin-top: 40px;
+}
+
+@media(max-width: 768px){
+	.title-webpay{
+		font-size: 21px;
+	}
+
+	.content-webpay{
+		font-size: 14px;
+	}
+
+	.quotation-code-webpay{
+		font-size: 14px;
+	}
+}
+
+.webpay-icon{
+	background: transparent;
+	width: 300px;
+}
+
+.terms-and-conditions-alert{
+	font-size: 16px;
+	font-weight: 300!important;
+	color: #fff;
+}
+
+.bold-terms{
+	color: #fff!important;
+	font-weight: 700!important;
+}
+
+.bold-terms:hover{
+	color: #fff!important;
+	font-weight: 700!important;
+}
+
+.bold-terms:focus{
+	color: #fff!important;
+	font-weight: 700!important;
+}
+
+.bold-terms:active{
+	color: #fff!important;
+	font-weight: 700!important;
+}
+
+.btn-terms{
+	margin-top: 20px;
+	font-size: 18px!important;
+}
+
+.webpay-cr {
+	border: 2px solid #fff!important;
+	border-radius: 4px!important;
+	width: 1.6em!important;
+	height: 1.6em!important;
+}
+
+.separation-left-check{
+	margin-left: 10px;
+	padding-top: 10px;
+}
+
+@media(max-width: 768px){
+	.separation-left-check{
+		margin-left: 5px;
+		padding-top: 10px;
+	}
+}
+
+.ammount-separation-webpay{
+	margin-top: 40px;
+}
+
+@media(max-width: 768px){
+	.checkbox .webpay-cr .cr-icon {
+		font-size: .5em;
+		line-height: 0;
+		top: 50%;
+		left: 20%;
+	}
+}
+
+.payment-method-separation{
+	margin-top: 25px;
+}
+
+.container-terms{
+	margin: 0px 0px;
+}
+
+.title-webpay-terms{
+	font-size: 28px;
+	color: #fff;
+	font-weight: 500;
+}
+
+@media(max-width: 768px){
+	.container-terms{
+		margin: 0px 20px;
+	}
+
+	.title-webpay-terms{
+		font-size: 18px;
+	}
+
+	.terms-and-conditions-alert{
+		font-size: 14px;
+	}
+}

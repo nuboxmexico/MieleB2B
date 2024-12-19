@@ -1,0 +1,50 @@
+<div class="line-row-info "></div>
+<div class="row top-both">
+	<div class="col-md-12 col-xs-12 text-left">
+		<p class="bold secondary-text">Documentos</p>
+	</div>
+</div>
+<%= form_tag load_billing_documents_path(quotation), method: :post, multipart: true, id: 'load-billing-documents-form' do %>
+	<div class="row top-both">
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+			<label for="billing_documents[]" class="title-input">Comprobantes de Pago</label>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="billing_documents[]" multiple="true"  accept="image/jpeg, image/png, application/pdf" id="billing_documents" class="file-input">
+				</div>
+				<% if quotation.billing_documents.size == 0 %>
+				<label id="billing_documents-error-out" class="error-out hidden" for="billing_documents">Este campo es obligatorio.</label>
+				<% end %>
+			</div>
+		</div>
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 col-lg-offset-1 top-mobile">
+			<label for="payment_documents[]" class="title-input">Boleta / Factura</label>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="payment_documents[]" multiple="true"  accept="image/jpeg, image/png, application/pdf" id="payment_documents" class="file-input">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row top-both">
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 top-mobile">
+			<label for="backup_documents[]" class="title-input">Respaldos</label>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="backup_documents[]" multiple="true" id="backup_documents" class="file-input">
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-lg-offset-3 col-md-6 col-xs-12 top-both text-right">
+			<p class="top-mobile">
+				<button type="submit" class="btn btn-miele" id="send-billing-documents">Guardar</button>
+			</p>
+		</div>
+	</div>
+<% end %>

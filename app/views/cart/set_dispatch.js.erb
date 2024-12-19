@@ -1,0 +1,7 @@
+$('<%= "#cart-total-cost-#{@cart_item.cart.id}" %>').html("<%= number_with_delimiter(@cart_item.cart.total_per_pay.to_i) %> <span class='min-text'>(IVA Incluído)</span>");
+<% if @cart_item.cart.pay_percent == 100 %>
+$('#cart-deb-<%= @cart_item.cart.id %>').addClass('hidden');
+<% else %>
+$('#cart-deb-<%= @cart_item.cart.id %>').removeClass('hidden');
+$('#cart-deb-<%= @cart_item.cart.id %>').text('Saldo: <span class="currency-change" data-currency="$"> <%= number_with_delimiter(@cart.total - @cart.total_per_pay ) %> </span>');
+<% end %>

@@ -1,0 +1,9 @@
+$('.lead-form #product-inputs-container')
+  .append("<%= j render partial: 'product_inputs', locals: {product: @product, tag_id: @tag_id, currency: @currency} %>");
+
+new Cleave($('.product-price').last()[0], {
+      numeral: true,
+      swapHiddenInput: true,
+      numeralDecimalMark: ',',
+      delimiter: '.',
+    });  

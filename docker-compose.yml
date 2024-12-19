@@ -1,0 +1,60 @@
+version: "3.3"
+
+services:
+  app: &app
+    build: .
+    image: miele-b2b-cl-dev
+    volumes:
+      - .:/usr/src
+      - bundler_cache:/usr/local/bundle
+    command: bash -c "rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'"
+    ports:
+      - 3000:3000
+    networks:
+      - local
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    tty: true
+    stdin_open: true
+
+  postgres:
+    image: postgres:12.17
+    restart: always
+    ports:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+    networks:
+      - local
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: mieleb2b
+
+  redis:
+    image: redis:7.2.3
+    command: redis-server
+    ports:
+      - 6379
+    volumes:
+      - redis_data:/var/lib/redis/data
+    networks:
+      - local
+
+  sidekiq:
+    <<: *app
+    command: bundle exec sidekiq
+    ports: []
+    depends_on:
+      - redis
+
+volumes:
+  bundler_cache:
+  postgres_data:
+  redis_data:
+
+networks:
+  local:

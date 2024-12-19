@@ -1,0 +1,251 @@
+<%
+=begin%>
+ <div class="box-cart-left pad-box no-right-box margin-bottom-box">
+    <div class="row">   
+        <div class="col-md-12 col-xs-12 text-left">
+            <p class="title-box-checkout">Unidad inmobiliaria</p>
+        </div>
+    </div>
+    <div class="row">
+        <br>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Nombreee</p>
+            <input class="input-real_state new_validation_<%=unit_real_state_project.id%>" onchange="validateInputsUpdateNewRealState(<%=unit_real_state_project.id%>)" type="text" multiple="true" id="" class="field-bordered" value="">
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Cantidad de unidades inmobiliarias</p>
+            <input min="1" id=<%="unit_real_state_input_"%> onblur="setTotalProducts(<%=unit_real_state_project.id%>)" class="input-real_state new_validation_<%=unit_real_state_project.id%>" onchange="validateInputsUpdateNewRealState(<%=unit_real_state_project.id%>)" type="number" name="u_tit" multiple="true" id="u_tit" class="field-bordered">
+        </div>
+        <div class="col-md-5 col-xs-12">
+        </div>
+        <div class="col-md-1 col-xs-12">
+            <br>
+            <button onclick="eliminateRealState(<%=unit_real_state_project.id%>)" class="eliminate-button-not-outline">X</button>
+        </div>
+    </div>
+    <div class="row">
+        <br>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Productos por unidad inmobiliaria</p>
+            <h1><%=unit_real_state_project.id%></h1>
+            <input  id=<%="products_input_"%> min="1" onchange="validateInputsUpdateNewRealState(<%=unit_real_state_project.id%>)" class="input-real_state new_validation_<%=unit_real_state_project.id%>" onblur="setTotalProducts()" type="number"  multiple="true" class="field-bordered" value="">
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Total de productos de unidad inmobiliaria</p>
+            <input id=<%="total_products_input_"%> class="input-real_state" type="text" multiple="true" class="field-bordered" value="" disabled>
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Valor por unidad inmobiliaria</p>
+            <br>
+            <input id=<%="value_unit_"%> class="input-real_state" type="text"  multiple="true" class="field-bordered" value="" disabled>
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Valor total de unidades inmobiliarias</p>
+            <input id=<%="total_value_unit_"%> class="input-real_state" type="text"  multiple="true" class="field-bordered" value="" disabled>
+        </div>
+    </div>
+    <%= form_for unit_real_state, html: {multipart: true} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+              <%= f.label :name, 'Nombre', class: 'title-input' %>
+              <%= f.text_field :name, class: 'field-bordered inlineb date-picker', :required => true, id: "unit_real_state-name-input-#{unit_real_state.id}", value: (unit_real_state.name ? unit_real_state.name : nil) %>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group actions-container text-right">
+              <button  class="btn btn-flat">
+                Eliminar
+              </button>
+              
+              <%= f.submit submit_label, class: 'btn btn-miele save-dispatch'%>
+
+            
+                <%= f.hidden_field :quotation_id, value: @quotation.id %>
+              
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <script type="text/javascript">
+        // let s= document.getElementById("all_unit_real_state");
+        // cantidad = parseInt(s.getAttribute("value"))
+        // s.setAttribute("value", (cantidad + 1).toString())
+        // // if (parseInt(val) <= cantidad+1){
+        // //      $("#new_link_button").addClass("hidden")
+        // // }
+    </script>
+</div>
+
+<script type="text/javascript">
+
+    var projectInstallationValues = <%=project_installation_values.to_json.html_safe%>
+    var projectInstallationDiscounts = <%=project_installation_discounts.to_json.html_safe%>
+    var total_cost = <%=total_cost.to_json.html_safe%>
+
+    function validateInputsUpdateNewRealState(unit_real_state_id){
+    var inputs = document.getElementsByClassName('new_validation_'+unit_real_state_id);
+    var i = 0
+    while (i<inputs.length){
+      if (inputs[i].value == ""){
+        $("#btn_update_new_real_state").attr("disabled", true);
+        return false
+      }
+      i++;
+    }
+    $("#btn_update_new_real_state").removeAttr("disabled", false);
+    return true
+  }
+
+    function validateGenerateButton(){
+         cantidad = <%=@unit_real_states%>
+         validateGenerateButton2();
+        // var i = 0
+        // var total = 0; 
+        // let val = document.getElementById('u_tit').value;
+        // while (i < cantidad){
+        //     var total_i = document.getElementById("unit_real_state_input_"+(i+1));
+        //     if (total_i){
+        //         total_i = parseInt(total_i.value);
+        //         if (!Number.isNaN(total_i)){
+        //             total = total + total_i
+        //         }
+        //     }
+        //     i = i+1
+        // }
+        // if (parseInt(val) ==  total){
+        //     document.getElementById("submit-quotation").disabled = false;
+        // }
+        // else{
+        //     document.getElementById("submit-quotation").disabled = true;
+        // }
+    }
+
+
+    function setDiscount(id){
+        var cantidad = <%=@unit_real_states%>
+        var i = 0
+        var total = 0; 
+        while (i < cantidad){
+            var total_i = document.getElementById("total_value_unit_"+(i+1));
+            if (total_i){
+                total_i = parseFloat(  (total_i.value).substring(2, total_i.value.length).replace(".",''));
+                if (!Number.isNaN(total_i)){
+                    total = total + total_i
+                }
+            }
+            i = i+1
+        }
+        i = 0
+        var discount_percentage = 0
+        while (i<projectInstallationDiscounts.length){
+            if (total_cost >= projectInstallationDiscounts[i].min_amount && total_cost <= projectInstallationDiscounts[i].max_amount){
+                discount_percentage = projectInstallationDiscounts[i].discount_percentage;
+                break;
+            }
+            i = i+1;
+        }
+        if (discount_percentage !=0){
+            document.getElementById("label_installation_price").innerHTML = "Instalación ("+discount_percentage+"% Descuento)";
+            var final = total- (total*(discount_percentage/100))
+            var redound = Math.round((final + Number.EPSILON) * 100) / 100;
+            installation_cost = final
+            document.getElementById("quotation-installation-price").innerHTML = redound.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            updateSubTotal();
+        }
+        else{
+             document.getElementById("label_installation_price").innerHTML = "Instalación";
+             document.getElementById("quotation-installation-price").innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        $("#show_installation_price").removeClass("hidden"); 
+        
+    }
+
+    function eliminateRealState(id){
+        $("#"+id.id).remove();
+        let s= document.getElementById("all_unit_real_state");
+        cantidad = parseInt(s.getAttribute("value"))
+        s.setAttribute("value", (cantidad - 1).toString())
+        let val = document.getElementById('u_tit').value;
+        // if (parseInt(val) > cantidad-1){
+        //      $("#new_link_button").removeClass("hidden"); 
+        // }
+        updatePendingProducts(id);
+        setDiscount(id);
+        validateGenerateButton();
+    }
+    function setTotalProducts(id){
+        var units = document.getElementById("unit_real_state_input_"+id).value;
+        var products =  document.getElementById("products_input_"+id).value;
+        var total = document.getElementById("total_products_input_"+id);
+        validateGenerateButton();
+        if (units!="" && products!=""){
+            var result = parseInt(units) * parseInt(products);
+            total.value = result;
+            setUnitValue(id,parseInt(products), parseInt(total.value));
+            updatePendingProducts(id);   
+            setDiscount(id);      
+            return ;
+        }
+         if (units!="" || products!=""){
+             total.value = "";
+             return ;
+         }
+    }
+    function setUnitValue(id,products, total){
+        var i = 0
+        var costRm = 0
+        var costAdditional = 0
+        while (i<projectInstallationValues.length){
+            if (products >= projectInstallationValues[i].min_amount && products <= projectInstallationValues[i].max_amount){
+                costRm = projectInstallationValues[i].cost_RM;
+                costAdditional = projectInstallationValues[i].cost_additional_region;
+                break;
+            }
+            i = i+1;
+        }
+         var valueUnit =  document.getElementById("value_unit_"+id);
+         var totalValueUnit = document.getElementById("total_value_unit_"+id);
+        if (isRm()){ 
+            valueUnit.value = "UF "+ (costRm * products).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            totalValueUnit.value = "UF "+(costRm * total).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+        }
+        else{
+            valueUnit.value = "UF "+((costRm + costAdditional) * products).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            totalValueUnit.value = "UF "+( (costRm + costAdditional) * total).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+        }
+    }
+
+    function updatePendingProducts(id){
+        var cantidad = <%=@unit_real_states%>
+            var i = 0
+            var total_pending = 0; 
+            while (i < cantidad){
+                var total_i = document.getElementById("total_products_input_"+(i+1));
+                if (total_i){
+                    total_i = parseInt(total_i.value);
+                    if (!Number.isNaN(total_i)){
+                        total_pending = total_pending + total_i
+                    }
+                }
+                i = i+1
+            }
+            var pending = parseInt(document.getElementById("span_installation_products").innerHTML) - total_pending;
+            document.getElementById("span_pending_products").innerHTML = pending;
+    }
+
+    function isRm(){
+        var commune_title = document.getElementById("select2-dispatch-commune-select-for-project-container").title;
+        if(commune_title.search("Metropolitana")!=-1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+</script>
+ 
+<%
+=end%>

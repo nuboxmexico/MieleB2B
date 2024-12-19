@@ -1,0 +1,43 @@
+<div class="nested-fields">
+	<div class="col-lg-12">
+		<div class="row">
+			<hr>
+			<% if !first %>
+			<div class="col-lg-12 col-xs-12 text-right">
+				<%= link_to_remove_association "<span class='miele-text'>Eliminar Rol X</span>".html_safe, f %>
+			</div>
+			<% end %>
+			<div class="col-md-6 col-xs-12">
+				<div class="select2-role role-div select2-full-border" id="user-role">
+					<%= f.select :role_id, options_for_select(@roles, f.object.role_id), { include_blank: 'Seleccione una ...', required: true}, {class: 'role' } %>
+				</div>
+			</div>
+
+			<% if current_user.administrator? or current_user.manager? or f.object.sale_channel_id %>
+			<div class="col-xs-12 col-md-6 <%= (f.object.sale_channel_id and (f.object.manager? or f.object.seller?)) ? '' : 'hidden' %> user-sale-channel">
+				<%= f.select :sale_channel_id, options_for_select(@sale_channels.pluck(:name, :id), (f.object.try(:sale_channel_id) ? f.object.try(:sale_channel_id) : @sale_channels.first.id)), { include_blank: 'Seleccione una ...' }, class:'sale_channel' %>
+			</div>
+			<% end %>
+			<div class="col-lg-6 col-xs-12">
+				<%= f.select :cost_center_id, options_for_select(CostCenter.all.collect{ |cc| [cc.code.to_s+' - '+cc.name, cc.id] }, (f.object.try(:cost_center_id) ? f.object.try(:cost_center_id) : CostCenter.first.id)), { include_blank: 'Seleccione una ...', required: true }, class:'cost_center'%>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$('.role').select2();
+	$('.cost_center').select2();
+	$(".sale_channel").select2();
+	$(".role").change(function(){
+    var target = $(this).parent().parent().parent().parent().find('.user-sale-channel'); // perdón por el trucazo
+    if($(this).val() == 2 || $(this).val() == 3){
+    	target.removeClass("hidden");
+    	target.first().prop("required", true);
+    }
+    else{
+    	target.addClass("hidden");
+    	target.first().prop("required", false);
+    }
+});
+</script>

@@ -1,0 +1,132 @@
+<div class="row label-bold">
+  <div class="col-xs-12 col-lg-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <label class="control-label" for="banner_banner_image">Banner <b>(Sugerencia 1900x550px)</b></label>
+        <div class="file-field input-field">
+          <div class="file-drop-area dashed-border">
+            <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+            <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+            <input type="file" name="banner[banner_image]" required="true" accept="image/gif, image/jpeg, image/png" id="banner-image-load" class="file-input">
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-xs-12 space-mobile-sections">
+        <label class="control-label" for="banner_banner_mobile">Banner Mobile <b>(Sugerencia 500x300px)</b></label>
+        <div class="file-field input-field">
+          <div class="file-drop-area dashed-border">
+            <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+            <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+            <input type="file" name="banner[banner_mobile]" required="true" accept="image/gif, image/jpeg, image/png" id="banner-mobile-load" class="file-input">
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  <div class="col-lg-12 col-xs-12 top-both-banner">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :start_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :end_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-12 col-xs-12 top-space">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.url_field :url, class: "field-bordered", placeholder: "URL" %>
+      </div>
+      <div class="col-lg-4 col-xs-12 mini-top-space">
+        <p class="text-light thin-text resize-mobile">Debes subir un archivo <span class="miele-text">.JPG</span> de dimensiones 1900x550px o puedes guiarte por nuestra  <b><a href="/banner/reference" id="image-reference-template" data-download="template" class="miele-text miele-link bold">imagen de referencia <i class="fa fa-file-download"></i></a></b>.</p>
+      </div>
+      <div class="col-lg-2 col-xs-12 text-right">
+        <%= button_tag(type: "submit", id: "submit-banner", class: 'btn btn-miele', disabled: true) do %>
+        Crear Banner
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#banner_sale_channels').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  $('#banner_start_date').daterangepicker({
+    singleDatePicker   : true,
+    showDropdowns      : true,
+    autoUpdateInput    : true,
+    drops              : "up",
+    applyButtonClasses : "btn btn-small btn-miele",
+    cancelClass        : "btn btn-flat btn-small",
+    locale: {
+      format      : 'DD/MM/YYYY',
+      applyLabel  : "Aplicar",
+      cancelLabel : "Limpiar",
+      daysOfWeek  : [
+      "Do",
+      "Lu",
+      "Ma",
+      "Mi",
+      "Ju",
+      "Vi",
+      "Sa"
+      ],
+      monthNames  : [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+      ]
+    }
+  });
+  $('#banner_end_date').daterangepicker({
+    singleDatePicker   : true,
+    showDropdowns      : true,
+    autoUpdateInput    : true,
+    drops              : "up",
+    applyButtonClasses : "btn btn-small btn-miele",
+    cancelClass        : "btn btn-flat btn-small",
+    locale: {
+      format      : 'DD/MM/YYYY',
+      applyLabel  : "Aplicar",
+      cancelLabel : "Limpiar",
+      daysOfWeek  : [
+      "Do",
+      "Lu",
+      "Ma",
+      "Mi",
+      "Ju",
+      "Vi",
+      "Sa"
+      ],
+      monthNames  : [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+      ]
+    }
+  });
+  $("#banner_start_date").on('apply.daterangepicker', function(ev, picker) {
+    minDate2 = picker.startDate;
+    $("#banner_end_date").data('daterangepicker').minDate = minDate2;
+  });
+</script>

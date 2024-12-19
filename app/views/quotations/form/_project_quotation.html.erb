@@ -1,0 +1,326 @@
+<script src="https://cdn.jsdelivr.net/npm/datalist-css/dist/datalist-css.min.js"></script>
+
+<div class="row label-bold quotation-form-container">
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :project_name, 'Nombre Proyecto', class: 'control-label required' %>
+        <%= form.text_field :project_name, required: true, class: "field-bordered", placeholder: "Nombre Proyecto" %>
+        <label id="quotation_project_name-error" class="error hidden" for="quotation_project_name">Este campo es obligatorio.</label>
+      </div>
+
+      <div class="col-lg-6 col-xs-12" style="display:none;">
+        <%= form.label :total, 'TOTAL', class: 'control-label required' %>
+        <%= form.text_field :total, class: "field-bordered", placeholder: "total Proyecto" %>
+      </div>
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :real_state_name, 'Nombre inmobiliaria', class: 'control-label' %>
+        <%= form.text_field :real_state_name, class: 'field-bordered', placeholder: 'Nombre inmobiliaria', list: 'real_state_companies', autocomplete: 'off' %>
+        <datalist id="real_state_companies">
+          <% @all_real_state_companies.each do |i| %>
+            <option><%= i.name %></option>
+          <% end %>
+        </datalist>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-lg-2 col-xs-12">
+        <%= form.label :dispatch_address_street_type, 'Tipo', class: 'control-label' %>
+        <%= form.select :dispatch_address_street_type, options_for_select([ "Calle", "Avenida", "Pasaje", "Diagonal"], @quotation.dispatch_address_street_type), { include_blank: 'Seleccione...' }, class: "select2-input-for-project"  %>
+      </div>
+
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :dispatch_address, 'Dirección Proyecto', class: 'control-label' %>
+        <%= form.text_field :dispatch_address, class: "field-bordered", placeholder: "Dirección" %>
+      </div>
+
+      <div class="col-lg-2 col-xs-12">
+        <%= form.label :dispatch_address_number, 'N°', class: 'control-label' %>
+        <%= form.text_field :dispatch_address_number, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+
+      <div class="col-lg-4 col-xs-12">
+        <div class="select2-full-border" id="dispatch-commune-content">
+          <%= form.label :dispatch_commune_id, 'Comuna' %>
+          <%= form.select :dispatch_commune_id, options_for_select(@communes_for_select, @quotation.dispatch_commune_id), { include_blank: 'Seleccione una ...' }, {class: 'select2-input-for-project', id: 'dispatch-commune-select-for-project'} %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-xs-12">
+        <label class="control-label" style="font-size: 18px !important; margin-bottom: 15px !important;">Constructora</label>
+      </div>
+
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :business_name, 'Razón social', class: 'control-label' %>
+        <%= form.text_field :business_name, class: "field-bordered", placeholder: "Razón social" %>
+      </div>
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :business_rut, 'Rut empresa', class: 'control-label' %>
+        <%= form.text_field :business_rut, class: "field-bordered", placeholder: "11111111-1" ,pattern: "[0-9]{1,2}[0-9]{3}[0-9]{3}-[0-9Kk]{1}", 'data-bv-regexp-message': 'RUT Inválido', oninput: "checkRut(this);" %>
+      </div>
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :business_sector, 'Giro comercial', class: 'control-label' %>
+        <%= form.text_field :business_sector, class: "field-bordered", placeholder: "Giro comercial" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :cost_center_id, 'Centro de costo', class: 'control-label' %>
+        <%= form.select :cost_center_id, options_for_select(CostCenter.all.collect{ |cc| [cc.code.to_s+' - '+cc.name, cc.id] }, current_user.try(:cost_center_id)), {} %>
+      </div>
+      <!-- 
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :estimated_dispatch_date, 'Fecha estimada Despacho', class: 'control-label' %>
+        <%= form.text_field :estimated_dispatch_date, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;", value: (@quotation.estimated_dispatch_date ? @quotation.estimated_dispatch_date.strftime('%d/%m/%Y') : nil) %>
+      </div>
+      <div class="col-lg-4 col-xs-12">
+        <%= form.label :installation_date, 'Fecha estimada Instalación', class: 'control-label' %>
+        <%= form.text_field :installation_date, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;", value: (@quotation.installation_date ? @quotation.installation_date.strftime('%d/%m/%Y') : nil) %>
+      </div>
+       -->
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <%= form.label :observations, 'Observaciones', class: 'control-label' %>
+        <%= form.text_area :observations, rows: 4, class: "text-area-shadow-0 field-bordered full-width" %>
+      </div>
+    </div>
+
+    <div class="row line-hr"></div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <h3>Información de contacto</h3>
+      </div>
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :name, 'Nombre', class: 'control-label' %>
+        <%= form.text_field :name, class: "field-bordered", placeholder: "Nombre" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :lastname, 'Apellido paterno', class: 'control-label' %>
+        <%= form.text_field :lastname, class: "field-bordered", placeholder: "Apellido Paterno" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :second_lastname, 'Apellido materno', class: 'control-label' %>
+        <%= form.text_field :second_lastname, class: "field-bordered", placeholder: "Apellido Materno" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :email, 'Correo electrónico', class: 'control-label' %>
+        <%= form.email_field :email, class: "field-bordered", 'data-bv-emailAddress-message': 'correo inválido', placeholder: "correo@email.cl" %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-2 col-xs-12">
+        <%= form.label :personal_address_street_type, 'Tipo', class: 'control-label' %>
+        <%= form.select :personal_address_street_type, options_for_select([ "Calle", "Avenida", "Pasaje", "Diagonal"], @quotation.personal_address_street_type), { include_blank: 'Seleccione...' }, class: "select2-input-for-project"  %>
+      </div>
+      <div class="col-lg-3 col-xs-12">
+        <%= form.label :personal_address, 'Dirección Contacto', class: 'control-label' %>
+        <%= form.text_field :personal_address, class: "field-bordered", placeholder: "Dirección" %>
+      </div>
+      <!-- personal_address_number -->
+      <div class="col-lg-2 col-xs-6">
+        <%= form.label :personal_address_number, 'N°', class: 'control-label' %>
+        <%= form.text_field :personal_address_number, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+      <div class="col-lg-2 col-xs-6">
+        <%= form.label :personal_dpto_number, 'Depto', class: 'control-label' %>
+        <%= form.text_field :personal_dpto_number, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+      <!-- personal_address_commune -->
+      <div class="col-lg-3 col-xs-12">
+        <div class="select2-full-border" id="personal-commune-content">
+          <%= form.label :personal_commune_id, 'Comuna', class: 'control-label' %>
+          <%= form.select :personal_commune_id, options_for_select(@communes_for_select, @quotation.personal_commune_id), { include_blank: 'Seleccione una ...' }, {class: 'select2-input-for-project'} %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :mobile_phone, 'Teléfono celular', class: 'control-label' %>
+        <%= form.text_field :mobile_phone, class: "field-bordered", placeholder: "111111111", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :phone, 'Teléfono fijo', class: 'control-label' %>
+        <%= form.text_field :phone, class: "field-bordered", placeholder: "111111111", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+    </div>
+  </div>
+</div>
+<%= hidden_field_tag 'edit', true %>
+<%= hidden_field_tag 'creation', true %>
+<% if @cart %>
+  <% if @cart.promotional_code %>
+    <%= hidden_field_tag 'quotation[promotional_code_id]', @cart.promotional_code.id %>
+  <% end %>
+  <%= hidden_field_tag 'quotation[bstock]', @cart.bstock %>
+  <%= hidden_field_tag 'quotation[apply_discount]', @cart.apply_discount %>
+<% end %>
+
+<%= hidden_field_tag 'quotation[sale_channel_id]', current_user.sale_channel_id %>
+<%= hidden_field_tag 'quotation[miele_role_id]', current_user.miele_role_id %>
+
+<%= hidden_field_tag 'quotation[currency]', quotation_currency_from_params %>
+<%= hidden_field_tag 'quotation[exchange_rate]', quotation_exchange_rate_from_params %>
+<%= hidden_field_tag 'quotation[exchange_rate_date]', quotation_exchange_rate_date_from_params %>
+
+<%= hidden_field_tag 'quotation[document_type]', 'factura' %>
+
+<script>
+  var business_name, business_sector, business_rut, billing_address, billing_address_number, billing_dpto_number, billing_commune_id = '';
+  $("#quotation_cost_center_id").select2();
+  <% if params[:action] == 'edit' and @quotation.try(:dispatch_commune_id) %>
+    $.post('/quotations/<%= @cart.id.to_s %>/check_dispatch/<%= @quotation.dispatch_commune_id %>.js')
+  <% end %>
+
+  function setBillingParams(){
+    $("#quotation_business_name").val(business_name);
+    $("#quotation_business_rut").val(business_rut);
+    $("#quotation_business_sector").val(business_sector);
+    $("#quotation_billing_address").val(billing_address);
+    $("#quotation_billing_address_number").val(billing_address_number);
+    $("#quotation_billing_dpto_number").val(billing_dpto_number);
+    $("#quotation_billing_commune_id").val(billing_commune_id);
+    $("#quotation_billing_commune_id").trigger("change");
+    $("#quotation_billing_commune_id").parent().removeClass('has-error');
+  }
+
+
+  $('#factura-label').click(function () {
+    $("#boleta-label").removeClass("btn-toggle-active");
+    $("#factura-label").addClass("btn-toggle-active");
+    $("#document-type").val("factura");
+    $("#bill-address-container").removeClass("hidden");
+    $("#quotation_business_name").attr("required", "true");
+    $("#quotation_business_rut").attr("required", "true");
+    $("#quotation_billing_address").attr("required", "true");
+    $("#quotation_billing_address_number").attr("required", "true");
+    $("#quotation_billing_commune_id").attr("required", "true");
+    setBillingParams();
+    if($(this).valid() && ($('.bform').find('.has-error').length == 0)){
+      $('#submit-quotation').prop("disabled", false);
+    } else {
+      $('#submit-quotation').prop("disabled", true);
+    }
+  });
+  $('#boleta-label').click(function () {
+    $("#factura-label").removeClass("btn-toggle-active");
+    $("#boleta-label").addClass("btn-toggle-active");
+    $("#document-type").val("boleta");
+    $("#bill-address-container").addClass("hidden");
+    $("#quotation_business_name").removeAttr("required");
+    $("#quotation_business_name").removeAttr("aria-required");
+    $("#quotation_business_name").val("");
+    $("#quotation_business_rut").removeAttr("required");
+    $("#quotation_business_rut").removeAttr("aria-required");
+    $("#quotation_business_rut").val("");
+    $("#quotation_billing_address").removeAttr("required");
+    $("#quotation_billing_address").removeAttr("aria-required");
+    $("#quotation_billing_address").val("");
+    $("#quotation_billing_address_number").removeAttr("required");
+    $("#quotation_billing_address_number").removeAttr("aria-required");
+    $("#quotation_billing_address_number").val("");
+    $("#quotation_billing_dpto_number").removeAttr("aria-required");
+    $("#quotation_billing_dpto_number").val("");
+    $("#quotation_billing_commune_id").removeAttr("required");
+    $("#quotation_billing_commune_id").removeAttr("aria-required");
+    $("#quotation_billing_commune_id").val("");
+    $("#quotation_billing_commune_id").trigger("change");
+    $("#quotation_billing_commune_id").parent().removeClass('has-error');
+    if($(this).valid() && ($('.bform').find('.has-error').length == 0)){
+      $('#submit-quotation').prop("disabled", false);
+    } else {
+      $('#submit-quotation').prop("disabled", true);
+    }
+  });
+
+  $('.document-type-option').click(function(){
+    $("#business-data").removeClass("hidden");
+    $('.repeat-value').prop('checked', false);
+
+  })
+
+  function fill_form_quotation(item){
+    $("#quotation_name").val(item.name);
+    $("#quotation_phone").val(item.phone);
+    $("#quotation_email").val(item.email);
+    $("#quotation_lastname").val(item.lastname);
+    $("#quotation_second_lastname").val(item.second_lastname);
+    $("#quotation_personal_address").val(item.personal_address);
+    $("#quotation_personal_address_number").val(item.personal_address_number);
+    $("#quotation_personal_dpto_number").val(item.personal_dpto_number);
+    $("#quotation_personal_commune_id").val(item.personal_commune_id);
+    $("#quotation_personal_commune_id").trigger('change');
+    $("#linked-quotation").html(item.linked_to);
+
+    <% if @cart and @cart.cart_items.where(dispatch: true).any? %>
+      $("#quotation_dispatch_address").val(item.dispatch_address);
+      $("#quotation_dispatch_address_number").val(item.dispatch_address_number);
+      $("#quotation_dispatch_dpto_number").val(item.dispatch_dpto_number);
+      $("#quotation_dispatch_commune_id").val(item.dispatch_commune_id);
+      $("#quotation_dispatch_commune_id").trigger('change');
+      $.post('/quotations/<%= @cart.id.to_s %>/check_dispatch/'+$("#quotation_dispatch_commune_id").val()+'.js');
+    <% end %>
+
+    <% if @cart and @cart.cart_items.where(instalation: true).any? %>
+      $("#quotation_instalation_address").val(item.instalation_address);
+      $("#quotation_instalation_address_number").val(item.instalation_address_number);
+      $("#quotation_instalation_dpto_number").val(item.instalation_dpto_number);
+      $("#quotation_instalation_commune_id").val(item.instalation_commune_id);
+      $("#quotation_instalation_commune_id").trigger('change');
+    <% end %>
+    business_name = item.business_name;
+    business_sector = item.business_sector;
+    business_rut = item.business_rut;
+    billing_address = item.billing_address;
+    billing_address_number = item.billing_address_number;
+    billing_dpto_number = item.billing_dpto_number;
+    billing_commune_id = item.billing_commune_id;
+    setBillingParams();
+
+    $("#quotation_rut").val(item.rut);
+    $("#quotation_rut").trigger("change");
+  }
+
+  if ($("#quotation_rut").length > 0) {
+    $("#quotation_rut").autocomplete({
+      source: function( request, response ) {
+        $.ajax( {
+          url: "/customers/search.json",
+          dataType: "json",
+          data: {
+            rut: $("#quotation_rut").val()
+          },
+          success: function( data ) {
+            response( data );
+          },
+
+        });
+      },
+      select: function( event, ui ) {
+        event.preventDefault();
+        fill_form_quotation(ui.item);
+      },
+      minLength: 2
+    }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+      return $( "<li>" )
+      .append('<div>'+item.rut+' - '+item.fullname+'</div>')
+      .appendTo( ul );
+    };
+  }
+</script>

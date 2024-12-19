@@ -1,0 +1,9 @@
+<p>
+    Estimado/a Manager Finanzas:
+</p>
+<p>
+	Se ha ingresado un nuevo pago a la cotización <%= @quotation.code %>, por el monto de UF <%= number_with_delimiter(@payment.ammount.round(2)) %>, y est&aacute; pendiente de validar por el rol Manager Finanzas.
+</p>
+<p>
+    Puede ingresar a la cotización <%= @quotation.code %> a trav&eacute;s del siguiente <%= link_to 'link', quotation_url(@quotation) %>.
+</p>

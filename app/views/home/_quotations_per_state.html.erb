@@ -1,0 +1,63 @@
+<p class="dashboard-title">Cotizaciones Enviadas v/s Cerradas</p>
+<figure class="highcharts-figure">
+	<div id="quotations-per-state-container"></div>
+</figure>
+
+<script>
+	var data = <%= @quotations_by_state.to_json.html_safe %>;
+	Highcharts.chart('quotations-per-state-container', {
+		chart: {
+			type: 'column'
+		},
+		title: {
+			text: ''
+		},
+		xAxis: {
+			categories: data.categories
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: 'Cotizaciones'
+			},
+			stackLabels: {
+				enabled: true,
+				style: {
+					fontWeight: 'bold',
+                color: ( // theme
+                	Highcharts.defaultOptions.title.style &&
+                	Highcharts.defaultOptions.title.style.color
+                	) || 'gray'
+            }
+        }
+    },
+    legend: {
+    	align: 'right',
+    	x: -30,
+    	verticalAlign: 'top',
+    	y: 25,
+    	floating: true,
+    	backgroundColor:
+    	Highcharts.defaultOptions.legend.backgroundColor || 'white',
+    	borderColor: '#CCC',
+    	borderWidth: 1,
+    	shadow: false
+    },
+    tooltip: {
+    	headerFormat: '<b>{point.x}</b><br/>',
+    	pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+    },
+    plotOptions: {
+    	column: {
+    		stacking: 'normal',
+    		dataLabels: {
+    			enabled: true
+    		}
+    	}
+    },
+    credits: {
+        enabled: false
+    },
+    series: data.data
+});
+</script>

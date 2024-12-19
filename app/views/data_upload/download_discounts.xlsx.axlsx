@@ -1,0 +1,14 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'Descuentos') do |sheet|
+	headers = ['TNR','Descuento','Canal','Fecha Inicio','Fecha Término']
+	sheet.add_row headers
+
+	@discounts.each do |discount|
+		sheet.add_row [discount.product.try(:sku),
+			discount.discount,
+			discount.sale_channels.pluck(:name).join(','),
+			discount.start_date.try(:strftime, "%d/%m/%Y"),
+			discount.end_date.try(:strftime, "%d/%m/%Y")], types: [:string,:integer,:string,:string,:string]
+		end
+	end

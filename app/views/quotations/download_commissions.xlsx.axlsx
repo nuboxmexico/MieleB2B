@@ -1,0 +1,33 @@
+xlsx_package.workbook.add_worksheet(name: 'Comisiones') do |sheet|
+	headers = ['Código Cotización','Fecha de Creación','Nombre Cliente','RUT Cliente','Email Cliente','Teléfono Cliente','Total', 'Estado Cotización']
+
+	unless current_user.cant_see_commissions?
+		headers.push(*['Vendedor','Monto Comisión (IVA Incluído)','Partner','Monto Comisión Partner (IVA incl.)'])
+	end
+
+	sheet.add_row headers
+
+	@quotations.each do |quotation|
+		row = [
+			quotation.code,
+			quotation.created_at.strftime("%d-%m-%Y"),
+			quotation.customer_name,
+			quotation.rut,
+			quotation.email,
+			quotation.phone,
+			quotation.total,
+			quotation.get_state
+		]
+
+		unless current_user.cant_see_commissions?
+			row.push(*[
+				quotation.user.try(:fullname),
+				quotation.mca_commission,
+				quotation.try(:partner_selected_commission).try(:name),
+				quotation.partner_commission
+			])
+		end
+
+		sheet.add_row row
+	end
+end

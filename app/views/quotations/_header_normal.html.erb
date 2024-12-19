@@ -1,0 +1,97 @@
+<div class="row">  
+	<div class="col-lg-12 col-xs-12 no-right no-left">
+		<div class="card-shadow margin-plus" id="mobile-accordion">
+			<div class="card-shadow-head" role="tab">
+				<div class="row">
+					<div class="top-row-mobile hidden-lg hidden-sm hidden-md">
+						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#mobile-accordion" href="#collapse<%= @quotation.id %>" aria-expanded="false" aria-controls="collapse<%= @quotation.id %>"><i class="fa fa-angle-down tertiary-row"></i></a>
+					</div>
+					<div class="col-sm-1 col-xs-4">
+						<p class="title-data"><b>Fecha</b></p>
+						<p class="text-data"><%= @quotation.created_at.strftime('%d/%m/%Y') %></p>
+					</div>
+					<% if @quotation_order%>
+						<div class="col-sm-1 col-xs-4">
+							<p class="title-data"><b>Orden Ecommerce</b></p>
+							<p class="text-data"><%= @quotation_order %></p>
+						</div>
+					<% end %>
+					<div class="col-sm-1 col-xs-4">
+						<p class="title-data"><b>Centro Costo</b></p>
+						<p class="text-data"><%= @quotation.try(:cost_center).try(:code) %></p>
+					</div>
+					<div class="col-sm-2 col-xs-4">
+						<p class="title-data"><b>Nombre Completo</b></p>
+						<p class="text-data"><%= @quotation.user.try(:fullname)%></p>
+					</div>
+					<div class="col-sm-2 hidden-xs">
+						<p class="title-data"><b>Rol</b></p>
+						<p class="text-data"><%= @quotation.user.try(:role_name)%></p>
+					</div>
+					<div class="col-sm-2 hidden-xs">
+						<p class="title-data"><b>Correo Contacto</b></p>
+						<p class="text-data"><%= @quotation.user.try(:email)%></p>
+					</div>
+					<div class="col-sm-<%= @quotation.user.is_mca? ? '1' : '2' %> hidden-xs">
+						<p class="title-data"><b>Teléfono Contacto</b></p>
+						<p class="text-data"><%= @quotation.user.try(:phone)%></p>
+					</div>
+					<% if (current_user.administrator? or current_user.manager?) and @quotation.partner_commission %>
+					<div class="col-sm-1 hidden-xs">
+						<p class="title-data"><b>Comisión <%= @quotation.try(:partner_selected_commission).try(:code) %></b></p>
+						<p class="text-data"><%= number_to_currency(@quotation.partner_commission) %></p>
+					</div>
+					<% end %>
+					<% if @quotation.user.is_mca? %>
+					<div class="col-sm-1 hidden-xs">
+						<p class="title-data"><b>Comisión Vendedor</b></p>
+						<p class="text-data"><%= number_to_currency(@quotation.mca_commission) %></p>
+					</div>
+					<% end %>
+					<% if @quotation.channel != 'Proyectos' %>
+					<div class="col-sm-1 hidden-xs">
+						<p class="title-data"><b>% <%= @quotation.try(:paid_ammount).to_i > 0 ? 'pagado' : 'pago'%></b></p>
+						<p class="text-data"><%= @quotation.try(:paid_ammount).to_i > 0 ? @quotation.paid_ammount : @quotation.try(:pay_percent)%> %</p>
+					</div>
+					<% end %>
+				</div>
+			</div>
+			<div id="collapse<%= @quotation.id %>" class="panel-collapse collapse hidden-lg hidden-md hidden-sm card-shadow-head" role="tabpanel" aria-labelledby="headingTwo">
+				<div class="row">
+					<div class="col-xs-4">
+						<p class="title-data"><b>Rol</b></p>
+						<p class="text-data"><%= @quotation.user.try(:role_name)%></p>
+					</div>
+					<div class="col-xs-4">
+						<p class="title-data"><b>Correo Contacto</b></p>
+						<p class="text-data"><%= @quotation.user.try(:email)%></p>
+					</div>
+					<div class="col-xs-4">
+						<p class="title-data"><b>Teléfono Contacto</b></p>
+						<p class="text-data"><%= @quotation.user.try(:phone)%></p>
+					</div>
+				</div>
+				<div class="row extra-pad-card-quotation">
+					<% if (current_user.administrator? or current_user.manager?) and @quotation.partner_commission %>
+					<div class="col-xs-4">
+						<p class="title-data"><b>Comisión Tienda</b></p>
+						<p class="text-data"><%= number_to_currency(@quotation.partner_commission) %></p>
+					</div>
+					<% end %>
+					<% if @quotation.user.is_mca? %>
+					<div class="col-xs-4">
+						<p class="title-data"><b>Comisión Vendedor</b></p>
+						<p class="text-data"><%= number_to_currency(@quotation.mca_commission) %></p>
+					</div>
+					<% end %>
+					<% if @quotation.channel != 'Proyectos' %>
+					<div class="col-xs-4">
+						<p class="title-data"><b>% <%= @quotation.try(:paid_ammount).to_i > 0 ? 'pagado' : 'pago'%></b></p>
+						<p class="text-data"><%= @quotation.try(:paid_ammount).to_i > 0 ? @quotation.paid_ammount : @quotation.try(:pay_percent)%> %</p>
+					</div>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

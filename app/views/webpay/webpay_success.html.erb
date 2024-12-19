@@ -1,0 +1,95 @@
+<% data = @payment.webpay_data.gsub('[','').gsub(']','').gsub('"','').split(',') %>
+
+<div class="row alert-row">
+    <i class="fa fa-exclamation-circle"></i>
+</div>
+<div class="row title-webpay">
+    Operación realizada con éxito
+</div>
+<div class="row">
+    <p class="content-webpay separate-webpay">Revisa los detalles de Pago.</p>
+</div>
+
+<div class="line-webpay"></div>
+<div class="row padding-sides-webpay first-row-webpay">
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-left">Código de Cotización</p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-right"><%= @payment.quotation.code %></p>
+    </div>
+</div>
+
+<div class="row padding-sides-webpay">
+    <div class="col-lg-7 col-xs-7">
+        <p class="payment-data text-left">Código de autorización Transbank</p>
+    </div>
+    <div class="col-lg-5 col-xs-5">
+        <p class="payment-data text-right"><%= data[4] %></p>
+    </div>
+</div>
+
+<div class="row padding-sides-webpay">
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-left">Fecha de transacción</p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-right">
+            <% unless data[7].nil? %>  
+                <%="#{data[7].split('T')[0].gsub('-','/')} #{data[7].split('T')[1].split('.')[0]}"%>
+            <% end %>
+        </p>
+    </div>
+</div>
+
+<div class="row padding-sides-webpay">
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-left">Tipo de Pago</p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-right">
+            <%= 'Débito' if data[5].to_s.strip == 'VD' %>
+            <%= 'Crédito' if data[5].to_s.strip != 'VD' %> 
+        </p>
+    </div>
+</div>
+
+<div class="row padding-sides-webpay">
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-left">Tipo de Cuota</p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-right">
+            <%= 'Venta Débito' if data[5].to_s.strip == 'VD' %>
+            <%= 'Sin Cuotas' if data[5].to_s.strip == 'VN' %>
+            <%= 'Cuotas normales' if data[5].to_s.strip == 'VC' %>
+            <%= 'Sin interés' if data[5].to_s.strip == 'SI' %>
+            <%= 'Sin interés' if data[5].to_s.strip == 'S2' %>
+            <%= 'Sin interés' if data[5].to_s.strip == 'NC' %>
+        </p>
+    </div>
+</div>
+
+<div class="row padding-sides-webpay">
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-left">Número de Cuotas</p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-right">
+            <%= data[10] %>
+        </p>
+    </div>
+</div>
+
+<div class="row padding-sides-webpay">
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-left">Monto Pagado</p>
+    </div>
+    <div class="col-lg-6 col-xs-6">
+        <p class="payment-data text-right">
+            <b><%= number_to_currency(@payment.ammount)%></b>
+        </p>
+    </div>
+</div>
+
+<div class="line-webpay"></div>

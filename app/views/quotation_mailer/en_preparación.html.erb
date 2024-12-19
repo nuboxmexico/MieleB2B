@@ -1,0 +1,14 @@
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> están aprobados para ser despachados en su totalidad.
+</p>
+<ul>
+	<% @quotation.quotation_products.to_dispatch.each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>
+<p><b>N° de S.O. :</b><%= @quotation.so_code %></p>
+<p><b>Fecha de despacho: </b><%= @quotation.estimated_dispatch_date.try(:strftime, "%d/%m/%Y") %></p>
+<% if @quotation.try(:installation_date) %>
+<p><b>Fecha de instalación: </b><%= @quotation.installation_date.try(:strftime, "%d/%m/%Y")%></p>
+<% end %>
+

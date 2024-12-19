@@ -1,0 +1,310 @@
+<style>
+  .select2-selection__choice{
+    display: none!important;
+  }
+</style>
+<div class="row">
+  <div class="col-xs-12 no-left">
+    <h1 class="title-section bold">
+      <%= @business_unit.name %>
+    </h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-7 col-sm-6 col-xs-12 no-left">
+     <ol class="breadcrumb">
+      <% if current_user.manager? or current_user.administrator? %>
+        <li><a href="<%= root_path %>">Inicio</a></li>
+      <% end %>
+      <li><a href="<%= business_units_path %>">Business Units</a></li>
+      <li id="badge-space">Todos</li>
+    </ol>
+  </div>
+  <div class="col-lg-5 col-sm-6 col-xs-12 searcher-div">
+    <div class="select2-miele select2-simple-border">
+      <%= form_tag(search_products_path, method: :get) do %>
+      <span class="input-group-addon inlineb"><i class="fa fa-search"></i></span>
+      <%= select_tag :search_products, {}, autofocus: true, onchange: "add_p($(this).val())", multiple: true, class:'inlineb' %>
+      <% end %>
+    </div>
+  </div>
+</div>
+<div class="col-xs-12">
+  <div class="row hidden-lg">
+    <div class="col-xs-1 col-xs-offset-11 pt16 text-right gray-text bot-space no-right">
+      <i class="fa fa-bars"></i>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 filter-box bot-space hidden-xs hidden-sm hidden-md">
+    <p><b>Filtros</b></p>
+    <div class="row">
+      <div class="col-xs-12">
+        <span class="pt11 gray-text">
+          <b>Precio</b>
+        </span>
+        <section class="range-slide">
+          <div class="range-slider">
+           <input value="<%= @min%>" min="<%= @min%>" max="<%= @max %>" step="10" type="range" onChange="handleRange()" id="min-value" />
+           <input value="<%= @max %>" min="<%= @min%>" max="<%= @max %>" step="10" type="range" onChange="handleRange()" id="max-value"/>
+         </div>
+       </section>
+     </div>
+   </div>
+   <div class="row top-space pt10 text-right">
+    <div class="col-xs-12 top-space-filter">
+      <span id="ranges" class="text-right">
+        <%= number_to_currency(@min)%> - <%= number_to_currency(@max) %> 
+      </span>
+    </div>
+  </div>
+  <br>
+  <div class="col-xs-12">
+    <div class="row" id="familyall">
+      <%= link_to products_path(family: @business_unit.id.to_s), remote: true, class: 'category category-selected', onclick: 'setFamily("'+@business_unit.id.to_s+'", "Todos")' do  %>
+      <div class="col-xs-8 family-name">
+        Todos
+      </div>
+      <div class="col-xs-4 text-right family-quantity right-space-filter">
+        <%= '['+@base.not_bstock.uniq.size.to_s+']' %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+  <div id="accordion" class="col-xs-12">
+    <% @families.uniq.each do |family| %>
+      <div class="row mini-top-filter" id="family<%= family.id %>">
+        <a class="collapsed category spin-row" role="button" data-toggle="collapse" data-id="<%= family.id.to_s %>" data-parent="#accordion" href="#families<%= family.id.to_s %>" aria-expanded="false" aria-controls="families<%= family.id.to_s %>" onclick="setFamily('<%= "#{family.id.to_s}" %>', '<%= "#{family.name}" %>')">
+          <div class="col-xs-8 family-name">
+           <%= family.name %>
+         </div>
+         <div class="col-xs-4 text-right family-quantity">
+            <% if family.children.any? %>
+              <%= '['+@base.where(id: Family.find_by(id: family.id).products.pluck(:id)).not_bstock.uniq.size.to_s+']' %>
+              <i class="fa fa-angle-right" id="row<%= family.id.to_s %>"></i>
+            <% end %>
+          </div>
+        </a>
+      </div>
+      <div id="families<%= family.id.to_s %>" class="panel-collapse collapse left-space-filter" role="tabpanel">
+        <% if family.children.any? %>
+          <% family.children.uniq.each do |subfamily| %>
+            <div class="row mini-top-filter">
+              <a class="collapsed category spin-row" role="button" data-toggle="collapse" data-parent="#family<%= family.id %>" href="#subfamilies<%= subfamily.id.to_s %>" aria-expanded="false" aria-controls="subfamilies<%= subfamily.id.to_s %>" data-id="<%= subfamily.id.to_s %>" onclick="setFamily('<%= "#{subfamily.id.to_s}" %>', '<%= "#{subfamily.name}" %>')">
+                <div class="col-xs-12 subfamily-name">
+                  <%= subfamily.name %>
+                  <% if subfamily.children.any? %>
+                    <i class="fa fa-angle-right" id="row<%= subfamily.id.to_s %>"></i>
+                  <% end %>
+                </div>
+              </a>
+            </div>
+            <div id="subfamilies<%= subfamily.id.to_s %>" class="panel-collapse collapse left-space-filter" role="tabpanel">
+              <% if subfamily.children.any? %>
+                <% subfamily.children.uniq.each do |specific| %>
+                  <div class="row mini-top-filter">
+                    <div class="col-xs-12 specific-name">
+                      <%= link_to specific.name, products_path(family: specific.id), remote: true, class: 'category', onclick: 'setFamily("'+specific.id.to_s+'", "'+specific.name+'")' %>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<div class="col-xs-12">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="row-white">
+      </div>
+      <div class="row">
+       <div class="col-xs-8 family-name">
+        <%= link_to 'Ofertas', products_path(business_unit: @business_unit.name ,family: 'offer'), class: 'category', remote: true, onclick: 'setFamily("offer","Ofertas")' %>
+      </div>
+      <div class="col-xs-4 text-right family-quantity right-space-filter">
+        <%= '['+@base.not_bstock.joins(:product_discount, product_discount: :discount_sale_channels).where("product_discounts.end_date >= ?", Date.today).where(discount_sale_channels: {sale_channel_id: @sale_channels}).uniq.size.to_s+']' %>
+      </div>
+    </div>
+    <div class="row mini-top-filter">
+       <div class="col-xs-8 family-name">
+        <%= link_to 'Outlet', products_path(business_unit: @business_unit.name ,family: 'outlet'), class: 'category', remote: true, onclick: 'setFamily("outlet","Outlet")' %>
+      </div>
+      <div class="col-xs-4 text-right family-quantity right-space-filter">
+        <%= '['+@base.outlet_not_bstock.uniq.size.to_s+']' %>
+      </div>
+    </div>
+    <div class="row mini-top-filter">
+       <div class="col-xs-8 family-name">
+        <%= link_to 'B-Stock', products_path(business_unit: @business_unit.name, family: 'bstock'), class: 'category', remote: true, onclick: 'setFamily("bstock","B-Stock")' %>
+      </div>
+      <div class="col-xs-4 text-right family-quantity right-space-filter">
+        <%= "[#{@base.bstock.uniq.count}]" %>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<div class="col-lg-10 col-xs-12 bot-products">
+  <div class="row" id="products">
+    <% @products.each do |product| %>
+      <%= render partial: 'products/product', locals: { product: product } %>
+    <% end %>
+  </div>
+</div>
+</div>
+
+<% if @products.respond_to?(:total_pages) %>
+<div class="center-paginate"  id="infinite-scrolling">
+  <%= will_paginate @products %>
+</div>
+<%= render partial: "products/preloader"%>
+<% end %> 
+
+<div id="comparator-link">
+  <% if @comparator.products.size > 0 %>
+  <%= render 'comparator/comparator_card' %>
+  <% end %>
+</div>
+<script>
+  var family_t = "";
+  $( document ).ready(function() {
+    $(window).scroll(scroll);
+  });
+  var scroll = function() {
+    var slide1 = $("#min-value").val();
+    var slide2 = $("#max-value").val();
+    var is_loading = false;
+    if( slide1 > slide2 ){ var tmp = slide2; slide2 = slide1; slide1 = tmp; }
+    if($('.next_page').attr('href') != undefined){
+      var more_posts_url = $('.next_page').attr('href') + '&business_unit=<%= @business_unit.name %>&family='+family_t+'&min='+slide1+'&max='+slide2;
+      if (more_posts_url && ($(window).scrollTop() + $(window).height() > $(document).height() -200) && !is_loading){
+        is_loading = true;
+        $('#catalog-preloader').removeClass("hidden");
+        $(window).off('scroll');
+        $.getScript(more_posts_url)
+        .done(function(script, textStatus){
+          $(window).scroll(scroll);
+          is_loading = false;
+        });   
+      }
+    }
+  };
+  $('#search_products').select2({
+    minimumInputLength: 3,
+    minimumResultsForSearch: 10,
+    placeholder: " Buscar",
+    language: {
+      errorLoading:function(){ return "Buscando..." },
+      inputTooLong:function(e){var t=e.input.length-e.maximum,n="Por favor, elimine "+t+" car";return t==1?n+="ácter":n+="acteres",n},
+      inputTooShort:function(e){var t=e.minimum-e.input.length,n="Por favor, introduce "+t+" car";return t==1?n+="ácter":n+="acteres",n},
+      loadingMore:function(){return"Cargando más resultados"},
+      maximumSelected:function(e){var t="Solo puede seleccionar "+e.maximum+" elemento";return e.maximum!=1&&(t+="s"),t},
+      noResults:function(){return"No se encontraron resultados"},
+      searching:function(){return"Buscando.."}
+    },
+    ajax: {
+      url: '<%= "/search.json" %>',
+      dataType: "json",
+      type: "GET",
+      data: function (params) {
+        var queryParameters = {
+          search_product: params.term
+        }
+        return queryParameters;
+      },
+      processResults: function (data) {
+        return {
+          results: $.map(data, function (item) {
+            return {
+              text: item.name,
+              html: 
+              '<div class="row select2-row" onclick="add_p("'+item.sku+'")">'
+              +  '<div class="col-lg-3 select2-img">'
+              +    '<img alt="producto" class="responsive-img" src="'+item.image_url+'">'
+              +  '</div>'
+              +  '<div class="col-lg-9 selec2-descriptions">' 
+              +    '<p><b>'   + item.name            + '</b></p>'
+              +    '<p>TNR: ' + item.sku             + '</p>'  
+              +    '<p>'      + (item.discount ? '<span class="old-price strikediag">'+item.price_formatted+'</span><span class="new-price pt14">'+item.discount_price+'</span>' : item.price_formatted) + '</p>'  
+              +  '</div>'
+              +'</div>'
+              ,
+              id: item.sku
+            }
+          })
+        };
+      }
+    },
+    escapeMarkup: function(markup) {
+      return markup;
+    },
+    templateResult: function(data) {
+      return data.html;
+    },
+    templateSelection: function(data) {
+      return data.text;
+    }
+  });
+
+  function getVals(child){
+    var parent = child.parentNode;
+    var slides = parent.getElementsByTagName("input");
+    var slide1 = parseFloat( slides[0].value );
+    var slide2 = parseFloat( slides[1].value );
+    if( slide1 > slide2 ){ var tmp = slide2; slide2 = slide1; slide1 = tmp; }
+    var displayElement = parent.parentNode.getElementsByClassName("rangeMinValue")[0];
+    displayElement = parent.parentNode.getElementsByClassName("rangeMaxValue")[0];
+    $("#ranges").html('$'+slide1.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")+' - $'+slide2.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1."));
+    $.get('/<%= @business_unit.name %>/products.js?min='+slide1+'&max='+slide2+'&family='+family_t)
+  }
+
+  function handleRange(){
+    var sliderSections = document.getElementsByClassName("range-slider");
+    sliderSections[0].childNodes.forEach( child => {
+      if( child.type === 'range'){
+        child.oninput = getVals(child);
+      }
+    })
+  }
+
+  function setFamily(id, name){
+    if(family_t != undefined && family_t != id){
+      family_t = id;
+      $("#badge-space").html("");
+      $("#badge-space").html(name);
+      $.get('/<%= @business_unit.name %>/products.js?&family='+family_t);
+    }
+  } 
+  $(".fa-bars").click(function(){
+    $(".filter-box").toggleClass('hidden-xs hidden-sm hidden-md');
+  })
+
+  $(".category").click(function(){
+    $(".category").removeClass('category-selected');
+    $(this).addClass('category-selected');
+  });
+
+  $(".spin-row").click(function(){
+    if($("#row"+$(this).data("id")).hasClass("spinned")){
+      $("#row"+$(this).data("id")).removeClass("spinned");
+    } else {
+      $("#row"+$(this).data("id")).addClass("spinned");
+    }
+  });
+
+  $(".check-item").on("change", function(e) {
+    if (e.target.tagName.toUpperCase() === "LABEL") {
+      return;
+    }
+    if($(this).prop('checked')){
+      $.post('/comparator/add/'+$(this).val()+'.js');
+    } else{
+      $.post('/comparator/remove/'+$(this).val()+'.js');
+    }
+  });
+</script>

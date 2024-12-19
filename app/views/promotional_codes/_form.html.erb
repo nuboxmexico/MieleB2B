@@ -1,0 +1,152 @@
+<div class="row label-bold">
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :name, required: true, class: "field-bordered", placeholder: "Nombre" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :code, required: true, class: "field-bordered", placeholder: "Código de descuento" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :description, required: true, class: "field-bordered", placeholder: "Descripción" %>
+      </div>
+      <div class="col-lg-4 col-xs-7 inlineb">
+        <%= form.number_field :use_limit, required: true, class: "field-bordered", placeholder: "Límite de uso" %>
+      </div>
+      <div class="col-lg-2 col-xs-5 inlineb checkbox no-left no-right">
+        <label for="unlimited" class="label-repeat top-both-30">
+          <input type="checkbox" value="1" name="no-limit" id="unlimited"> 
+          <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+          Uso ilimitado
+        </label>
+        <div id="for-hidden"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :start_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.text_field :end_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-3 col-xs-12" id="sale_channels_ids">
+        <%= form.select :sale_channels, options_for_select(SaleChannel.all.pluck(:name, :id), 0), { include_blank: 'Seleccione uno ...', required: true }, multiple: true %>
+      </div>
+      <div class="col-lg-3 col-xs-12">
+        <%= form.number_field :percent, required: true, class: "field-bordered", placeholder: "50%" %>
+      </div>
+      <div class="col-lg-3 col-xs-12">
+        <label for="promotional_code_is_for_product">Tipo de código</label>
+        <br>
+        <div class="mini-top-space">
+          <b>Despacho</b>
+          <label class="switch">
+            <input type="checkbox" name="promotional_code[is_for_product]" id="promotional_code_is_for_product">
+            <span class="slider round"></span>
+          </label>
+          <b>Productos</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $('#promotional_code_sale_channels').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  $('#promotional_code_start_date').daterangepicker({
+    singleDatePicker   : true,
+    showDropdowns      : true,
+    autoUpdateInput    : true,
+    drops              : "up",
+    applyButtonClasses : "btn btn-small",
+    cancelClass        : "btn btn-flat btn-small",
+    locale: {
+      format      : 'DD/MM/YYYY',
+      applyLabel  : "Aplicar",
+      cancelLabel : "Limpiar",
+      daysOfWeek  : [
+      "Do",
+      "Lu",
+      "Ma",
+      "Mi",
+      "Ju",
+      "Vi",
+      "Sa"
+      ],
+      monthNames  : [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+      ]
+    }
+  });
+  $('#promotional_code_end_date').daterangepicker({
+    singleDatePicker   : true,
+    showDropdowns      : true,
+    autoUpdateInput    : true,
+    drops              : "up",
+    applyButtonClasses : "btn btn-small",
+    cancelClass        : "btn btn-flat btn-small",
+    locale: {
+      format      : 'DD/MM/YYYY',
+      applyLabel  : "Aplicar",
+      cancelLabel : "Limpiar",
+      daysOfWeek  : [
+      "Do",
+      "Lu",
+      "Ma",
+      "Mi",
+      "Ju",
+      "Vi",
+      "Sa"
+      ],
+      monthNames  : [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+      ]
+    }
+  });
+  $("#promotional_code_start_date").on('apply.daterangepicker', function(ev, picker) {
+    minDate2 = picker.startDate;
+    $("#promotional_code_end_date").data('daterangepicker').minDate = minDate2;
+  });
+
+  $("#unlimited").change(function(){
+    if($("#unlimited").prop("checked")){
+      $("#promotional_code_use_limit").prop('disabled', true);
+      $("#for-hidden").html(" <input type='hidden' name='promotional_code[use_limit]' value='-1'>");
+    } else {
+      $("#promotional_code_use_limit").prop('disabled', false);
+      $("#for-hidden").html("");
+    }
+  });
+</script>

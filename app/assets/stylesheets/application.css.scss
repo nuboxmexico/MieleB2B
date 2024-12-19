@@ -1,0 +1,92 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree . 
+ *= require adminlte
+ *= require toastr
+ *= require bootstrapValidator.min
+ *= require slider
+ *= require select2.min
+ *= require file_input
+ *= require comparator
+ *= require sweetalert2
+ *= require slick
+ *= require swiper.min
+ *= require loader_page
+ *= require error
+ *= require data-upload
+ *= require webpay
+ *= require banner
+ *= require bootstrap-datetimepicker
+ *= require customer
+ *= require_self
+ */
+ @import "variables";
+
+.toast-info {
+  background-color: $brand-primary!important;
+  background-image: none!important;
+}
+
+.toast-error {
+  background-color: $brand-secondary!important;
+  background-image: none!important;
+}
+
+ .main-header .sidebar-toggle {
+ 	float: left;
+ 	background-color: transparent;
+ 	background-image: none;
+ 	padding: 15px 15px;
+ 	/* font-family: fontAwesome; */
+ 	font-family: "Font Awesome\ 5 Free"; /* cjr */
+	 z-index: 9999;
+	 position: absolute;
+ }
+ .main-header .sidebar-toggle:before {
+ 	content: "\f0c9";
+ 	font-weight: 900; /* cjr */
+ }
+ .main-header{
+	z-index: 9999;
+ }
+
+ h1 {font-size: 32px!important;color: $brand-secondary!important;}
+ h2 {font-size: 28px!important;color: $brand-secondary!important;}
+ h3 {font-size: 24px!important;color: $brand-secondary!important;}
+ h4 {font-size: 21px!important;color: $brand-secondary!important;}
+ h5 {font-size: 18px!important;color: $brand-secondary!important;}
+ h6 {font-size: 16px!important;color: $brand-secondary!important;}
+
+ .swal2-modal .swal2-image{
+ 	width: 80px;
+ 	height: 80px;
+ }
+
+ #quotation_billing_commune_id-error{
+ 	display: none!important;
+ }
+
+.bootstrap-datetimepicker-widget table td.active, 
+.bootstrap-datetimepicker-widget table td.active:hover { 
+  background: $brand-primary!important; 
+}
+
+
+select.btn-default {
+  appearance: none;
+  background: url("chevron-down-solid.svg") $grey-light no-repeat 90% !important; 
+}
+
+.mb-3 {
+  margin-bottom: 30px;
+}

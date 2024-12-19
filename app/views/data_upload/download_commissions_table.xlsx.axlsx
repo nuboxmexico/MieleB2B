@@ -1,0 +1,20 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'Tabla Comisiones') do |sheet|
+	headers = ['Monto de Orden de Compra Precios de Lista (IVA incluido)','','Socio Comercial','','']
+	sheet.add_row headers
+	sheet.merge_cells "A1:B1"
+	sheet.merge_cells "C1:G1"
+	headers = ['Límite Inferior','Límite Superior','A','B','C','D','E']
+	sheet.add_row headers
+	
+	@table.each do |rule|
+		sheet.add_row [rule.lower_bound,
+			rule.upper_bound,
+			rule.level_a,
+			rule.level_b,
+			rule.level_c,
+			rule.level_d,
+			rule.level_e], types: [:integer,:integer,:integer,:integer,:integer,:integer,:integer]
+		end
+	end

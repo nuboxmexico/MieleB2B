@@ -1,0 +1,10 @@
+<% if @added_home_program %>
+  $("#accordion").append("<%= escape_javascript render(partial: 'cart/cart_item', locals: {counter: @cart.cart_items.count, product: @cart.cart_items.find_by(product: @home_program)}) %>");
+  <%= render :partial => 'cart/update_totals.js.erb' %>
+<% end %>
+
+<% if @deleted_home_program %>
+  $("#card<%= @deleted_id  %>").remove();
+  $("#items-in-cart").text("<%= current_user.cart_products %>");
+  <%= render :partial => 'cart/update_totals.js.erb' %>
+<% end %>

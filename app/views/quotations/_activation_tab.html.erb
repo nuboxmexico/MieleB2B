@@ -1,0 +1,265 @@
+<% delivery_type =  ((quotation.quotation_products.where(dispatch: false).size > 0 and quotation.quotation_products.where(dispatch: true).size > 0) ? 'retiro+despacho' : (quotation.quotation_products.where(dispatch: false).size > 0 ? 'retiro' : 'despacho')) %>
+<% if can? :activate, quotation %>
+	<div class="quotation-box padding-box text-left">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Activación de Cotización</p>
+			</div>
+		</div>
+		<%= form_tag activate_quotation_path(quotation), method: :post, multipart: true, id: 'activate-form' do %>
+		<div class="row">
+			<% if delivery_type == 'retiro' or delivery_type == 'retiro+despacho' %>
+				<div class="col-lg-4 col-md-5 col-sm-6 col-xs-12">
+					<p class="title-input">Retiro</p>
+					<% quotation.quotation_products.quantity_greater_than_zero.where(dispatch: false).order(available: :asc).each do |product| %>
+						<div class="checkbox">
+							<label class="activation-tnr">
+								<input type="checkbox" class="<%= product.available ? 'check-item' : 'check-item-not-available' %>" name="activation_ready_retirement[]" value="<%= product.id %>" required="required" <%= 'checked' if product.show_as_checked? %> <%= 'disabled' unless product.available %>>
+								<span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+								<span class="<%= !product.available ? 'striked-text' : '' %>"><%= "TNR #{product.product.sku} - #{product.name}" %></span> <%= !product.available ? '<span class="miele-text">(Producto no disponible)</span>'.html_safe : '' %>
+							</label>
+						</div>
+					<% end %>
+				</div>
+			<% end %>
+			<% if delivery_type == 'despacho' or delivery_type == 'retiro+despacho' %>
+				<div class="col-lg-4 col-md-5 col-sm-6 col-xs-12">
+					<p class="title-input">Despacho</p>
+					<% quotation.quotation_products.quantity_greater_than_zero.where(dispatch: true).order(available: :asc).each do |product| %>
+						<div class="checkbox">
+							<label class="activation-tnr">
+								<input type="checkbox" class="<%= product.available ? 'check-item' : 'check-item-not-available' %>" name="activation_ready_dispatch[]" value="<%= product.id %>" <%= product.available ? 'checked' : '' %> disabled>
+								<span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+								<span class="<%= !product.available ? 'striked-text' : '' %>"><%= "TNR #{product.product.sku} - #{product.name}" %></span> <%= !product.available ? '<span class="miele-text">(Producto no disponible)</span>'.html_safe : '' %>
+							</label>
+						</div>
+					<% end %>
+				</div>
+			<% end %>
+			<% if !current_user.is_project? and  delivery_type != 'despacho' %>
+				<div class="col-lg-3 col-md-2 col-sm-12 col-xs-12">
+					<label class="activation-msg">
+						Los productos sólo pueden ser retirados en tienda cuando ya se canceló el total de la cotización.
+					</label>
+				</div>
+			<% end %>
+		</div>
+		<div class="line-row-info"></div>
+		<div class="row top-both">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Activar</p>
+			</div>
+		</div>
+		<%unless current_user.administrator? || current_user.manager? || current_user.seller?%>
+			<div class="row top-both">
+				<% if delivery_type != 'retiro' %>
+					<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+						<label for="sell_note_documents[]" class="title-input">Nota de venta</label>
+						<div class="file-field input-field">
+							<div class="file-drop-area dashed-border">
+								<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+								<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+								<input type="file" name="sell_note_documents[]" multiple="true" id="sell_note_documents" class="file-input">
+							</div>
+						</div>
+					</div>
+				<% end %>
+				<% if delivery_type != 'despacho' %>
+					<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 <%= delivery_type != 'retiro' ? 'col-lg-offset-1' : '' %> top-mobile">
+						<label for="quotation[v1]" class="title-input">V1</label>
+						<p><input type="text" name="quotation[v1]" class="field-bordered" id="quotation_v1" placeholder="Escribe aquí ..." value="<%= @quotation.try(:v1) %>"></p>
+					</div>
+				<% end %>
+			</div>
+		<%end%>
+		<div class="row top-both">
+			<% if quotation.payments.completed.sum(:ammount) < quotation.total %> 
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" id="payment-type-activation">
+					<label for="payment[payment_type]" class="title-input">Tipo Pago</label>
+					<%= select_tag 'payment[payment_type]', options_for_select(quotation.payment_type_options, 'efectivo'), class: 'inlineb select2', id: 'quotation-payment-type' %>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-mobile">
+					<label for="payment[ammount]" class="title-input">
+						<span class="pt12">Saldo total: <%= number_to_currency(quotation.for_project? ? quotation.pending_amount.round(2) : quotation.pending_amount.round, unit: quotation.for_project? ? 'UF' : quotation.currency.upcase, precision: quotation.for_project? ? 2 : 0) %></span>
+						<br />
+						<% if quotation.pay_percent < 100 %>
+							<% if quotation.payments.completed.sum(:ammount).round(2) >= (quotation.total * quotation.pay_percent / 100).round(2) %>
+								<span class="pt12">Saldo por activar: <%= number_to_currency(0, unit: quotation.for_project? ? 'UF' : quotation.currency.upcase, precision: quotation.for_project? ? 2 : 0) %></span>
+							<% else %>
+								<span class="pt12">Saldo por activar: <%= number_to_currency(quotation.for_project? ? ((quotation.total * quotation.pay_percent / 100) - quotation.payments.completed.sum(:ammount)).round(2) : ((quotation.total * quotation.pay_percent / 100) - quotation.payments.completed.sum(:ammount)).round, unit: quotation.for_project? ? 'UF' : quotation.currency.upcase, precision: quotation.for_project? ? 2 : 0) %></span>
+							<% end %>
+						<% end %>
+					</label>
+					<p>
+						<%= number_field_tag 'payment[ammount]', nil, class: 'field-bordered', id: 'payment_ammount', required: quotation.payments.completed.empty?, placeholder: 'Escribe aquí...', max: quotation.for_project? ? quotation.pending_amount.round(2) : quotation.pending_amount.round, min: 0 %>
+					</p>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-mobile" id="backup-document-container">
+					<label for="backup_document" class="title-input">
+						Archivo de respaldo
+					</label>
+					<div class="file-field input-field">
+						<div class="file-drop-area dashed-border">
+							<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+							<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+							<input type="file" name="backup_document" multiple="false" id="backup_document" class="file-input">
+						</div>
+					</div>
+				</div>
+				<%= hidden_field_tag 'payment[quotation_id]', quotation.id %>
+			<% end %> 
+		</div>
+		<div class="row">
+			
+		</div>
+		<input type="hidden" name="delivery_type" value="<%= delivery_type %>" id="delivery_type">
+		<div id="hidden-info-activate"></div>
+		<div class="row">
+			<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+				<% if !current_user.is_project? %>
+					<label class="activation-msg">
+						Los pagos registrados por WebpayPlus desde la Cotización se reflejan en la pestaña "Finanzas" automáticamente.
+					</label>
+				<% end %>
+			</div>
+			<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-12 col-xs-12">
+				<% if !current_user.is_project? and quotation.payments.completed.sum(:ammount) < quotation.total %>
+					<label class="activation-msg">
+						Debes justificar al menos la mitad del pago para enviar la cotización a finanzas y reservar el stock de los productos.
+					</label>
+				<% end %>
+			</div>
+			<div class="col-lg-5 col-md-12 col-xs-12 top-space text-right">
+				<p class="top-mobile">
+					<button type="button" class="btn btn-miele" id="save-activation">Guardar <span class="hidden-xs">Cambios</span></button>
+					<% if quotation.can_activate? %>
+						<button type="submit" class="btn btn-miele" id="send-activation" <%= (quotation.payments.completed.sum(:ammount) > quotation.total/2) ? '' : 'disabled' %>><%= delivery_type == 'retiro' ? 'Entregado' : 'Enviar' %></button>
+					<% end %>
+				</p>
+			</div>
+		</div>
+		<% end %>
+
+		<% if quotation.payments.where(state: 'complete').any? %>
+			<%= render 'quotations/payments' %>
+		<% end %>
+
+		<% if can? :load_billing_documents, Quotation %>
+			<%= render partial: 'quotations/activation_documents', locals: { quotation: quotation }  %>
+		<% end %>
+		<% if quotation.has_documents? %>
+			<%= render partial: 'quotation_documents', locals: { quotation: quotation } %>
+		<% end %>
+	</div>
+
+	<script>
+		<% if quotation.for_project? %>
+			var pay_percent = <%= quotation.pay_percent %>;
+			var pay_percent_factor = pay_percent / 100;
+			var min_pay = <%= quotation.total %> * pay_percent_factor;
+		<% else %>
+			var min_pay = <%= quotation.total / 2 %>;
+		<% end %>
+		var payments_total = <%= quotation.payments.completed.sum(:ammount) %>;
+		$(document).ready(function(){
+			$('#activate-form input').trigger('change');
+			$(".select2").select2();
+		})
+		$("#delivery_options").select2();
+		$('#activate-form input').on('change', function() {
+			if ($("#activate-form").valid() || $('.check-item:checked').length === $('.check-item').length) {
+				$(".error-out").addClass("hidden");
+				if(payments_total >= min_pay || parseFloat($("#payment_ammount").val()) >= min_pay || ( parseFloat($("#payment_ammount").val()) + payments_total ) >= min_pay ){
+					$('#send-activation').prop('disabled', false);  
+				} else {
+					$('#send-activation').prop('disabled', 'disabled');
+				}
+			} else {
+				$('#send-activation').prop('disabled', 'disabled');
+			}
+		});
+		$("#save-activation").click(function(){
+			event.preventDefault();
+			swal({
+				title: "Agregar nuevo pago y documento",
+				text: 'Se agregará un nuevo pago y documento a la cotización.',
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonText: "Continuar",
+				cancelButtonText: "Cancelar"
+				}).then( function (result) {
+					$(".check-item").prop('required', false);
+					$("#quotation_v1").attr("required", false);
+					$("#payment_documents").attr("required", false);
+					$("#billing_documents").attr("required", false);
+					$("#sell_note_documents").attr("required", false);
+					$("#hidden-info-activate").html('<input type="hidden" name="save_changes" value="true">');
+					$("#activate-form").submit();
+				});
+		});
+	</script>
+<% else %>
+	<div class="quotation-box padding-box text-left">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Activación de Cotización</p>
+			</div>
+		</div>
+		<div class="row">
+			<% if delivery_type == 'retiro' or delivery_type == 'retiro+despacho' %>
+			<div class="col-md-4 col-xs-12 products-in-dispatch">
+				<p class="title-input">Retiro</p>
+				<% quotation.quotation_products.quantity_greater_than_zero.where(dispatch: false).each do |product| %>
+					<div class="checkbox">
+						<label class="activation-tnr">
+							<input type="checkbox" class="check-item" name="activation_ready_retirement[]" value="<%= product.id %>" required="required" <%= (product.available and product.activation_ready) ? 'checked' : '' %> disabled>
+							<span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+							<span class="<%= !product.available ? 'striked-text' : '' %>"><%= "TNR #{product.product.sku} - #{product.name}" %></span> <%= !product.available ? '<span class="miele-text">(Producto no disponible)</span>'.html_safe : '' %>
+						</label>
+					</div>
+				<% end %>
+			</div>
+			<% end %>
+			<% if delivery_type == 'despacho' or delivery_type == 'retiro+despacho' %>
+				<div class="col-md-4 col-xs-12 products-in-dispatch">
+					<p class="title-input">Despacho</p>
+					<% quotation.quotation_products.quantity_greater_than_zero.where(dispatch: true).each do |product| %>
+						<div class="checkbox">
+							<label class="activation-tnr">
+								<input type="checkbox" class="check-item" name="activation_ready_dispatch[]" value="<%= product.id %>" required="required" <%= (product.available and product.quantity > 0) ? 'checked' : '' %> disabled>
+								<span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+								<span class="<%= (!product.available or product.quantity == 0) ? 'striked-text' : '' %>"><%= "TNR #{product.product.sku} - #{product.name}" %></span> <%= !product.available ? '<span class="miele-text">(Producto no disponible)</span>'.html_safe : '' %>
+							</label>
+						</div>
+					<% end %>
+				</div>
+			<% end %>
+		</div>
+		<% if quotation.quotation_products.quantity_equal_to_zero.any? %>
+			<div class="line-row-info"></div>
+			<div class="row">
+				<div class="col-md-4 col-xs-12 removed-products-in-dispatch">
+						<p class="title-input">Productos no recepcionados</p>
+						<% quotation.quotation_products.quantity_equal_to_zero.each do |product| %>
+							<div class="checkbox">
+								<label class="activation-tnr">
+									<input type="checkbox" class="check-item" name="activation_ready_dispatch[]" value="<%= product.id %>" required="required" <%= (product.available and product.quantity > 0) ? 'checked' : '' %> disabled>
+									<span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+									<span"><%= "TNR #{product.product.sku} - #{product.name}" %></span> <%= !product.available ? '<span class="miele-text">(Producto no disponible)</span>'.html_safe : '' %>
+								</label>
+							</div>
+						<% end %>
+					</div>
+			</div>
+		<% end %>
+
+		<% if quotation.payments.where(state: 'complete').any? %>
+			<%= render 'quotations/payments' %>
+		<% end %>
+
+		<%= render partial: 'quotations/quotation_documents', locals: { quotation: quotation } %>
+		<% if can? :load_billing_documents, Quotation %>
+			<%= render partial: 'quotations/activation_documents', locals: { quotation: quotation }  %>
+		<% end %>
+	</div>
+<% end %>

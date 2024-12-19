@@ -1,0 +1,73 @@
+<div class="row product text-center">
+  <div class="col-md-1 col-xs-12 title-products">
+    <%= image_tag(product.product.get_product_photo, alt: 'producto', class:'image-cart') %>
+  </div>
+  <div class="col-md-2 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">Nombre</p>
+    <p class="content-input"><%= product.product.name %></p>
+    <% if product.backorderable  %>
+      <span class="last-stock hidden-xs hidden-sm left-space"><%= t("backorderable_label")%></span>
+    <% end %>
+  </div>
+  <div class="col-md-1 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">TNR</p>
+    <p class="content-input"><%= product.product.sku %></p>
+  </div>
+  <div class="col-md-1 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">Mandatorio</p>
+    <p class="content-input"><%= product.product.mandatory ? 'Si' : 'No' %></p>
+  </div>
+  <div class="col-md-1 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">Instalación</p>
+    <p class="content-input"><%= product.product.instalation ? 'Si' : 'No' %></p>
+  </div>
+  <div class="col-md-1 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">Neto</p>
+    <p class="content-input"><span class="price-quotation-show"><%= number_to_currency(product.price / 1.19) %></span></p>
+  </div>
+  <% if product.price == product.product.price%>
+  <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Precio Final</p>
+      <p class="content-input"><span class="price-quotation-show"><%= number_to_currency(product.price) %></span></p>
+    </div>
+    <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Porcentaje</p>
+      <p class="content-input"><span class="price-quotation-show">0%</span></p>
+    </div>
+    <div class="col-md-1 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">Cantidad</p>
+    <p class="content-input"><%= product.quantity %></p>
+  </div>
+    <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Descuento Total Producto</p>
+      <p class="content-input"><span class="miele-text">0</span></p>
+    </div>    
+  <% else %>
+    <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Precio Final</p>
+      <p class="content-input"><span class="price-quotation-red"><%= number_to_currency(product.price) %></span></p>
+      <p class="content-input"><span class="price-quotation-show old-price strikediag"><%= number_to_currency(product.product.price) %></span></p>
+    </div>
+    <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Porcentaje</p>
+      <p class="content-input"><span class="price-quotation-show"><%= product.product.discount.nil? ? "0%" : product.product.discount.round(2).to_s + "%"%></span></p>
+    </div>
+    <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Cantidad</p>
+      <p class="content-input"><%= product.quantity %></p>
+    </div>
+    <div class="col-md-1 col-xs-6 title-products">
+      <p class="hidden-lg hidden-md bold title-input">Descuento Total Producto</p>
+      <% if !product.product.product_discount.blank?%>
+        <p class="content-input"><span class="miele-text"><%= product.product.product_discount.discount.blank? ? "$ 0" : number_to_currency(-product.product.price.round(0) * (product.product.product_discount.discount / 100.0) * product.quantity) %></span></p>
+      <% else %>
+        <p class="content-input"><span class="miele-text">$ --</span></p>
+      <% end %>
+    </div>
+  <% end %>  
+  <div class="col-md-1 col-xs-6 title-products">
+    <p class="hidden-lg hidden-md bold title-input">Total</p>
+    <p class="content-input"><span class="price-quotation-show"><%= number_to_currency(product.price * product.quantity) %></span></p>
+  </div>
+</div>
+<div class="line-row hidden-lg hidden-md"></div>

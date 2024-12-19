@@ -1,0 +1,6 @@
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Carro vaciado con éxito');
+$("#cart-section").html("");
+$(".row-content").remove();
+$("#cart-section").html('<%= j render partial: "cart/empty" %>');
+$("#items-in-cart").text("<%= current_user.cart_products %>");

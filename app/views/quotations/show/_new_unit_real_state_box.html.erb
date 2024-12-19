@@ -1,0 +1,86 @@
+<div class="quotation-box pad-box">
+    <div class="row">   
+        <div class="col-md-12 col-xs-12 text-left">
+            <p class="title-box-checkout" style="font-size: 18px !important;">Unidad inmobiliaria</p>
+        </div>
+    </div>
+            
+<div class="row">
+        <br>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Nombre</p>
+            <input class="input-real_state" type="text" name="u_tit" multiple="true" id="name_unit" class="input-real_state">
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Cantidad de unidades</p>
+            <input class="input-real_state" type="number" name="u_tit" multiple="true" id="quantity_unit" class="input-real_state">
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Productos por unidad</p>
+            <input  id="products_quantity_unit" min="1" class="input-real_state" type="number"  multiple="true" class="input-real_state">
+        </div>
+  
+    </div>
+    
+    <div class="row">
+        <br>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Total de productos de unidad</p>
+            <input id="total_product_unit_new_show" class="input-real_state field-bordered" type="text" name="u_tit" multiple="true"  value="0" disabled>
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Valor por unidad inmobiliaria</p>
+            <input id="value_unit_new_show" class="input-real_state field-bordered" type="text" name="u_tit" multiple="true" value="0" disabled>
+        </div>
+        <div class="col-md-3 col-xs-12">
+            <p class="title-input-real_state">Valor total de unidades</p>
+            <input id="total_value_unit_new_show" class="input-real_state field-bordered" type="text" name="u_tit" multiple="true" value="0" disabled>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+    <br>
+      <div class="col-xs-12">
+        <div class="form-group actions-container text-right">
+          <a  class="btn btn-flat" onclick="deleteUnitAux()">
+            Eliminar
+          </a>
+        
+          
+          <a  class="btn btn-miele save-dispatch" onclick="createUnit(<%=@quotation.id%>)">
+            Guardar
+          </a>
+               
+             </div>
+           </div>
+         </div>
+</div>
+
+<script>
+  function deleteUnitAux(){
+      document.getElementById('add_unit_real_state_project').style.display = "";
+      $("#all_new_unit_real_state").empty();
+  }
+
+  function createUnit(quotation_id){
+    var data = {
+       unit_real_state: {
+         name: document.getElementById('name_unit').value,
+         quantity: document.getElementById('quantity_unit').value,
+         products_quantity: document.getElementById('products_quantity_unit').value,
+         quotation_id: quotation_id,
+         is_rm: "show"
+       }
+     }
+    $.ajax({
+            url: "/unit_real_states/create_show",
+            type : 'post',
+            data: data
+        }).done(function (data) {
+            $("#all_new_unit_real_state").empty(); 
+            document.getElementById('add_unit_real_state_project').style.display = "";
+    })
+  }
+</script>

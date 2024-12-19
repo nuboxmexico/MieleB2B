@@ -1,0 +1,126 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id %>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4 class="dispatch-group-subtitle">
+        Envío #<%= dispatch_group_counter + 1 %>
+        <%= get_state_label(dispatch_group.state, 'full') %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    <div class="collapse" id="<%= id %>" data-type="dispatch">
+      <% dispatch_group.dispatch_guides.each do |dispatch_guide| %>
+        <%= link_to dispatch_guide.document.url(:original), class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(dispatch_guide.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, DispatchGuide and @quotation.post_in_preparation_status? %>
+          <%= link_to dispatch_guide_path(dispatch_guide), method: :delete, class: "btn btn-delete no-loader", data: { 
+              confirm: '¿Estás seguro de eliminar el archivo '+dispatch_guide.document_file_name+'?',
+              'confirm-button-text': 'Eliminar',
+              'cancel-button-text': 'Cancelar'
+            }  do %>
+             <i class="fa fa-times"></i>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% if dispatch_group.visit_report_url%>
+      <%visit_report_url = Rails.application.secrets.miele_ticket_api[:url_base].to_s + dispatch_group.visit_report_url%>
+        <%= link_to visit_report_url, class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+          Reporte de visita
+        <% end %>
+      <%end%>
+      <p><%=@url_base_miele_tickets%> </p>
+      
+      <%= form_for dispatch_group, html: {multipart: true, class: 'dispatched-group'} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :dispatch_order, 'Guía de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_order, class: 'field-bordered inlineb', readonly: true %>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :reception_type, 'Tipo de recepción', class: 'title-input' %>
+              <%= f.text_field :reception_type, class: 'field-bordered inlineb', readonly: true, value: DispatchGroup.reception_types[dispatch_group.reception_type.try(:to_sym)] %>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :freight_order, 'Orden de flete', class: 'title-input' %>
+              <%= f.text_field :freight_order, class: 'field-bordered inlineb'%>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :dispatch_date, 'Fecha de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_date, class: 'field-bordered inlineb', readonly: true, value: (dispatch_group.dispatch_date ? dispatch_group.dispatch_date.strftime('%d/%m/%Y') : nil) %>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <%= f.submit 'Guardar cambios', class: 'btn btn-miele save-dispatch' %>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :installation_date, 'Fecha de instalación', class: 'title-input' %>
+              <%= f.text_field :installation_date, class: 'field-bordered inlineb date-picker', value: (dispatch_group.installation_date ? dispatch_group.installation_date.strftime('%d/%m/%Y') : nil) %>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group actions-container">
+              <%= render partial: 'quotations/dispatch/notes', locals: { notes: dispatch_group.notes, id: "dispatch-note-#{id}" } %>
+            </div>
+          </div>
+        </div>
+        <div class="border-container">
+          <div class=" row">
+            <div class="col-xs-12 col-md-5 text-center">
+              <p class="title-input">
+                Nombre
+              </p>
+            </div>
+            <div class="col-xs-12  col-md-2 text-center">
+              <p class="title-input">
+                TNR
+              </p>
+            </div>
+            <div class="col-xs-12 col-md-2 text-center">
+              <p class="title-input">
+                ID
+              </p>
+            </div>
+            <div class="col-xs-12 col-md-2 text-center">
+              <p class="title-input">
+                Estados
+              </p>
+            </div>
+          </div>
+          <div class="product">
+            <% dispatch_group.detail_quotation_products.each do |detail| %>
+          <div class=" row">
+            <div class="col-xs-12 col-md-5">
+              <span><%= detail.name %></span>
+            </div> 
+            <div class="col-xs-12 col-md-2 text-center">
+              <span><%= detail.tnr %></span>
+            </div>
+            <div class="col-xs-12 col-md-2 text-center">
+              <span><%= detail.serial_id %></span>
+            </div>
+            <div class="col-xs-12 col-md-2 text-center">
+              <span><%= detail.state %></span>
+            </div>
+          </div>
+        <% end %>
+        </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="add-unit-real-state-container">
+  <%= link_to '/unit_real_states/new_config_show/'+@quotation.id.to_s, :onclick => "setDisabledNewUnit()", remote: true, id: 'add_config_unit_real_state_project', method: :get do %>
+    <div class="new_link_unir_real"><i class="fa fa-plus"></i> Nueva unidad inmobiliaria</div>
+  <%end%>
+</div>
+<script> 
+function setDisabledNewUnit(){
+    document.getElementById('add_config_unit_real_state_project').style.display = "none";
+}
+</script>

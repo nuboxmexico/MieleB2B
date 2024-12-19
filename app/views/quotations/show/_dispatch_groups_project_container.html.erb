@@ -1,0 +1,5 @@
+<%if quotation.dispatch_groups.count > 0%>
+    <% quotation.dispatch_groups.order(id: :asc).each_with_index do |dispatch_group, counter| %>
+        <%= render partial: 'quotations/show/dispatched_project', locals: { quotation: quotation, dispatch_group: dispatch_group, submit_label: 'Guardar', dispatch_group_counter: counter, dispatch_group_iteration_last: (quotation.dispatch_groups.count - 1) == counter, id: "dispatch-in-dispatch-tab-#{counter}"} %>
+    <% end %>
+<%end%>

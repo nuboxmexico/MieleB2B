@@ -1,0 +1,5 @@
+<% if quotation.config_unit_real_states.length > 0 %>
+    <% quotation.config_unit_real_states.order(id: :asc).each_with_index do |unit_real_state, counter| %>
+        <%= render partial: 'quotations/show/config_unit_real_state_created', locals: {quotation: quotation, project_installation_values: quotation.project_installation_values, unit_real_state: unit_real_state, submit_label: 'Guardar', id: "unit_real_state-tab-#{counter}"} %>
+    <% end %>
+<%end%>

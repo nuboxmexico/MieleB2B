@@ -1,0 +1,7 @@
+<% if @success == true %>
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Usuario actualizado');
+<% else %>
+$(".toast-bottom-right-custom").remove();
+toastr['error']('No fue posible actualizar este usuario');
+<% end %>

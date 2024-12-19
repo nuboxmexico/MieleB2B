@@ -1,0 +1,42 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Leads") do |sheet|
+  headers = [
+    "Nombre Lead",
+    "Nombre inmobiliaria",
+    "Dirección Proyecto",
+    "Fecha tentativa de inicio",
+    "TNR",
+    "Nombre Producto",
+    "Cantidad x Producto",
+    "Tipo moneda",
+    "Valor unitario Producto neto",
+    "Valor IVA unitario Producto",
+    "Total neto",
+    "Total IVA",
+    "Total",
+    "Estado",
+  ]
+  sheet.add_row headers
+  
+  @leads.each do |lead|
+    lead.products.each do |product|
+      row = [
+        lead.name,
+        lead.real_state_name,
+        lead.project_address,
+        lead.start_date_estimated.try(:strftime, "%d/%m/%Y"),
+        product.sku,
+        product.name,
+        product.quantity,
+        lead.currency.to_s.upcase,
+        product.unit_price.to_f,
+        product.unit_price.to_f * 0.19,
+        product.total_price,
+        product.total_price * 0.19,
+        product.total_price * 1.19,
+        lead.status_name
+      ]
+      sheet.add_row row
+    end
+  end       
+end

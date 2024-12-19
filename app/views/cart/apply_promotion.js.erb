@@ -1,0 +1,43 @@
+<% if @success == true %>
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Descuento aplicado con éxito!');
+<% if @code_type == 'product' %>
+$("#resume-info-code-discount").html("<span><button id='test-delete-code' class='delete-promotional-code'>X</button> Código descuento <%= @cart.promotional_code.code %> (-<%= @cart.promotional_code.percent%>%)</span>");
+$("#resume-total-code-discount").html("<span id='quotation-discount-code-<%= @cart.id.to_s %>' class='miele-text'> - <%= number_with_delimiter(@cart.discount_per_code.to_i) %></span>");
+$("#promotional-tab").addClass('hidden');
+$("#section-tab").click();
+<% else %>
+$("#dispatch-code-info").html("<span>Dcto. Despacho <%= @cart.dispatch_code.code %> (-<%= @cart.dispatch_code.percent%>%)</span>");
+$("#dispatch-code-value").html("<span id='quotation-discount-code-<%= @cart.id.to_s %>' class='miele-text'> - <%= number_with_delimiter(@cart.discount_code_dispatch.to_i) %></span>");
+$("#code-dispatch").html("");
+$("#toggle-dispatch-button").remove();
+<% end %>
+
+
+let cart_total = ["<%= number_with_delimiter(@cart.total.round(2)) %>"]
+<% unless current_user.sale_channel.try(:name) == "Proyectos" %>
+  cart_total.push("<span class='min-text'>(IVA Incluído)</span>") 
+<% end %>
+
+<% if @cart.pay_percent == 100 %>
+    $('<%= "#cart-total-cost-#{@cart.id}" %>').html(cart_total.join(' '));
+    $('#cart-deb-<%= @cart.id %>').addClass('hidden');
+<% else %>
+    $('<%= "#cart-total-cost-#{@cart.id}" %>').html(cart_total.join(' '));
+    $('#cart-deb-<%= @cart.id %>').removeClass('hidden');
+    $('#cart-deb-<%= @cart.id %>').html('Saldo: <span class="currency-change" data-currency="$"> <%= number_with_delimiter(@cart.total - @cart.total_per_pay ) %> </span>');
+<% end %>
+
+<% elsif @type == 1 %>
+$("#error-message-coupon").text("El código que ingresaste ya no es válido.");
+<% elsif @type == 2 %>
+$("#error-message-coupon").text("El código que ingresaste excedió el número de usos.");
+<% elsif @type == 3 %>
+$("#error-message-coupon").text("El código que ingresaste no existe.");
+<% elsif @type == 4 %>
+$("#error-message-coupon").text("El código que ingresaste no aplica a <%= params[:type] == 'product' ? 'productos' : 'despachos'%>.");
+<% end %>
+
+$("#test-delete-code").on("click",function(){
+  location.reload();
+});

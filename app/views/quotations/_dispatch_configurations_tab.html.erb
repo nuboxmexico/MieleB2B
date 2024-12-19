@@ -1,0 +1,28 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row">
+    <div class="col-xs-12">
+      <%= render 'quotations/dispatch/instructions_files' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <%= form_for @quotation do |f| %>
+        <div class="form-group">
+          <%= f.label :dispatch_instruction_files, 'Agregar guías de envíos', class: 'title-input' %>
+          <div class="file-field input-field">
+            <div class="file-drop-area dashed-border">
+              <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+              <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+              <%= f.file_field :dispatch_instruction_files, multiple: true, accept: 'application/pdf, application/xlsx, application/xls, image/jpeg, image/png. application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel', class: 'file-input', required: true %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group text-right">
+          <%= f.submit 'Guardar', class: 'btn btn-miele' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

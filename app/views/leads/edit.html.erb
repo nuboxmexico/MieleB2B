@@ -1,0 +1,18 @@
+<div class="row">
+  <div class="col-xs-12">
+    <ol class="breadcrumb">
+      <li><a href="<%= root_path %>">Inicio</a></li>
+      <li><a href="<%= leads_path %>">Leads</a></li>
+      <li><a href="<%= lead_path(@lead) %>"><%= @lead.name %></a></li>
+      <li>Editar</li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12 bot-space no-left">
+    <h1 class="bold">Editar Lead <%= @lead.name %></h1>
+  </div>
+</div>
+
+<%= render 'form' %>

@@ -1,0 +1,170 @@
+<% if can? :activate_finance_retail, @quotation %>
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="bold secondary-text">Información</p>
+		</div>
+	</div>
+	<%= form_tag activate_finance_retail_path(@quotation), multipart: true do |f| %>
+	<div class="row top-both">
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+			<label for="so_code" class="title-input">Ingresar S.O</label>
+			<p><input type="text" name="so_code" class="field-bordered" id="so_code" required="required" placeholder="Escribe aquí ..."></p>
+		</div>
+		<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12">
+			<label for="oc_validation" class="title-input">Validación OC</label>
+			<p class="less-bot">
+				<label class="thin-text radio-button" id="oc_ready">
+					<input type="radio" name="oc_validation" value="ready" required="true" checked>
+					<span class="label-visible space-radio-button">
+						<span class="fake-radiobutton"></span>
+						O.C Lista
+					</span>
+				</label>
+			</p>
+			<p>
+				<label class="thin-text radio-button" id="oc_updated">
+					<input type="radio" name="oc_validation" value="updated" required="true"> 
+					<span class="label-visible space-radio-button">
+						<span class="fake-radiobutton"></span>
+						O.C Lista con actualización de inventario
+					</span>
+				</label>
+			</p>
+		</div>
+	</div>
+	<div class="row top-both">
+		<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+			<label for="credit_note_documents[]" class="title-input">Documento Nota de Crédito</label>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="credit_note_documents[]" multiple="true" id="credit_note_documents" class="file-input" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf">
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12">
+			<label for="so_code" class="title-input">Nota de crédito</label>
+			<p><input type="text" name="credit_note" class="field-bordered" id="credit_note" placeholder="Escribe aquí ..."></p>
+		</div>
+	</div>
+	<div class="row top-both">
+		<div class="col-lg-8 col-md-5 col-sm-12 col-xs-12 hidden" id="observations-div">
+			<textarea name="finance_observations" class="field-bordered full-width padding-text-area" cols="50" rows="7" placeholder="Observaciones..." id="finance-observations"></textarea>
+		</div>
+		<div class="col-md-3 col-xs-12 col-sm-12 text-right align-to-textarea hidden" id="send-updated">
+			<button type="submit" class="btn btn-miele" id="send-finance-activation-updated">Aceptar</button>
+		</div>
+		<div class="col-lg-12 col-xs-12 text-right" id="send-ready">
+			<button type="submit" class="btn btn-miele" id="send-finance-activation-ready">Aceptar</button>
+		</div>
+	</div>
+	<% end %>
+	<% if current_user.is_finance_manager? or current_user.is_finance? %>
+	<%= render 'quotations/document_forms/payment', quotation: @quotation %>
+	<% end %>
+	<%= render 'quotations/credit_notes' %>
+	<% if @quotation.has_documents? %>
+	<%= render 'quotation_documents', quotation: @quotation %>
+	<% end %>
+</div>
+
+<script>
+	$('input[name="oc_validation"]').change(function(){
+		if($(this).val() == "updated"){
+			$("#observations-div").removeClass('hidden');
+			$("#finance-observations").attr("required", true);
+			$("#send-updated").removeClass("hidden");
+			$("#send-ready").addClass("hidden");
+		} else {
+			$("#observations-div").addClass('hidden');
+			$("#finance-observations").attr("required", false);
+			$("#send-updated").addClass("hidden");
+			$("#send-ready").removeClass("hidden");
+		}
+	});
+</script>
+
+<% else %>
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="secondary-text bold">Información</p>
+			<%if current_user.is_finance? || current_user.is_finance_manager? %>
+			<div class="row padding-row">
+				<%= form_for(@quotation, html: {multipart: true}) do |f| %>
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<%= f.label :so_code, 'SO',  class:'bold title-input' %>
+					<p>
+						<%= f.text_field :so_code, class: "field-bordered", required: (@quotation.paid_ammount == '100' ? true : false) ,placeholder: "Escriba aquí", value: @quotation.so_code %>
+						<label id="quotation_so_code-error-out" class="error-out <%= (@quotation.paid_ammount == '100' ? '' : 'hidden') %>" for="quotation_so_code">Este campo es obligatorio.</label>
+					</p>
+				</div>
+			</div>
+			<div class="line-row-info"></div>
+			<div class="row padding-row">
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<label for="credit_note_documents[]" class="title-input">Documento Nota de Crédito</label>
+					<div class="file-field input-field">
+						<div class="file-drop-area dashed-border">
+							<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+							<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+							<input type="file" name="credit_note_documents[]" multiple="true" id="credit_note_documents" class="file-input" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf">
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12">
+					<%= f.label :credit_note, 'Nota de crédito',  class:'bold title-input' %>
+					<p>
+						<%= f.text_field :credit_note, class: "field-bordered", placeholder: "Escriba aquí", value: @quotation.credit_note %>
+					</p>
+				</div>
+				<div class="col-md-3 col-md-offset-1 col-xs-12 top-space text-right">
+					<p class="top-mobile">
+						<button type="submit" class="btn btn-miele" id="save_changes">Guardar <span class="hidden-xs">Cambios</span></button>
+					</p>
+				</div>
+			</div>
+			<div class="line-row-info"></div>
+			<% end %>
+			<%else%>
+			<div class="row padding-row">
+				<div class="col-md-3 col-xs-12 top-both">
+					<p class="bold title-input">SO</p>
+					<p class="content-input"><%= @quotation.try(:so_code) ? @quotation.try(:so_code) : '-' %></p>
+				</div>
+				<div class="col-md-3 col-xs-12 top-both">
+					<p class="bold title-input">Nota de crédito</p>
+					<p class="content-input"><%= @quotation.try(:credit_note)%></p>
+				</div>
+				<%end%>
+
+				<div class="col-md-3 col-xs-12 top-both">
+					<p class="bold title-input">Activación</p>
+					<p class="content-input"><%= @quotation.try(:oc_validation) ? (@quotation.try(:oc_validation) == 'ready' ? 'OC Lista' : 'OC Lista con Actualización de Inventario') : '-' %></p>
+				</div>
+			</div>
+
+			<% if @quotation.quotation_notes.finance.size > 0 %>
+			<% @quotation.quotation_notes.finance.each do |note| %>
+			<div class="line-row-info"></div>
+			<div class="row padding-row">
+				<div class="col-xs-12">
+					<p class="bold title-input"><b>Observación de <%= note.user.fullname %> el día <%= note.created_at.strftime("%d/%m/%Y")%></b></p>
+					<p class="content-input"><%= note.observation %></p>
+				</div>
+			</div>
+			<% end %>
+			<% end %>
+		</div>
+		<% if current_user.is_finance_manager? or current_user.is_finance? %>
+		<%= render 'quotations/document_forms/payment', quotation: @quotation %>
+		<% end %>
+		<%= render 'quotations/credit_notes' %>
+		<% if @quotation.has_documents? %>
+		<%= render 'quotation_documents', quotation: @quotation %>
+		<% end %>
+	</div>
+</div>
+<% end %>

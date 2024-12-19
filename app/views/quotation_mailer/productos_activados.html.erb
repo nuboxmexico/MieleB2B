@@ -1,0 +1,33 @@
+<% if @is_for_miele %>
+<p>
+	Estimado(a) <%= @quotation.user.name %>, 
+</p>
+<p>
+	Uno o más productos pertenecientes a la cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron activados satisfactoriamente a través del servicio de Home Program.
+</p>
+<p>
+	<% @quotation.quotation_notes.home_program.each do |note| %>
+	<div class="row padding-row">
+		<div class="col-xs-12">
+			<p class="bold title-input"><b>Observación de <%= note.user.fullname %> el día <%= note.created_at.strftime("%d/%m/%Y")%></b></p>
+			<p class="content-input"><%= note.observation %></p>
+		</div>
+	</div>
+	<hr>
+	<% end %>
+</p>
+<p>
+	Puedes ver todos los detalles en la pestaña "Home Program" de tu cotización <%= link_to 'aquí.', quotation_url(@quotation) %>
+</p>
+<% else %>
+<p>
+	Estimado(a) <%= @quotation.name %>, 
+</p>
+<p>
+	Ya estás preparado para disfrutar tus productos Miele en casa, después de haber participado de nuestro <b>Home Program.</b>
+</p>
+<p>
+	Muchas gracias por preferirnos. Esperamos que tu compra te motive a conocer más del universo Miele en alguna de nuestras tiendas o en <a href="www.miele.cl">www.miele.cl</a>.
+</p>
+<p>#LifeBeyondOrdinary.</p>
+<% end %>

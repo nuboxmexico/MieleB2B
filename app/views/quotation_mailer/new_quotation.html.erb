@@ -1,0 +1,30 @@
+<% if @reactivate %>
+<p>
+	Estimado(a) <%= @quotation.name %>, 
+</p>
+<p>
+	La cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> creada el <%= @quotation.created_at.strftime("%d/%m/%Y") %> ha sido reactivada el día de hoy, con la respectiva actualización de precios, ofertas y stock disponibles.
+</p>
+<p>
+	Le recordamos que esta cotización no representa una reserva de los productos detallados. Estos se reservan solo al momento de cancelar el total o un 50% del valor de lo cotizado.
+</p>
+<p>
+	Si desea solicitar más información, o realizar una nueva cotización se debe contactar con su asesor de ventas <%= @quotation.user.try(:fullname) %>, correo: <%= @quotation.user.try(:email) %>
+</p>
+<% else %>
+<p>
+	<%= @quotation.name %>, 
+</p>
+<p>
+	Tu cotización N° <%= @quotation.id %>  ha sido generada exitosamente y lo podrás encontrar adjunto en este correo.
+</p>
+<% end %>
+<% if @quotation.quotation_products.to_install.size > 0 %>
+<p>
+	Adjuntamos además los Términos y Condiciones de Venta y un Manual de Instalación donde podrás encontrar los elementos básicos que debes tener previamente instalados. Esto es fundamental para que nuestros técnicos puedan dejar tus equipos funcionando correctamente.
+</p>
+<%else%>
+<p>
+	Adjuntamos además los Términos y Condiciones de Venta.
+</p>
+<% end %>

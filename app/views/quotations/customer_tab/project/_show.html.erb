@@ -1,0 +1,135 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row">
+    <div class="col-xs-12 text-left">
+      <p class="bold secondary-text">
+        Datos de contacto
+      </p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Nombre</p>
+      <p class="content-input">
+        <%= @quotation.name %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Apellido Paterno</p>
+      <p class="content-input">
+        <%= @quotation.lastname %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Apellido Materno</p>
+      <p class="content-input">
+        <%= @quotation.second_lastname %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Dirección personal</p>
+      <p class="content-input">
+        <%= "#{@quotation.personal_address} #{@quotation.personal_address_number}" %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Nombre Proyecto</p>
+      <p class="content-input">
+        <%= @quotation.project_name %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Correo</p>
+      <p class="content-input">
+        <%= @quotation.email %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Teléfono</p>
+      <p class="content-input">
+        <%= @quotation.phone %>
+      </p>
+    </div>
+  </div>
+
+  <div class="row line-hr"></div>
+
+  <div class="row top-separation-data">
+    <div class="col-xs-12 text-left">
+      <p class="bold secondary-text">
+        Datos de Envío
+      </p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Dirección Proyecto</p>
+      <p class="content-input">
+        <%= @quotation.dispatch_address %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">N°</p>
+      <p class="content-input">
+        <%= @quotation.dispatch_address_number %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Comuna</p>
+      <p class="content-input">
+        <%= @quotation.dispatch_commune.try(:name) %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Fecha estimada de Despachos</p>
+      <p class="content-input">
+        <%= @quotation.estimated_dispatch_date.strftime("%d/%m/%Y") if @quotation.estimated_dispatch_date %>
+      </p>
+    </div>
+  </div>
+
+  <div class="row line-hr"></div>
+
+  <div class="row top-separation-data">
+    <div class="col-xs-12 text-left">
+      <p class="bold secondary-text">
+        Datos de Instalación
+      </p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Fecha estimada de Instalaciones</p>
+      <p class="content-input"><%= @quotation.installation_date.strftime("%d/%m/%Y") if @quotation.installation_date %></p>
+    </div>
+  </div>
+
+  <div class="row line-hr"></div>
+
+  <div class="row top-separation-data">
+    <div class="col-xs-12 text-left">
+      <p class="bold secondary-text">
+        Datos de facturación
+      </p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Razón social</p>
+      <p class="content-input">
+        <%= @quotation.business_name %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Rut empresa</p>
+      <p class="content-input">
+        <%= @quotation.business_rut %>
+      </p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Giro comercial</p>
+      <p class="content-input">
+        <%= @quotation.business_sector %>
+      </p>
+    </div>
+  </div>
+</div>

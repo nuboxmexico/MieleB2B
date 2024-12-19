@@ -1,0 +1,18 @@
+<% if @for_miele %>
+<p>
+	La siguiente cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> cumplió los 180 días de almacenaje sin costo.
+</p>
+<p>
+	Fecha inicio almacenaje <%= (@quotation.expiration_date-180.days).strftime("%d/%m/%Y")%>
+</p>
+<% else %>
+<p>
+	Los productos pertenecientes a la cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> con Fecha Inicio Almacenaje <%= (@quotation.expiration_date-180.days).strftime("%d/%m/%Y")%> que se encuentran en las bodegas de Miele Chile cumplirán el período de almacenaje gratuito en un plazo de 5 días.
+</p>
+<p>
+	Pasada esta fecha se cobrará 1% mensual + IVA calculado sobre el monto total de la Orden de Compra únicamente por el período excedente a los 180 días corridos del almacenaje gratuito.
+</p>
+<p>
+	Por cualquier duda contacte a su asesor de ventas <%= @quotation.user.fullname %>, correo: <%= @quotation.user.email %>
+</p>
+<% end %>

@@ -1,0 +1,337 @@
+<div id="cart-section">
+  <% if @cart.cart_items.size == 0 %>
+   <%= render 'cart/empty' %>
+  <% else %>
+  <div class="row">
+    <div class="col-lg-6">
+      <h1 class="title-section bold">
+        Mi cotización
+      </h1>
+    </div>
+    <div class="col-lg-6 text-right title-section bot-mobile-sm no-right no-left-mobile">
+      <% if current_user.can_manage_project_quotations? %>
+      <spam> Fecha </spam>
+      <%= text_field_tag :exchange_rate_date, DateTime.current.strftime("%d/%m/%Y"), class: "date-picker", style: "width: 12rem;" %>
+      <!--
+      <spam> T/C </spam>
+      <%= number_field_tag :exchange_rate, 1, class: "field-bordered", step: 2, style: "width: 12rem;" %>
+      <%= select_tag :currency, options_for_select(Lead.currency_options.to_a.map{|c| c.reverse!; [c[0].prepend("CLP/"),c[1]]}, "clp"), { class: 'btn btn-default', id: 'cart-currency-selector' } %>
+      -->
+      <br>
+      <spam>Valor UF: $<%= number_with_delimiter(@uf.value)%> </spam>
+      <% end %>
+      <% if @cart.cart_items.any? %>
+        <%= link_to 'Vaciar carro'.html_safe , empty_cart_path, id: 'empty-cart', method: :delete, remote: true, class: 'btn btn-secondary  btn-transparent-miele btn-mobile', data: { 
+            confirm: '¿Estás seguro de vaciar el carro?',
+            'confirm-button-text': 'Vaciar',
+            'cancel-button-text': 'Cancelar'
+          } %>
+      <% end %>
+      <%= link_to 'Agregar productos', business_units_path, class: 'btn btn-miele btn-mobile', id: 'add-products' %>
+      <%= link_to 'Continuar'.html_safe , new_quotation_path(currency:"clp",exchange_rate:1,exchange_rate_date:DateTime.current.strftime("%d/%m/%Y")), class: 'btn btn-miele btn-mobile link-to-new-quotation' %>
+      </div>
+    </div>
+    <% if @cart.quotation %>
+    <div class="row">
+      <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
+        <h5 class="bold">Editando cotización <%= @cart.quotation.code %></h5>
+      </div>
+    </div>
+    <% end %>
+    <div class="row">
+      <!-- Products -->
+      <div class="col-md-12 col-xs-12 hidden-xs hidden-sm dark-ground bot-space">
+        <div class="col-md-1 no-sides-all">Imagen</div>
+        <div class="col-md-2 no-sides-all">Nombre</div>
+        <div class="col-md-1 no-sides-all text-center">TNR</div>
+        <div class="col-md-1 no-sides-all text-center">Tipo</div>
+        <div class="col-md-1 no-sides-all text-center">Mandatorio</div>
+        <div class="col-md-1 no-sides-all text-center">Despacho</div>
+        <div class="col-md-1 no-sides-all text-center">Instalación</div>
+        <div class="col-md-1 no-sides-all text-center">Cantidad</div>
+        <div class="col-md-1 no-sides-all">Precio</div>
+        <div class="col-md-1 no-sides-all">Total</div>
+        <div class="col-md-1 no-sides-all">Acciones</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-xs-12 no-pad top-mobile panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <% @cart.cart_items.order(order_item: :asc, mandatory: :asc).each_with_index do |product, counter| %>
+          <%= render partial: 'cart/cart_item', locals: {product: product, counter: counter} %>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+  <div class="row row-content fix-top-mobile">
+    <% if @cart.cart_items.where(is_service: true).size != @cart.cart_items.size %>
+      <div class="col-md-8 col-xs-12 no-left">
+        <div class="row">
+          <% if !@cart.bstock and !current_user.is_project? %>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link tab-quotation active <%= @cart.apply_discount ? '' : 'hidden' %>" id="section-tab" data-toggle="tab" href="#section" role="tab" aria-controls="section" aria-selected="true">Tramo descuento <i class="fa fa-question-circle miele-text" data-toggle="tooltip" data-placement="top" title="Paso al siguiente tramo"></i></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link tab-quotation" id="promotional-tab" data-toggle="tab" href="#promotional" role="tab" aria-controls="promotional" aria-selected="false">Cupones</a>
+              </li>
+            </ul>
+          <% end %>
+        </div>
+        <br>
+        <div class="tab-content" id="quotation-content">
+          <% if !@cart.bstock and !current_user.is_project? %>
+            <div class="tab-pane fade active <%= @cart.apply_discount ? '' : 'hidden' %>" id="section" role="tabpanel" aria-labelledby="section-tab">
+              <div class="flat-indicator box-mini" id="indicator">
+                <span class='miele-text' style='font-size:0.9em;' >*Monto faltante para pasar al siguiente tramo</span>
+                <div class="box-flat-indicator" style="text-align:center">
+                  <span class="cost-section currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+                    <%= number_with_delimiter(Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[0].to_i) %>
+                  </span>
+                  <i class="fas fa-long-arrow-alt-right tertiary-color"></i>
+                  <span class="percentage-section"><%= Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[3] %> %</span>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="promotional" role="tabpanel" aria-labelledby="promotional-tab">
+              <div id="discount-section">
+                <% @type = 'product' %>
+                <%= render 'cart/discount_form' %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <div class="col-md-4 <%= (@cart.cart_items.where(is_service: true).size != @cart.cart_items.size) ? '' : 'col-md-offset-8' %> col-xs-12 no-sides bot-space">
+      <div class="row text-light">
+        <div class="col-md-12 col-xs-12 bot-space extra-top-mobile">
+          <h5>Detalle del pago</h5>
+          <div class="sub-total-cart"></div>
+        </div>
+        <div class="resumen-quotation-name ">
+          <span>Sub Total</span>  
+          <% if @cart.cart_items.where(is_service: true).size != @cart.cart_items.size and !current_user.is_project? %>
+          <% if !@cart.bstock %>
+          <span id="discount-info-section">
+            <% if @cart.total_section_discount > 0 %>
+            Dcto. por Tramo -<%= (Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[2]*100).to_i %>%
+            <% end %>
+          </span> 
+          <span id="discount-info-miele">
+            <% if @cart.total_miele_discount > 0 %>
+              Dcto. Politica Comercial de Lavadoras, Secadoras y Sistemas de Planchado -<%= Quotation.discount_miele(@cart.cart_items)[0] %>%
+            <% end %>
+          </span> 
+          <% end %>
+          <div id="resume-info-code-discount">
+            <% if @cart.promotional_code %> 
+              <span>Código descuento <%= @cart.promotional_code.code %> (-<%= @cart.promotional_code.percent%>%)</span>
+            <% end %>
+          </div>
+          <% end %>
+          <%if current_user.is_project?%>
+            <span>Porcentaje de margen</span>  
+          <%end%>
+        </div>
+        <div class="resumen-quotation-price">
+          <span <%= "id=quotation-subtotal-price-#{@cart.id}" %> class=" currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%> >
+            <%= current_user.is_project_manager? ? number_with_delimiter(@cart.total_cost.round(2)) : number_with_delimiter(@cart.total_cost.to_i) %>
+          </span>
+          <%if current_user.is_project?%>
+            <span <%= "id=quotation-total-margen-#{@cart.id}" %>>
+              <%= number_with_delimiter(@cart.margen_cost.round(2)) %> %
+            </span>
+          <%end%>
+          <% if @cart.cart_items.where(is_service: true).size != @cart.cart_items.size and !current_user.is_project? %>
+            <% if !@cart.bstock %>
+              <span id="quotation-discount-section-<%= @cart.id %>" class="miele-text currency-change <%= @cart.total_section_discount > 0 ? "" : "hidden" %> " data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+                <% if @cart.total_section_discount > 0 %>
+                <%= number_with_delimiter((@cart.total_section_discount * -1).to_i ) %>
+                <% end %>
+              </span>
+              <span id="quotation-discount-miele-<%= @cart.id %>" class="miele-text currency-change <%= @cart.total_miele_discount > 0 ? "" : "hidden" %> " data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+                <% if @cart.total_miele_discount > 0 %>
+                  <%= number_with_delimiter((@cart.total_miele_discount * -1).to_i) %>
+                <% end %>
+              </span>
+            <% end %>
+            <div id="resume-total-code-discount">
+              <% if @cart.promotional_code %> 
+                <span <%= "id=quotation-discount-code-#{@cart.id}"%> class="miele-text currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+                  - <%= number_with_delimiter(@cart.discount_per_code.to_i) %>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="text-left">
+        <% if current_user.can_manage_project_quotations? %>
+          <%= render 'cart/advance_percent/project' %>
+        <% else %>
+          <%= render 'cart/advance_percent/normal' %>
+        <% end %>
+      </div>
+      
+        <div class="text-left top-both text-light <%= current_user.is_project? ? 'hidden' : ''%>"> 
+          <p>Aplicar política de descuento</p>
+          OFF 
+          <label class="switch" id="toggle-discounts">
+            <input type="checkbox" name="toggle" id="discount_checkbox" onchange="applyDiscount()" <%= @cart.apply_discount ? 'checked' : '' %>>
+            <span class="slider round"></span>
+          </label>
+          ON
+          <br>
+          <br>
+          <div class="danger-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" id="danger-text-cart">
+            El o los productos serán despachados solo posterior al pago del 50% restante 3 días hábiles antes de la fecha elegida para despacho.
+          </div>
+        </div>
+        <br>
+      
+      <% if current_user.is_project? && @cart.apply_discount %>
+        <script>
+          $(document).ready(function() {
+            $("#discount_checkbox").click();
+          });
+        </script>
+      <% end %>
+
+      <div class="sub-total-cart"></div>
+      <% if current_user.is_project_manager? %>
+        <h4 class="text-right no-bot-margin">
+          Adelanto (Neto)*:
+          <span class="cart-total-price currency-change" data-currency="uf" id="cart-total-cost-<%= @cart.id %>"><%= number_with_delimiter(@cart.total_per_pay.round(2)) %></span>
+        </h4>
+      <% else %>
+        <h4 class="text-right no-bot-margin cart-total-price currency-change" data-currency="$" id="cart-total-cost-<%= @cart.id %>" >
+          <%= number_with_delimiter(@cart.total_per_pay.to_i ) %> 
+          <span class="min-text">(IVA Incluído)</span>
+        </h4>
+      <% end %>
+
+      <!--
+      <h4 class="text-right no-bot-margin cart-total-price currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%> id="cart-total-cost-<%= @cart.id %>" >
+        <%= current_user.is_project_manager? ? number_with_delimiter(@cart.total_per_pay.round(2)) : number_with_delimiter(@cart.total_per_pay.to_i ) %> 
+        <% unless current_user.is_project? %>
+          <span class="min-text">(IVA Incluído)</span>
+        <% end %>
+      </h4>
+      -->
+
+      <% if current_user.is_project_manager? %>
+        <h5 class="text-right mar-bot-mobile min-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" <%= "id=cart-deb-#{@cart.id}" %> >
+          Saldo (Neto)*: <span class="currency-change" data-currency="uf"><%= number_with_delimiter((@cart.total - @cart.total_per_pay).round(2)) %></span>
+        </h5>
+      <% else %>
+        <h5 class="text-right mar-bot-mobile min-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" <%= "id=cart-deb-#{@cart.id}" %> >
+          Saldo: <span class="currency-change" data-currency="$"><%= number_with_delimiter((@cart.total - @cart.total_per_pay).to_i) %></span>
+        </h5>
+      <% end %>
+
+      <!--
+      <h5 class="text-right mar-bot-mobile min-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" <%= "id=cart-deb-#{@cart.id}" %> >
+        Saldo (Neto)*: <span class="currency-change" data-currency=<%=current_user.is_project_manager? ? "uf" : "$"%>><%= current_user.is_project_manager? ? number_with_delimiter((@cart.total - @cart.total_per_pay).round(2)) : number_with_delimiter((@cart.total - @cart.total_per_pay).to_i ) %></span>
+      </h5>
+      -->
+
+      <% if current_user.is_project_manager? %>
+        <p class="text-right min-text no-bot-margin mtop-1">*: Más instalación y despacho.</p>
+      <% end %>
+
+      <div class="pull-right top-both">
+        <% if @cart.quotation %>
+        <%= link_to 'Cancelar', empty_cart_path, id: 'cancel-and-empty-cart', method: :delete, remote: true, class: 'btn btn-secondary  btn-transparent-miele btn-mobile' %>
+        <% end %>
+        <%= link_to 'Continuar'.html_safe , new_quotation_path(currency:"clp",exchange_rate:1,exchange_rate_date:DateTime.current.strftime("%d/%m/%Y")), class: 'btn btn-miele link-to-new-quotation', id: 'continue-link' %>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+</div>
+
+<div id="popup">
+</div>
+
+<script>
+  <% if @cart.apply_discount %>
+    $("#section-tab").click();
+  <% else %>
+    $("#promotional-tab").click();
+  <% end %>
+  $(document).ready(function(){
+    $(".right-space-icon").click(function(){
+      if($(this).hasClass('open-card')){
+        $(this).removeClass('open-card');
+        $("#popup").hide();
+        $("#card"+$(this).data("id")).removeClass("show-highlighted");
+      } else {
+        $("#popup").show();
+        $("#card"+$(this).data("id")).addClass("show-highlighted");
+        $(this).addClass('open-card');
+      }
+    });
+
+    $(".select2").select2({ language: { noResults:function(){ return "No requiere mandatorio." } } });
+    
+    $(".select2").trigger("change");
+  });
+
+  $( document ).ready(function() {
+    $("#exchange_rate_date").daterangepicker({
+      singleDatePicker   : true,
+      showDropdowns      : true,
+      autoUpdateInput    : false,
+      drops              : "down",
+      applyButtonClasses : "btn btn-small btn-miele",
+      cancelClass        : "btn btn-flat btn-small",
+      locale: {
+        format      : 'DD/MM/YYYY',
+        applyLabel  : "Aplicar",
+        cancelLabel : "Limpiar",
+        daysOfWeek  : [
+          "Do",
+          "Lu",
+          "Ma",
+          "Mi",
+          "Ju",
+          "Vi",
+          "Sa"
+        ],
+        monthNames  : [
+          "Enero",
+          "Febrero",
+          "Marzo",
+          "Abril",
+          "Mayo",
+          "Junio",
+          "Julio",
+          "Agosto",
+          "Septiembre",
+          "Octubre",
+          "Noviembre",
+          "Diciembre"
+        ]
+      }
+    });
+    $("#exchange_rate_date").on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('DD/MM/YYYY'));
+      let currency = $('#cart-currency-selector').val();
+      let exchange_rate_date = $("#exchange_rate_date").val()
+      let exchange_rate = $("#exchange_rate").val()
+      $('.link-to-new-quotation').attr("href", "/quotations/new?currency="+currency+"&exchange_rate_date="+exchange_rate_date+"&exchange_rate="+exchange_rate);
+    });
+  
+    $("#exchange_rate_date").on('cancel.daterangepicker', function(ev, picker) {
+      let current_date = new Date().getDate().toString().padStart(2,"0") + "/" +  (new Date().getMonth()+1).toString().padStart(2,"0") + "/" + new Date().getFullYear().toString();
+      $(this).val(current_date);
+      let currency = $('#cart-currency-selector').val();
+      let exchange_rate_date = $("#exchange_rate_date").val()
+      let exchange_rate = $("#exchange_rate").val()
+      $('.link-to-new-quotation').attr("href", "/quotations/new?currency="+currency+"&exchange_rate_date="+exchange_rate_date+"&exchange_rate="+exchange_rate);
+    });
+  });
+
+  </script>

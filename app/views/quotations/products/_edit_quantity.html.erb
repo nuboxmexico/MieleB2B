@@ -1,0 +1,51 @@
+<div class="cart-stepper-container">
+  <div class="cart-stepper">
+    <i class="fa fa-angle-up row-angle-after change-quotation-item-quantity" data-action="up" onclick="bottleneck(<%= item.id %>)"></i>
+  </div>
+  <div class="item-quantity">
+    
+    <input type="text" value=<%= item.quantity %> onkeyup="this.value = this.value.replace(/[^0-9]/, '')" class="cart-item-quantity" onchange="bottleneck(<%= item.id %>)" />
+    
+    <%= hidden_field_tag "quantity", item.quantity, class: "item-quantity-hidden quantity_#{item.id}" %>
+  </div>
+  <div class="cart-stepper">
+    <i class="fa fa-angle-down row-angle-after change-quotation-item-quantity" data-action="down" onclick="bottleneck(<%= item.id %>)"></i>
+  </div>
+</div>
+
+<script>
+var busy = false;
+var pending = false;
+
+async function bottleneck(quotProdId) {
+  if (!busy) {
+    busy = true;
+    await setTimeout(updateQuantity, 1000, quotProdId);
+  } else {
+    pending = true;
+  }
+}
+
+async function updateQuantity(quotProdId) {
+  var quantityElem = document.querySelector(`.quantity_${quotProdId}`);
+  var quantity = Number(quantityElem.value);
+
+  if (!isNaN(quantity) && quantity > 0) {
+    var data = { new_quantity: quantity };
+
+    await $.ajax({
+      url: `/quotation_products/${quotProdId}/update_quantity`,
+      type: 'patch',
+      data: data
+    })
+    .done(function (data) {
+      busy = false;
+      if (pending) {
+        pending = false;
+        bottleneck(quotProdId);
+      }
+    });
+  }  
+}
+
+</script>

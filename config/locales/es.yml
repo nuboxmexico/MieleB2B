@@ -1,0 +1,131 @@
+es:
+  apipie:
+    code: Código
+  cocoon:
+    defaults:
+      add: "Add record"
+      remove: "Remove record"
+      destroy: 'Borrar Rol'
+      delete: 'Borrar Rol'
+    custom_roles:
+        destroy: 'Borrar Rol'
+  dispatch_order : "Orden de Flete"
+  installation_date : "Fecha de Instalación"
+  estimated_dispatch_date: 'Fecha de Despacho'
+  backorderable_label: Stock en proceso de reposición, fecha a confirmar
+  last_products_label: ¡Últimas unidades disponibles!
+  helpers:
+    submit:
+      create                             : "Crear %{model}"
+      update                             : "Modificar %{model}"
+  activerecord: 
+    models:
+      user                               : "Usuario"
+      quotation                          : "Cotización"
+    attributes:
+      quotation:
+        name                             : "Nombre"
+        lastname                         : "Apellido Paterno"
+        second_lastname                  : "Apellido Materno"
+        project_name                     : "Nombre Proyecto"
+        real_state_name                  : "Nombre inmobiliaria"
+        email                            : "Correo Electrónico"
+        phone                            : "Teléfono"
+        observations                     : "Observaciones"
+        dispatch_address_number          : "N°"
+        personal_address_number          : "N°"
+        dispatch_address                 : "Dirección Despacho"
+        personal_address                 : "Dirección Personal"
+        dispatch_commune_id              : "Comuna"
+        personal_commune_id              : "Comuna"
+        dispatch_dpto_number              : "Dpto"
+        personal_dpto_number             : "Dpto"
+        estimated_dispatch_date          : "Fecha estimada Despacho"
+        installation_date                : "Fecha estimada Instalación"
+        business_name                    : "Razón social"
+        business_rut                     : "RUT Empresa"
+        cost_center_id                      : "Centro de costo"
+        billing_address                  : "Dirección Facturación"
+        billing_address_number           : "N°"
+        billing_dpto_number              : "Dpto"
+        billing_commune_id               : "Comuna"
+        instalation_address                  : "Dirección Instalación"
+        instalation_address_number           : "N°"
+        instalation_dpto_number              : "Dpto"
+        instalation_commune_id               : "Comuna"
+        business_sector                  : "Giro Comercial"
+        dispatch_guide : "Orden de Flete"
+        installation_date : "Fecha de Instalación"
+        partner_referred_id: "Referido"
+        retirement_date: "Fecha de Retiro"
+      customer: 
+        name                             : "Nombre"
+        lastname                             : "Apellido Paterno"
+        second_lastname                             : "Apellido Materno"
+        email                            : "Correo Electrónico"
+        phone                            : "Teléfono"
+        dispatch_address_number          : "N°"
+        personal_address_number          : "N°"
+        dispatch_address                 : "Dirección Despacho"
+        personal_address                 : "Dirección Personal"
+        dispatch_commune_id              : "Comuna"
+        personal_commune_id              : "Comuna"
+        dispatch_dpto_number              : "Dpto"
+        personal_dpto_number             : "Dpto"
+        business_name                    : "Razón social"
+        business_rut                     : "RUT Empresa"
+        billing_address                  : "Dirección Facturación"
+        billing_address_number           : "N°"
+        billing_dpto_number              : "Dpto"
+        billing_commune_id               : "Comuna"
+        instalation_address                  : "Dirección Instalación"
+        instalation_address_number           : "N°"
+        instalation_dpto_number              : "Dpto"
+        instalation_commune_id               : "Comuna"
+        business_sector                  : "Giro Comercial"
+      user:
+        name                             : "Nombre"
+        lastname                         : "Apellido Paterno"
+        second_lastname                  : "Apellido Materno"
+        email                            : "Correo Electrónico"
+        phone                            : "Teléfono"
+        cost_center_id                      : "Centro de costo"
+        shop                             : "Tienda"
+        workday                          : "Jornada de trabajo"
+        role_id                          : "Rol"
+        sale_channel_id: 'Canal'
+        miele_role_id: 'ID de Rol'
+      custom_role:
+        role_id: "Rol"
+        sale_channel_id: 'Canal'
+        cost_center_id: 'Centro de costo'
+      promotional_code:
+        name                             : "Nombre"
+        code                             : "Código de descuento"
+        description                      : "Descripción"
+        percent                          : "Porcentaje de descuento"
+        start_date                       : "Comienza el"
+        end_date                         : "Termina el"
+        use_limit                        : "Cantidad de cotizaciones"
+        sale_channels                    : "Canales"
+      banner:
+        url                             : "Link asociado"
+        start_date                       : "Comienza el"
+        end_date                         : "Termina el"
+  number:
+    format:
+      delimiter: '.'
+      separator: ','
+      precision: 0
+    currency:
+      format:
+        delimiter: "."
+        format: " %u %n"
+        precision: 0
+        separator: ","
+        significant: false
+        strip_insignificant_zeros: false
+        unit: "$"
+  will_paginate:
+    previous_label: Anterior
+    next_label: Siguiente

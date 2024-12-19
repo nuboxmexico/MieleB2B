@@ -1,0 +1,11 @@
+<p>
+	Estimado(a) <%= @quotation.name %>, 
+</p>
+<p>
+	Los artículos pertenecientes a esta cotización fueron pagados parcialmente, le recordamos que para ser despachados deben estar cancelados en su totalidad al menos 7 días hábiles antes de la fecha pactada para despacho - 1% + IVA (MENSUAL del total de la orden) se cobrará como bodegaje pasado 180 días corridos.
+</p>
+<ul>
+	<% @quotation.quotation_products.availables.each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>

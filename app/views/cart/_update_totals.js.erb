@@ -1,0 +1,54 @@
+$("#items-in-cart").text("<%= current_user.cart_products %>");
+$(".cost-section").text("<%= number_with_delimiter(Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[0].round()) %>");
+// Actualiza: Porcentaje de llegada al siguiente tramo
+$(".percentage-section").text("<%= Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[3] %> %");
+// Actualiza: SubTotal
+$('<%= "#quotation-subtotal-price-#{@cart.id}" %>').text("<%= current_user.is_project_manager? ? number_with_delimiter(@cart.total_cost.round(2)) : number_with_delimiter(@cart.total_cost.round()) %>");
+$('<%= "#quotation-total-margen-#{@cart.id}" %>').text("<%= number_with_delimiter(@cart.margen_cost.round(2)) %> %");
+
+<% if @cart.total_miele_discount > 0 and @cart.apply_discount %>
+  $("#discount-info-miele").html("Dcto. Politica Comercial de Lavadoras, Secadoras y Sistemas de Planchado -<%= Quotation.discount_miele(@cart.cart_items)[0] %>%");
+  $('<%= "#quotation-discount-miele-#{@cart.id}" %>').text('<%= "#{number_with_delimiter((@cart.total_miele_discount * -1).round())}" %>');
+  $('<%= "#quotation-discount-miele-#{@cart.id}" %>').removeClass("hidden");
+<% else %>
+  $('<%= "#quotation-discount-miele-#{@cart.id}" %>').text('');
+  $('<%= "#quotation-discount-miele-#{@cart.id}" %>').addClass("hidden");
+  $("#discount-info-miele").html("");
+<% end %>
+
+<% if @cart.total_section_discount > 0 and @cart.apply_discount %>
+  $('<%= "#quotation-discount-section-#{@cart.id}" %>').text('<%= number_with_delimiter((@cart.total_section_discount * -1).round()) %>');
+  $("#discount-info-section").html("Dcto. por Tramo -<%= (Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[2]*100).round()%>%");
+  $('<%= "#quotation-discount-section-#{@cart.id}" %>').removeClass("hidden");
+<% else %>
+  $('<%= "#quotation-discount-section-#{@cart.id}" %>').text('');
+  $('<%= "#quotation-discount-section-#{@cart.id}" %>').addClass("hidden");
+  $("#discount-info-section").html("");
+<% end %>
+
+let cart_total = ["<%= current_user.is_project_manager? ? number_with_delimiter(@cart.total_per_pay.round(2)) : number_with_delimiter(@cart.total.round()) %>"]
+<% unless current_user.sale_channel.try(:name) == "Proyectos" %>
+  cart_total.push("<span class='min-text'>(IVA Incluído)</span>") 
+<% end %>
+
+<% if @cart.pay_percent == 100 %>
+  $('<%= "#cart-total-cost-#{@cart.id}" %>').html(cart_total.join(' '));
+  $('#cart-deb-<%= @cart.id %>').addClass('hidden');
+<% else %>
+  $('<%= "#cart-total-cost-#{@cart.id}" %>').html(cart_total.join(' '));
+  $('#cart-deb-<%= @cart.id %>').removeClass('hidden');
+  <% if current_user.is_project_manager? %>
+    $('#cart-deb-<%= @cart.id %>').html('Saldo (Neto)*: <span class="currency-change" data-currency="uf"> <%= number_with_delimiter((@cart.total - @cart.total_per_pay).round(2)) %> </span>');
+  <% else %>
+    $('#cart-deb-<%= @cart.id %>').html('Saldo: <span class="currency-change" data-currency="$"> <%= number_with_delimiter((@cart.total - @cart.total_per_pay).round(0)) %></span>');
+  <% end %>
+<% end %>
+
+<% if @cart.promotional_code %>
+  $("#resume-info-code-discount").html("<span><button id='test-delete-code' class='delete-promotional-code'>X</button>  Código descuento <%= @cart.promotional_code.code %> (-<%= @cart.promotional_code.percent%>%)</span>");
+  $("#resume-total-code-discount").html("<span id='quotation-discount-code-<%= @cart.id.to_s %>' class='miele-text'> - <%= number_with_delimiter(@cart.discount_per_code.round()) %></span>");
+<% end %>
+
+$("#test-delete-code").on("click",function(){
+  location.reload();
+});

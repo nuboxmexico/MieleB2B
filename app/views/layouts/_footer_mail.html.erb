@@ -1,0 +1,8 @@
+<br>
+<p>Mit freundlichen Grüßen / Saludos cordiales</p>
+<p>Atentamente, Equipo Miele.</p>
+<% if Rails.env.production? %>
+<p><%= image_tag 'https:'+ActionController::Base.helpers.asset_url("logo-mini.png") %></p>
+<% else %>
+<p><%= image_tag "logo-mini.png" %></p>
+<% end %>

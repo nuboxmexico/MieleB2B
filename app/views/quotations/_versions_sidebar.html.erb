@@ -1,0 +1,40 @@
+<div class="versions-alert">
+  <p>
+    Última modificación el <%= @quotation.created_at.strftime('%d/%m/%Y %H:%M:%S') %>
+  </p>
+  <%= link_to 'Ver historial de versiones', '#versions-sidebar', id: 'open-sidebar-link' %>
+</div>
+
+<div id="versions-sidebar">
+  <div class="close-sidebar">
+    <%= link_to 'X', '#' %>
+  </div>
+  <h3>Historial de versiones</h3>
+
+  <% @versions.each do |version| %>
+    <%= link_to version do %>
+      <div class="version-container <%= 'current-version' if version == @quotation %>">
+        <p><%= version.created_at.strftime('%d/%m/%Y %H:%M:%S') %></p>
+        <p>
+          <%= display_quotation_currency( version.for_project? ? 'uf' : 'clp' ).upcase + ' ' + number_with_delimiter( version.for_project? ? version.total.round(2) : version.total.round(0) ) %>
+        </p>
+        <p>
+          Productos: <%= version.products.count %>
+        </p>
+        <%= link_to quotation_path(version, format: :pdf), class: 'download-pdf no-loader' do %>
+          <%= image_tag 'file.svg' %> Descargar
+        <% end %>
+        <% if version.valid_quotation %>
+          <p class="current-version-label">
+            Versión vigente
+          </p>
+        <% end %>
+        <% if version == @quotation %>
+          <p class="current-version-label">
+            Vista actual
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

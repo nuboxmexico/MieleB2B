@@ -1,0 +1,67 @@
+<p class="dashboard-title">Productos Más Vendidos v/s Cotizados</p>
+<figure class="highcharts-figure">
+	<div id="top-10-div"></div>
+</figure>
+
+<script>
+	var data = <%= @products_most_selled.to_json.html_safe %>
+	Highcharts.chart('top-10-div', {
+		chart: {
+			type: 'bar'
+		},
+		title: {
+			text: ''
+		},
+		xAxis: {
+			categories: data.categories,
+			title: {
+				text: 'Producto'
+			}
+		},
+		yAxis: {
+			min: 0,
+			title: {
+				text: 'Unidades',
+				align: 'high'
+			},
+			labels: {
+				overflow: 'justify'
+			}
+		},
+		plotOptions: {
+			bar: {
+				dataLabels: {
+					enabled: true
+				}
+			}
+		},
+		legend: {
+			layout: 'vertical',
+			align: 'right',
+			verticalAlign: 'top',
+			x: -40,
+			y: 250,
+			floating: true,
+			borderWidth: 1,
+			backgroundColor:
+			Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+			shadow: true
+		},
+		credits: {
+			enabled: false
+		},
+		series: data.data,
+		responsive: {
+			rules: [{
+				condition: {
+					maxWidth: 600
+				},
+				chartOptions: {
+					legend: {
+						enabled: false
+					}
+				}
+			}]
+		}
+	});
+</script>

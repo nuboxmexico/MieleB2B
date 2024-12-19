@@ -1,0 +1,131 @@
+<div class="row bot-space top-space-home">
+	<div class="col-lg-5 col-xs-12">
+		<h1 class="bold">
+			Dashboard <%= current_user.administrator? ? 'Administrador' : 'Manager' %>
+		</h1>
+	</div>
+	<div class="col-lg-2 col-lg-offset-5 col-xs-12">
+		<%= form_tag(filter_home_path, method: :get, remote: true, id: 'filter-form') do %>
+		<label for="filter" class="label-text">Inicio - Fin</label>
+		<input type="text" class="inlineb date-range gray-background" name="date_range" id="date_range">
+		<% end %>
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<div class="dashboard-panel" id="quotations-state">
+			<%= render 'home/quotations_per_state' %>
+		</div>
+	</div>
+	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<div class="dashboard-panel" id="sales-channels">
+			<%= render 'home/sales_per_channel_and_cost_center' %>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<div class="dashboard-panel">
+			<%= render 'home/sales_per_channel_and_product_type' %>
+		</div>
+	</div>
+	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<div class="dashboard-panel" id="top-products">
+			<%= render 'home/top_10_products' %>
+		</div>
+	</div>
+</div>
+<% if can? :index, Quotation %>
+<div class="row bot-space top-space-home">
+	<div class="col-lg-5 col-xs-12">
+		<h3>
+			Últimas cotizaciones
+			<%= link_to 'Ver todas', quotations_path, class: 'btn btn-miele left-mar' %>
+		</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			<% @quotations.each_with_index do |quotation, index| %>
+			<% if quotation.channel == 'Retail' %>
+				<%= render partial: 'quotations/quotation_card_retail', locals: {quotation: quotation} %>
+			<% else %>
+				<%= render partial: 'quotations/quotation_card', locals: {quotation: quotation} %>
+			<% end %>
+			<% end %>
+		</div>
+	</div>
+</div>
+<% end %>
+<script>
+	$(document).ready(function(){
+		$("#date_range").val('<%= "#{(Date.today - 3.months).strftime('%d/%m/%Y')} - #{Date.today.strftime('%d/%m/%Y')}" %>');
+	});
+	$(document).ready(function(){
+		$('.date-range').daterangepicker({
+			"autoUpdateInput": true,
+			"minDate": new Date(2012, 0, 1),
+			"locale": {
+				"format": "DD/MM/YYYY",
+				"separator": " - ",
+				"applyLabel": "Guardar",
+				"cancelLabel": "Cancelar",
+				"fromLabel": "Desde",
+				"toLabel": "Hasta",
+				"customRangeLabel": "Custom",
+				"weekLabel": "S",
+				"daysOfWeek": [
+				"Do",
+				"Lu",
+				"Ma",
+				"Mi",
+				"Ju",
+				"Vi",
+				"Sa"
+				],
+				"monthNames": [
+				"Enero",
+				"Febrero",
+				"Marzo",
+				"Abril",
+				"Mayo",
+				"Junio",
+				"Julio",
+				"Agosto",
+				"Septiembre",
+				"Octubre",
+				"Noviembre",
+				"Diciembre"
+				],
+				"firstDay": 1
+			},
+			"cancelClass": "btn-secondary",
+			"applyClass": "btn-miele",
+			"singleDatePicker": false
+		}, function(init_date, end_date) {
+			$('.date-range').val(init_date.format('DD/MM/YYYY')+' - '+end_date.format('DD/MM/YYYY'));
+			$(".date-range").trigger('change');
+		});
+		$("#filter-form").change(function(){
+			var dates = $("#date_range").val().split(' - ');
+			$(this).submit();
+			$(".loader-page").fadeIn();
+		});
+	}); 
+	$(".row-toggle-quotation").click(function(){
+		if($(this).hasClass('open-quotation')){
+			$(this).removeClass('open-quotation');
+		} else {
+			$(this).addClass('open-quotation');
+		}
+	});
+	$('.panel-collapse').on('show.bs.collapse', function () {
+		$(this).siblings('.panel-heading').addClass('active');
+	});
+
+	$('.panel-collapse').on('hide.bs.collapse', function () {
+		$(this).siblings('.panel-heading').removeClass('active');
+	});
+</script>

@@ -1,0 +1,155 @@
+<div class="row">
+  <div class="col-lg-12">
+    <% if current_user.manager? or current_user.administrator? %>
+      <ol class="breadcrumb">
+        <li><a href="<%= root_path %>">Inicio</a></li>
+        <li>Leads</li>
+      </ol>
+    <% end %>
+    <h1 class="title-section bold">
+      Leads
+    </h1>
+  </div>
+</div>
+
+<% if @leads.any? %>
+  <div class="row leads-actions-container">
+    <div class="col-xs-12">
+      <div class="searcher-div">
+        <label for="filter" class="label-text">Desde - Hasta</label>
+        <input type="text" class="inlineb gray-background" name="date_range" id="leads-daterange-filter">
+      </div>
+      <div class="search-container">
+        <%= search_form_for @query do |f| %>
+
+          <i class="fas fa-search"></i>
+          <%= f.search_field :name_or_real_state_name_or_contacts_or_project_address_or_observations_cont, id: 'search-lead-input' %>
+
+          <%= button_tag type: 'submit', class: 'btn btn-sm btn-miele' do %>
+            Buscar
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="leads-container col-xs-12">
+      <div class="header row dark-ground bot-space hidden-xs">
+        <div class="col-sm-2">
+          <%= sort_link(@query, :created_at, 'Fecha de creación', {}, class: 'sort-link') %>
+        </div>
+        <div class="col-sm-2">
+          <%= sort_link(@query, :name, 'Nombre', {}, class: 'sort-link') %>
+        </div>
+        <div class="col-sm-2">
+          <%= sort_link(@query, :real_state_name, 'Inmobiliaria', {}, class: 'sort-link') %>
+        </div>
+        <div class="col-sm-2">
+          <%= sort_link(@query, :start_date_estimated, 'Fecha estimada de inicio', {}, class: 'sort-link') %>
+        </div>
+        <div class="col-sm-2">
+          <%= sort_link(@query, :status, 'Estado', {}, class: 'sort-link') %>
+        </div>
+        <div class="col-sm-2">
+          Acciones
+        </div>
+      </div>
+
+      <% @leads.each do |lead| %>
+        <div class="lead row">
+          <div class="col-xs-12 col-sm-2">
+            <span data-label="Fecha de creación">
+              <%= lead.created_at.strftime('%d/%m/%Y') %>
+            </span>
+          </div>
+          <div class="col-xs-12 col-sm-2">
+            <span data-label="Nombre">
+              <%= lead.name %>
+            </span>
+          </div>
+          <div class="col-xs-12 col-sm-2">
+            <span data-label="Inmobiliaria">
+              <%= lead.real_state_name %>
+            </span>
+          </div>
+          <div class="col-xs-12 col-sm-2">
+            <span data-label="Fecha estimada de inicio">
+              <%= lead.start_date_estimated.strftime('%d/%m/%Y') if lead.start_date_estimated %>
+            </span>
+          </div>
+          <div class="col-xs-12 col-sm-2">
+            <span data-label="Estado">
+              <%= lead.status_name %>
+            </span>
+          </div>
+          <div class="actions col-xs-12 col-sm-2">
+            <%= link_to lead_path(lead) do %>
+              <%= image_tag('eye-icon.svg', class: 'file-icon inlineb right-space-icon')%>
+            <% end %>
+            <%= link_to edit_lead_path(lead) do %>
+              <%= image_tag('edit.svg', class: 'file-icon inlineb right-space-icon')%>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <div class="pull-right">
+        <%= will_paginate @leads, renderer: BootstrapPagination::Rails %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="alert alert-info">
+        No hay leads registrdos
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script>
+  $('#leads-daterange-filter').daterangepicker({
+    "autoUpdateInput": true,
+    "minDate": new Date(2012, 0, 1),
+    "locale": {
+      "format": "DD/MM/YYYY",
+      "separator": " - ",
+      "applyLabel": "Descargar",
+      "cancelLabel": "Cancelar",
+      "fromLabel": "Desde",
+      "toLabel": "Hasta",
+      "customRangeLabel": "Custom",
+      "weekLabel": "S",
+      "daysOfWeek": [
+      "Do",
+      "Lu",
+      "Ma",
+      "Mi",
+      "Ju",
+      "Vi",
+      "Sa"
+      ],
+      "monthNames": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+      ],
+      "firstDay": 1
+    },
+    "cancelClass": "btn-secondary",
+    "applyClass": "btn-miele",
+    "singleDatePicker": false
+  }, function(init_date, end_date) {
+    $('#leads-daterange-filter').val(init_date.format('DD/MM/YYYY')+' - '+end_date.format('DD/MM/YYYY'));
+    $("#leads-daterange-filter").trigger('change');
+  });
+</script>

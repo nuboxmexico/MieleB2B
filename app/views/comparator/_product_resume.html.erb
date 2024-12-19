@@ -1,0 +1,17 @@
+<div id="comparator-resume" class="row">
+  <% products.each do |product| %>
+  <div class="product <%= @size_cols%>">
+    <div class="info">
+      <p><%= product.name %></p>
+      <p>
+        <%= number_to_currency product.display_price(current_user)[1] %>
+      </p>
+      <% if product.can_supply? %>
+      <%= link_to 'Cotizar', add_product_to_cart_path(product), class: "btn btn-miele", method: :post, remote: true %>
+      <% else %>
+      Próximamente disponible
+      <% end %>
+    </div>
+  </div>
+  <% end %>
+</div>

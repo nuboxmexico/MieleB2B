@@ -1,0 +1,38 @@
+<% if @cart.pay_percent == 100 %>
+$('<%= "#cart-total-cost-#{@cart.id}" %>').html("<%= number_with_delimiter(@cart.total.to_i) %> <span class='min-text'>(IVA Incluído)</span>");
+$('#cart-deb-<%= @cart.id %>').addClass('hidden');
+<% else %>
+$('<%= "#cart-total-cost-#{@cart.id}" %>').html("<%= number_with_delimiter(@cart.total_per_pay.to_i) %> <span class='min-text'>(IVA Incluído)</span>");
+$('#cart-deb-<%= @cart.id %>').html('Saldo: <span class="currency-change" data-currency="$"> <%= number_with_delimiter(@cart.total - @cart.total_per_pay ) %> </span>');
+<% end %>
+
+<% if  @success == true %>
+$("#installation-info").html("<span>Instalación</span> ");
+$("#installation-value").html("<span id='quotation-installation-value-<%= @cart.id.to_s %>'><span class='currency-change' data-currency='<%= display_quotation_currency(@cart.quotation.nil? ? 'clp' : @cart.quotation.currency) %>'>  <%= number_with_delimiter(@cart.installation_value.to_i) %></span> <input type='hidden' name='quotation[installation_value]' value='<%= @cart.installation_value %>'>");
+    
+    
+<% if @cart.cart_items.apply_dispatch.mdas.size > 0  || @cart.cart_items.apply_dispatch.sdas.size > 0 %>
+    <% if  @cart.cart_items.to_install.any? %>
+        $("#installation-disclaimer").html('<div class="warning-msg">Los equipos instalados por Miele tendrán garantía de 2 años</div>');
+        
+    <% else %>
+        $("#installation-disclaimer").html('<div class="warning-msg">Los equipos instalados por terceros tendrán garantía de 3 meses</div>');
+    <% end %>
+<% end %>
+
+$("#dispatch-info").html("<span>Despacho</span> ");
+$("#dispatch-value").html("<span id='quotation-dispatch-value-<%= @cart.id.to_s %>'> <span class='currency-change' data-currency='<%= display_quotation_currency(@cart.quotation.nil? ? 'clp' : @cart.quotation.currency) %>'> <%= number_with_delimiter(@cart.dispatch_value.to_i) %></span> <input type='hidden' name='quotation[dispatch_value]' value='<%= @cart.dispatch_value %>'>");
+
+$("#dispatch-info").append("<a class='collapsed row-toggle inlineb' role='button' data-toggle='collapse' data-parent='#accordion' href='#collapse' aria-expanded='false' aria-controls='collapse' id='toggle-dispatch-button'><i class='fa fa-plus-circle'></i></a>");
+
+$("#code-dispatch").html("<%= escape_javascript render(:partial => 'quotations/dispatch_discount_form') %>");
+
+$("#dispatch-code-info").html("");
+$("#dispatch-code-value").html("");
+is_rm = <%= Commune.find_by(id: params[:commune]).try(:region).try(:id) == 13 %>;
+$('#quotation_installation_date').data("DateTimePicker").minDate(moment($("#quotation_estimated_dispatch_date").val(), "DD/MM/YYYY").add((is_rm ? 3 : 5), 'days'));
+$('#quotation_installation_date').val(moment($("#quotation_estimated_dispatch_date").val(), "DD/MM/YYYY").add((is_rm ? 3 : 5), 'days').format("DD/MM/YYYY"));
+<% else %>
+$("#dispatch-info").html("");
+$("#dispatch-value").html("");
+<% end %>

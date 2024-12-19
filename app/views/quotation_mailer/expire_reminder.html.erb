@@ -1,0 +1,4 @@
+<p>
+	La cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> esta pronta a vencer el día <%= (Date.today+ 3.days).strftime("%d/%m/%Y") %>. Contactar cliente a <%= @quotation.email %> o al <%= @quotation.phone %>
+</p>
+<p>Puedes ver todo el detalle de la cotización <%= link_to 'aquí.', quotation_url(@quotation), target: '_blank' %></p>

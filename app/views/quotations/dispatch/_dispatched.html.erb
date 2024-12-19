@@ -1,0 +1,154 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id + "dispatched" %>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4 class="dispatch-group-subtitle">
+        Envío #<%= dispatch_group_counter + 1 %>
+        <%= get_state_label(dispatch_group.state, 'full') %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    <div class="collapse" id="<%= id + "dispatched" %>" data-type="dispatch">
+      <% dispatch_group.dispatch_guides.each do |dispatch_guide| %>
+        <%= link_to dispatch_guide.document.url(:original), class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(dispatch_guide.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, DispatchGuide and @quotation.post_in_preparation_status? %>
+          <%= link_to dispatch_guide_path(dispatch_guide), method: :delete, class: "btn btn-delete no-loader", data: { 
+              confirm: '¿Estás seguro de eliminar el archivo '+dispatch_guide.document_file_name+'?',
+              'confirm-button-text': 'Eliminar',
+              'cancel-button-text': 'Cancelar'
+            }  do %>
+             <i class="fa fa-times"></i>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= form_for dispatch_group, html: {multipart: true, class: 'dispatched-group'} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :dispatch_order, 'Guía de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_order, class: 'field-bordered inlineb', placeholder: 'Escribe aquí ...' %>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :reception_type, 'Tipo de recepción', class: 'title-input' %>
+              <%= f.select :reception_type, DispatchGroup.reception_types.to_a.map{|r| r.reverse}, {include_blank: 'Seleccione el tipo de recepción' }, { class: 'field-bordered inlineb form-control select2-reception-type', id: 'reception-type-select', required: true, data: {container_id: id} } %>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :freight_order, 'Orden de flete', class: 'title-input' %>
+              <%= f.text_field :freight_order, class: 'field-bordered inlineb', placeholder: 'Escribe aquí ...' %>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :dispatch_date, 'Fecha de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_date, class: 'field-bordered inlineb date-picker', value: (dispatch_group.dispatch_date ? dispatch_group.dispatch_date.strftime('%d/%m/%Y') : nil) %>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <!--
+            <div class="form-group">
+              <%= f.label :installation_date, 'Fecha de instalación', class: 'title-input' %>
+              <%= f.text_field :installation_date, class: 'field-bordered inlineb', value: (dispatch_group.installation_date ? dispatch_group.installation_date.strftime('%d/%m/%Y') : nil) %>
+            </div>
+            -->
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :dispatch_guides, 'Guía de despacho', class: 'title-input' %>
+              <div class="file-field input-field">
+                <div class="file-drop-area dashed-border">
+                  <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+                  <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+                  <%= f.file_field :dispatch_guides, id: 'dispatch_guide_documents', class: 'file-input', accept: 'application/pdf', multiple: true %>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :provider_type, 'Tipo de Proveedor', class: 'title-input asd' %>
+              <%= f.select :provider_type, ["Interno", "Externo"], { include_blank: 'Seleccione una ...' }, {class: ''} %>
+            </div>
+
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.fields_for :notes, dispatch_group.notes.reception.last do |note_form| %>
+                <%= note_form.label :observation, 'Observaciones', class: 'title-input' %>
+                <%= note_form.text_area :observation, class: 'field-bordered full-width padding-text-area', required: true %>
+                <%= note_form.hidden_field :user_id, value: current_user.id %>
+              <% end %>
+            </div>
+            <%= render partial: 'quotations/dispatch/notes', locals: { notes: dispatch_group.notes, id: "dispatched-note-#{dispatch_group_counter}" } %>
+          </div>
+        </div>
+
+      <p></p>
+    <div class="border-container">
+      <div class=" row">
+        <div class="col-xs-12 col-md-5 text-center">
+          <p class="title-input">
+            Nombre
+          </p>
+        </div>
+        <div class="col-xs-12  col-md-2 text-center">
+          <p class="title-input">
+            TNR
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-2 text-center">
+          <p class="title-input">
+            ID
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-2 text-center">
+          <p class="title-input">
+            Estado
+          </p>
+        </div>
+      </div>
+      <div class="product">
+        <% dispatch_group.detail_quotation_products.each do |detail| %>
+          <div class=" row">
+            <div class="col-xs-12 col-md-5">
+              <span><%= detail.name %></span>
+            </div> 
+            <div class="col-xs-12 col-md-2 text-center">
+              <span><%= detail.tnr %></span>
+            </div>
+            <div class="col-xs-12 col-md-2 text-center">
+              <span><%= detail.serial_id %></span>
+            </div>
+            <div class="col-xs-12 col-md-2 text-center">
+              <span><%= detail.state %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+        <% if current_user.dispatch? %>
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="form-group actions-container text-right">
+                <%= f.submit 'Aceptar', class: 'btn btn-miele save-dispatch' %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

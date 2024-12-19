@@ -1,0 +1,54 @@
+<% if can? :activate_home_program, @quotation and @quotation.get_state == 'Por activar' %>
+	<div class="quotation-box padding-box text-left">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Confirmar activación</p>
+			</div>
+		</div>
+		<%= form_tag activate_home_program_quotation_path(@quotation), method: :post, id: 'home_program_form' do %>
+		<div class="row top-both">
+			<div class="col-lg-8 col-md-7 col-sm-12 col-xs-12">
+				<textarea name="home_program_observation" id="home-program-observation" class="field-bordered full-width padding-text-area" cols="50" rows="7" placeholder="Observaciones..."></textarea>
+			</div>
+			<div class="col-md-3 col-xs-12 col-sm-12 text-right align-home-program">
+				<button type="submit" class="btn btn-miele" id="send-home-program" disabled>Aceptar</button>
+			</div>
+		</div>
+		<% end %>
+	</div>
+	<script>
+		$(document).ready(function(){
+			$("#home_program_form").trigger("change");
+			if ($("#home_program_form").valid()) {
+				$('#send-home-program').prop('disabled', false);
+			} else {
+				$('#send-home-program').prop('disabled', 'disabled');
+			}
+		})
+		$('#home_program_form input').on('change', function() {
+			if ($("#home_program_form").valid()) {
+				$('#send-home-program').prop('disabled', false);
+			} else {
+				$('#send-home-program').prop('disabled', 'disabled');
+			}
+		});
+	</script>
+<% else %>
+	<div class="quotation-box padding-box text-left">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Información Home Program</p>
+			</div>
+		</div>
+		<% if @quotation.quotation_notes.home_program.size > 0 %>
+			<% @quotation.quotation_notes.home_program.each do |note| %>
+				<div class="row padding-row">
+					<div class="col-xs-12">
+						<p class="bold title-input"><b>Observación de <%= note.user.fullname %> el día <%= note.created_at.strftime("%d/%m/%Y")%></b></p>
+						<p class="content-input"><%= note.observation %></p>
+					</div>
+				</div>
+			<% end %>
+		<% end %>
+	</div>
+<% end %>

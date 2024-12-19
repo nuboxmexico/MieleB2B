@@ -1,0 +1,26 @@
+xlsx_package.workbook.add_worksheet(name: 'Cotizaciones') do |sheet|
+  headers = ['','', '', 'Productos', '', '', '']
+  sheet.add_row headers
+  headers = ['Código Cotización','Nombre Proyecto', 'Estado', 'TNR', 'Nombre', 'Cantidad', 'Precio']
+  sheet.add_row headers
+
+  @quotations.each do |quotation|
+    new_row = [
+      quotation.code,
+      quotation.project_name,
+      quotation.get_state
+    ]
+    if quotation.quotation_products.any? 
+      quotation.quotation_products.each do |item|
+        sheet.add_row new_row + [
+          item.sku,
+          item.name,
+          item.quantity,
+          item.price
+        ]
+      end
+    else
+      sheet.add_row new_row
+    end
+  end
+end

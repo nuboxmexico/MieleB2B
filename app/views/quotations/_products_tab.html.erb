@@ -1,0 +1,214 @@
+<div class="quotation-box text-center products-container">
+	<%= render 'quotations/products/headers' %>
+	<% @quotation.quotation_products.quantity_greater_than_zero.order(is_service: :asc).each do |product| %>
+		<%= render partial: 'quotations/products/show', locals: { product: product } %>
+	<% end %>
+</div>
+
+<% if @quotation.quotation_products.quantity_equal_to_zero.any? %>
+	<h3>Productos no recepcionados</h3>
+	<div class="quotation-box text-center removed-products-container">
+		<%= render 'quotations/products/headers' %>
+		<% @quotation.quotation_products.quantity_equal_to_zero.order(is_service: :asc).each do |product| %>
+			<%= render partial: 'quotations/products/show', locals: { product: product } %>
+		<% end %>
+	</div>
+<% end %>
+
+<div class="row">
+	<div class="col-md-4 col-md-offset-8 col-xs-12 bot-detail">
+		<div class="row detail-quotation">
+			<div class="col-md-6 col-xs-6">
+				<p>Equipos</p>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<p><%= number_to_currency(@quotation.total_product) %></p>
+			</div>
+			<% if @quotation.sale_channel.name == "E-commerce" and @quotation.discount_from_ecommerce > 0 %>
+				<div class="col-md-6 col-xs-6 miele-text">
+					<p>Dctos. provenientes de Ecommerce</p>
+				</div>
+				<div class="col-md-6 col-xs-6 text-right miele-text">
+					<p><%= "-"+number_to_currency(@quotation.discount_from_ecommerce) %></p>
+				</div>
+				<div class="col-md-6 col-xs-6">
+					<p>Sub Total:        </p>
+				</div>
+				<div class="col-md-6 col-xs-6 text-right">
+					<p><%=number_to_currency(@quotation.total_cost - @quotation.discount_from_ecommerce)%></p>
+				</div>
+			<% else %>
+				<div class="col-md-6 col-xs-6">
+					<p>Sub Total:        </p>
+				</div>
+				<div class="col-md-6 col-xs-6 text-right">
+					<p><%=number_to_currency(@quotation.total_cost)%></p>
+				</div>
+			<% end %>
+		</div>
+		<div class="row detail-quotation">
+			<% if @quotation.dispatch_value > 0 %>
+			<div class="col-md-6 col-xs-6">
+				<p>Despacho</p>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<p><%= number_to_currency(@quotation.dispatch_value) %></p>
+			</div>
+			<% end %>
+
+			<% if @quotation.installation_value > 0 %>
+			<div class="col-md-6 col-xs-6">
+				<p>Instalación</p>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<p><%= number_to_currency(@quotation.installation_value) %></p>
+			</div>
+			<% end %>
+		</div>
+		<div class="row detail-quotation">
+			<div class="col-md-6 col-xs-6">
+				<% if !@quotation.bstock and @quotation.apply_discount %>
+				<% if @quotation.total_section_discount > 0 %>
+				<p>Dcto. por Tramo -<%= (Quotation.cost_next_section(@quotation.quotation_products, @quotation.quotation_products.where(discount_type: 'miele'))[2]*100).to_i %>%</p> 
+				<% end %>
+				<% if @quotation.total_miele_discount > 0 %>
+				<p>Dcto. Politica Comercial de Lavadoras, Secadoras y Sistemas de Planchado -<%= Quotation.discount_miele(@quotation.quotation_products)[0] %>%</p> 
+				<% end %>
+				<% end %>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<% if !@quotation.bstock and @quotation.apply_discount %>
+				<% if @quotation.total_section_discount > 0 %>
+				<p class="miele-text"><%= number_to_currency(@quotation.total_section_discount * -1 ) %></p>
+				<% end %>
+				<% if @quotation.total_miele_discount > 0 %>
+				<p class="miele-text"><%= number_to_currency(@quotation.total_miele_discount * -1 ) %></p>
+				<% end %>
+				<% end %>
+			</div>
+		</div>
+		<div class="row detail-quotation">
+			<% if @quotation.promotional_code %> 
+			<div class="col-md-6 col-xs-6">
+				<p>Código descuento <%= @quotation.promotional_code.code %> (-<%= @quotation.promotional_code.percent%>%)</p>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<p class="miele-text"> - <%= number_to_currency(@quotation.discount_per_code) %></p>
+			</div>
+			<% end %>
+		</div>
+		<div class="row detail-quotation">
+
+			<% if @quotation.dispatch_code %> 
+			<div class="col-md-6 col-xs-6">
+				<p>Dcto. Despacho <%= @quotation.dispatch_code.code %> (-<%= @quotation.dispatch_code.percent%>%)</p>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<p class="miele-text"> - <%= number_to_currency(@quotation.discount_code_dispatch) %></p>
+			</div>
+			<% end %>
+		</div>
+		<div class="row detail-quotation">
+
+			<div class="col-md-6 col-xs-6">
+				<p class="total-quotation bold">Total</p>
+			</div>
+			<div class="col-md-6 col-xs-6 text-right">
+				<% if @quotation.sale_channel %>
+					<% if @quotation.sale_channel.name == "E-commerce" %>
+						<p class="total-quotation" id="total_1"><%= number_to_currency(@quotation.total_per_pay - @quotation.discount_from_ecommerce) %></p> <span class="min-text">(IVA Incluído)</span>
+					<% else %>
+						<p class="total-quotation" id="total_0"><%= number_to_currency(@quotation.total_per_pay) %></p> <span class="min-text">(IVA Incluído)</span>
+					<% end %>
+				<% else %>
+					<p class="total-quotation" id="total_0"><%= number_to_currency(@quotation.total_per_pay) %></p> <span class="min-text">(IVA Incluído)</span>
+				<% end %>
+				<% if @quotation.pay_percent == 50 %>
+				<p>Saldo <span id="balance" ><%= number_to_currency(@quotation.total - @quotation.total_per_pay) %></span></p> <span class="min-text">(IVA Incluído)</span>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+var quotationId = <%= @quotation.id %>;
+
+var products = <%= @quotation.total_product %>;
+var dispatch = <%= @quotation.dispatch_value %>;
+var installation = <%= @quotation.installation_value %>;
+
+var discount_ecommerce = <%= @quotation.discount_from_ecommerce %>;
+var discount_dispatch = <%= @quotation.discount_code_dispatch %>
+var discount_code = <%= @quotation.discount_per_code %>;
+var discount_miele = <%= @quotation.total_miele_discount %>;
+var discount_section = <%= @quotation.total_section_discount %>;
+
+var pay_percent = <%= @quotation.pay_percent %>;
+var total_per_pay = <%= @quotation.total_per_pay %>;
+
+function doTheMath() {
+	var total = 0;
+	if (products) {
+		total += Number(products);
+	}
+	if (dispatch) {
+		total += Number(dispatch);
+	}
+	if (installation) {
+		total += Number(installation);
+	}
+	if (discount_ecommerce && discount_ecommerce > 0) {
+		total -= Number(discount_ecommerce);
+	}
+	if (discount_dispatch && discount_dispatch > 0) {
+		total -= Number(discount_dispatch);
+	}
+	if (discount_code && discount_code > 0) {
+		total -= Number(discount_code);
+	}
+	if (discount_miele && discount_miele > 0) {
+		total -= Number(discount_miele);
+	}
+	if (discount_section && discount_section > 0) {
+		total -= Number(discount_section);
+	}
+
+	totalSpan_0 = document.getElementById("total_0");
+	totalSpan_1 = document.getElementById("total_1");
+	if (totalSpan_0) {
+		totalSpan_0.innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+	}
+	if (totalSpan_1) {
+		totalSpan_1.innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+	}
+	if (pay_percent && total_per_pay && Number(pay_percent) === 50 ) {
+		var balance = total/2;
+		var balanceSpan = document.querySelector("#balance");
+		if (balanceSpan) {
+			balanceSpan.innerHTML = balance.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		}
+		if (totalSpan_0) {
+			totalSpan_0.innerHTML = balance.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		}
+		if (totalSpan_1) {
+			totalSpan_1.innerHTML = balance.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		}
+	}
+	updateTotalInDB(quotationId, total);
+}
+
+doTheMath();
+
+function updateTotalInDB (quotationId, totalValue) {
+  $.ajax({
+    url: `/quotation/${quotationId}/update_total_from_view`,
+    type : 'patch',
+    data: {
+      total_value: totalValue
+    }
+    }).done(function (data) {
+  	})
+}
+</script>

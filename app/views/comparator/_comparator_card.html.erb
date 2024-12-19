@@ -1,0 +1,5 @@
+<div class="comparator-card">
+	<%= link_to empty_comparator_path, remote: true, id: 'empty-comparator' do %><i class="fa fa-times"></i><% end %>
+	<p>Tienes productos seleccionados para comparar</p>
+	<p><button type="button" class="btn btn-miele" id="link-to-comparator" <%= (@comparator.products.size > 1 ? '' : 'disabled')%>>Comparar</button> </p>
+</div>

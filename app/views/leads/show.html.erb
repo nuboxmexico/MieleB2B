@@ -1,0 +1,178 @@
+<div class="row">
+  <div class="col-lg-12">
+    <ol class="breadcrumb">
+      <li><a href="<%= root_path %>">Inicio</a></li>
+      <li><a href="<%= leads_path %>">Leads</a></li>
+      <li><%= @lead.name %></li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12 bot-space no-padding lead-header">
+    <h1 class="bold">
+      <%= @lead.name %>
+      <%= link_to 'Crear cotización', lead_to_quotation_path(@lead), class: 'btn btn-miele pull-right no-loader', id: 'lead-to-quotation-btn', data: {existing_skus: @existing_skus.any?} %>
+
+      <%= link_to 'Editar', edit_lead_path(@lead), class: 'btn btn-miele pull-right' %>
+    </h1>
+  </div>
+</div>
+
+<div class="row lead-container normal-alert panel-heading">
+  <div class="row">
+    <div class="data-container col-sm-6 col-xs-12">
+      <p class="label">Nombre del Lead</p>
+      <p class="value">
+        <%= @lead.name %>
+      </p>
+    </div>
+    <div class="data-container col-sm-6 col-xs-12">
+      <p class="label">Nombre Inmobiliaria</p>
+      <p class="value">
+        <%= @lead.real_state_name %>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="data-container col-sm-6 col-xs-12">
+      <p class="label">Dirección del proyecto</p>
+      <p class="value">
+        <%= @lead.project_address %>
+      </p>
+    </div>
+    <div class="data-container col-sm-6 col-xs-12">
+      <p class="label">Fecha estimada de inicio</p>
+      <p class="value">
+        <%= @lead.start_date_estimated.strftime('%d/%m/%Y') if @lead.start_date_estimated %>
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="data-container col-xs-12 col-sm-6">
+      <p class="label">Estado</p>
+      <p class="value">
+        <%= @lead.status_name %>
+      </p>
+    </div>
+
+    <div class="data-container col-xs-12 col-sm-6">
+      <p class="label">Moneda</p>
+      <p class="value">
+        <%= @lead.currency.to_s.upcase %>
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="data-container col-sm-6 col-xs-12">
+      <p class="label">Contactos</p>
+      <p class="value">
+        <%= @lead.contacts.html_safe %>
+      </p>
+    </div>
+
+    <div class="data-container col-sm-6 col-xs-12">
+      <p class="label">Observaciones</p>
+      <p class="value">
+        <%= @lead.observations.html_safe %>
+      </p>
+    </div>
+  </div>
+
+  <% if @lead.attachments.any? %>
+    <div class="row">
+      <div class="attachments-container data-container">
+        <p class="label">Archivos adjuntos</p>
+        <div>
+          <% @lead.attachments.each do |attachment| %>
+            <%= link_to attachment.file.url(:original), class: 'btn btn-miele mini-top-space attachment', target: "_blank" do %>
+              <i class="fa fa-file-image"></i> <%= truncate(attachment.file_file_name, length: 15) %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="row line-hr"></div>
+
+  <% if @lead.products.any? %>
+    <div class="products-container">
+      <% @lead.sorted_products.each_with_index do |product, counter| %>
+        <div class="row product">
+          <h4>Producto <%= counter + 1 %></h4>
+          <div class="data-container col-xs-12">
+            <p class="label">Nombre</p>
+            <p class="value">
+              <%= product.name %>
+            </p>
+          </div>
+          <div class="data-container col-xs-12 col-sm-4">
+            <p class="label <%= 'existing-sku-alert' if @existing_skus[product.sku] %>" data-existing-message="TNR ya registrado">
+              TNR
+            </p>
+            <p class="value">
+              <%= product.sku %>
+            </p>
+          </div>
+          <div class="data-container col-xs-12 col-sm-4">
+            <p class="label">Cantidad</p>
+            <p class="value">
+              <%= product.quantity %>
+            </p>
+          </div>
+          <div class="data-container col-xs-12 col-sm-4">
+            <p class="label">Precio</p>
+            <p class="currency value" data-currency="<%= @lead.currency %>">
+              <%= number_with_delimiter product.unit_price.to_f.round(2) %>
+            </p>
+          </div>
+          <div class="data-container col-xs-12 col-sm-4">
+            <p class="label">Total Neto</p>
+            <p class="currency total-net-price" data-currency="<%= @lead.currency %>">
+              <%= number_with_delimiter product.total_price.round(2) %>
+            </p>
+          </div>
+          <div class="data-container col-xs-12 col-sm-4">
+            <p class="label">Total IVA</p>
+            <p class="currency total-tax-value" data-currency="<%= @lead.currency %>">
+              <%= number_with_delimiter (product.total_price * 0.19).round(2) %>
+            </p>
+          </div>
+          <div class="data-container col-xs-12 col-sm-4">
+            <p class="label">Total IVA + Total Neto</p>
+            <p class="currency total-price" data-currency="<%= @lead.currency %>">
+              <%= number_with_delimiter (product.total_price * 1.19).round(2) %>
+            </p>
+          </div>
+        </div>
+        
+        <div class="row line-hr"></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div id="lead-totals">
+    <div class="data-container col-xs-12 col-sm-4">
+      <p class="label">Total Neto</p>
+      <p class="currency net-price" data-currency="<%= @lead.currency %>">
+        <%= number_with_delimiter (@lead.net_price).round(2) %>
+      </p>
+    </div>
+    <div class="data-container col-xs-12 col-sm-4">
+      <p class="label">Total IVA</p>
+      <p class="currency tax-value" data-currency="<%= @lead.currency %>">
+        <%= number_with_delimiter (@lead.net_price * 0.19).round(2) %>
+      </p>
+    </div>
+    <div class="data-container col-xs-12 col-sm-4">
+      <p class="label">Total IVA + Total neto</p>
+      <p class="currency price" data-currency="<%= @lead.currency %>">
+        <%= number_with_delimiter (@lead.net_price * 1.19).round(2) %>
+      </p>
+    </div>
+  </div>
+
+</div>

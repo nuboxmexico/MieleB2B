@@ -1,0 +1,26 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html class="ie ie6" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9" lang="<%= I18n.locale %>"> <![endif]-->
+<!--[if gt IE 9]><!--><html lang="<%= I18n.locale %>"><!--<![endif]-->
+<head>
+	<%= csrf_meta_tags %>
+	<%= csp_meta_tag %>
+	<meta charset="utf-8">
+	<title>Miele</title>
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />  
+	<%= stylesheet_link_tag    'application', media: 'all' %>
+	<%= javascript_include_tag 'application' %>
+	<%= favicon_link_tag asset_path('favicon.ico') %>
+</head>
+
+<body class="customer-container">
+	<div class="row text-center">
+		<%= image_tag('logo.png', alt: 'miele', class: 'logo-miele')%>
+	</div>
+	<div class="row customer-content">
+		<%= yield %>
+	</div>
+</body>

@@ -1,0 +1,17 @@
+let cart_total = ["<%= current_user.is_project_manager? ? number_with_delimiter(@cart.total_per_pay.round(2)) : number_with_delimiter(@cart.total.round()) %>"]
+<% unless current_user.sale_channel.try(:name) == "Proyectos" %>
+  cart_total.push("<span class='min-text'>(IVA Incluído)</span>") 
+<% end %>
+
+<% if @cart.pay_percent == 100 %>
+  $('<%= "#cart-total-cost-#{@cart.id}" %>').html(cart_total.join(' '));
+  $('#cart-deb-<%= @cart.id %>').addClass('hidden');
+<% else %>
+  $('<%= "#cart-total-cost-#{@cart.id}" %>').html(cart_total.join(' '));
+  $('#cart-deb-<%= @cart.id %>').removeClass('hidden');
+  <% if current_user.is_project_manager? %>
+    $('#cart-deb-<%= @cart.id %>').html('Saldo (Neto)*: <span class="currency-change" data-currency="uf"> <%= number_with_delimiter((@cart.total - @cart.total_per_pay).round(2)) %> </span>');
+  <% else %>
+    $('#cart-deb-<%= @cart.id %>').html('Saldo: <span class="currency-change" data-currency="$"> <%= number_with_delimiter((@cart.total - @cart.total_per_pay).round(0)) %></span>');
+  <% end %>
+<% end %>

@@ -1,0 +1,77 @@
+<div class="line-row-info"></div>
+    
+<div class="row bot-space">
+  <% if quotation.billing_documents.any? %>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+      <p class="bold title-input">Comprobantes de pago</p>
+      <% quotation.billing_documents.each do |bill_doc| %>
+        <%= link_to bill_doc.document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+        <i class="fa fa-file-image"></i> <%= truncate(bill_doc.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, bill_doc and can_delete_docs(quotation) %>
+        <%= link_to billing_document_path(bill_doc), method: :delete, class: "btn btn-delete no-loader space-btn", data: 
+            { confirm: '¿Estás seguro de eliminar el archivo '+bill_doc.document_file_name+'?',
+            'confirm-button-text': 'Eliminar',
+            'cancel-button-text': 'Cancelar'}  do %>
+            <i class="fa fa-times"></i>
+            <% end %>
+          <% end %>
+      <% end %>
+    </div>
+  <% end %>
+  <% if quotation.payment_documents.any? %>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 <%= quotation.billing_documents.any? ? 'col-lg-offset-1' : ''%>">
+      <p class="bold title-input">Boleta / Factura</p>
+      <% quotation.payment_documents.each do |payment_doc| %>
+        <%= link_to payment_doc.document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(payment_doc.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, payment_doc and can_delete_docs(quotation) %>
+        <%= link_to payment_document_path(payment_doc), method: :delete, class: "btn btn-delete no-loader space-btn", data: 
+            { confirm: '¿Estás seguro de eliminar el archivo '+payment_doc.document_file_name+'?',
+            'confirm-button-text': 'Eliminar',
+            'cancel-button-text': 'Cancelar'}  do %>
+            <i class="fa fa-times"></i>
+            <% end %>
+            <% end %>
+      <% end %>
+    </div>
+  <% end %>
+  <% if quotation.sell_note_documents.any? %>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+      <p class="bold title-input">Nota de Venta</p>
+      <% quotation.sell_note_documents.each do |sell_note| %>
+        <%= link_to sell_note.document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+        <i class="fa fa-file-image"></i> <%= truncate(sell_note.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, SellNoteDocument and can_delete_docs(quotation) %>
+        <%= link_to sell_note_document_path(sell_note), method: :delete, class: "btn btn-delete no-loader space-btn", data: 
+            { confirm: '¿Estás seguro de eliminar el archivo '+sell_note.document_file_name+'?',
+            'confirm-button-text': 'Eliminar',
+            'cancel-button-text': 'Cancelar'}  do %>
+            <i class="fa fa-times"></i>
+            <% end %>
+      <% end %>
+      <% end %>
+    </div>
+  <% end %>
+  <% if quotation.backup_documents.any? %>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+      <p class="bold title-input">Respaldos</p>
+      <% quotation.backup_documents.each do |backup| %>
+        <%= link_to backup.document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(backup.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, BackupDocument and can_delete_docs(quotation) %>
+          <%= link_to backup_document_path(backup), method: :delete, class: "btn btn-delete no-loader space-btn", data: { 
+              confirm: '¿Estás seguro de eliminar el archivo '+backup.document_file_name+'?',
+              'confirm-button-text': 'Eliminar',
+              'cancel-button-text': 'Cancelar'
+            }  do %>
+             <i class="fa fa-times"></i>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

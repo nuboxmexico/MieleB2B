@@ -1,0 +1,27 @@
+<div class="row row-content">
+	<div class="col-xs-12">
+		<ol class="breadcrumb">
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<li><a href="<%= promotional_codes_path %>">Códigos de Descuento</a></li>
+			<li>Nuevo Código</li>
+		</ol>
+		<h1 class="bold">Crear código</h1>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-12 bot-space">
+		<div class="box-content">
+			<%= bv_form_for(@code, html: { class: 'bform'}) do |form| %>
+			<div class="card-shadow-body">
+				<%= render 'form', form: form %>
+			</div>
+			<div class="text-right">
+				<%= button_tag(type: "submit", id: "submit-code", class: 'btn btn-miele', disabled: true) do %>
+				Crear código
+				<% end %>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>

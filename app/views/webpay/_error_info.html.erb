@@ -1,0 +1,45 @@
+<% 
+if @quotation.payments.where(state: 'complete') == 0 and @quotation.pay_percent == 100 
+	ammount_per_pay = @quotation.total
+elsif @quotation.payments.where(state: 'complete') == 1 and @quotation.pay_percent == 50 
+	ammount_per_pay = @quotation.total - @quotation.total_per_pay
+else
+	ammount_per_pay = @quotation.total_per_pay
+end
+%>
+<div class="row alert-row">
+	<i class="fa fa-exclamation-circle"></i>
+</div>
+<div class="row title-webpay">
+	La transacción no se pudo realizar con éxito
+</div>
+<div class="row">
+	<p class="content-webpay separate-webpay">Hubo un error en el procesamiento del pago, por favor inténtalo nuevamente.</p>
+</div>
+
+<div class="line-webpay"></div>
+<p class="ammount-payment">Monto: <%= number_to_currency(ammount_per_pay) %></p>
+<p class="quotation-code-webpay">Código de cotización: <%= @quotation.code %></p>
+<p class="quotation-code-webpay"><%= DateTime.now.strftime("%d/%m/%Y    %H:%M") %></p>
+<div class="line-webpay"></div>
+<div class="webpay-explanation text-left">
+	<p>Las posibles causas de este rechazo son:</p>
+	<ul class="container-fluid"> 
+		<br>
+		<li>
+			Error en el ingreso de los datos de su tarjeta de Crédito o Débito (fecha y/o código de seguridad).
+		</li>
+		<br>
+		<li>
+			Su tarjeta de Crédito o Débito no cuenta con el cupo necesario para cancelar la compra.
+		</li>
+		<br>
+		<li>
+			Tarjeta aún no habilitada en el sistema financiero. 
+		</li>
+		<br>
+		<li>
+			Durante el proceso en WebPay, ha anulado el pago.
+		</li>
+	</ul>
+</div>

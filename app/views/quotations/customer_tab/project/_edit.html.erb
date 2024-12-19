@@ -1,0 +1,8 @@
+<div class="box-cart-left pad-box no-right-box mb-3">
+  <%= form_for @quotation, url: new_version_path(@quotation), method: :post, html: {id: 'update-project-data-form', class: 'no-loader'} do |form| %>
+    <%= render 'quotations/form/project_quotation', form: form %>
+    <div class="form-group text-right">
+      <%= form.submit 'Guardar', class: 'btn btn-miele' %>
+    </div>
+  <% end %>
+</div>

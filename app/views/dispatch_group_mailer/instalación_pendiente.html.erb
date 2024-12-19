@@ -1,0 +1,18 @@
+<p>
+  Estimado(a) <%= @quotation.user.fullname %>, 
+</p>
+<p>
+  Uno o más artículos pertenecientes a la cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> presentaron algún inconveniente al momento de ser instalados.
+</p>
+<p>
+  <% @dispacth_group.notes.instalation.each do |note| %>
+  <div class="row padding-row">
+    <div class="col-xs-12">
+      <p class="bold title-input"><b>Observación de <%= note.user.fullname %> el día <%= note.created_at.strftime("%d/%m/%Y")%></b></p>
+      <p class="content-input"><%= note.observation %></p>
+    </div>
+  </div>
+  <hr>
+  <% end %>
+</p>
+<p>Puedes ver todo el detalle de la cotización y las imágenes adjuntas <%= link_to 'aquí.', quotation_url(@quotation), target: '_blank' %></p>

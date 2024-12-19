@@ -1,0 +1,61 @@
+<p class="dashboard-title">Ventas <%= current_user.administrator? ? 'Por Áreas y Centro de Costo' : '' %></p>
+<figure class="highcharts-figure">
+	<div id="chart-channels"></div>
+</figure>
+
+<script>
+	// Create the chart
+	Highcharts.chart('chart-channels', {
+		lang: {
+			drillUpText: 'Volver'
+		},
+		chart: {
+			type: 'column'
+		},
+		title: {
+			text: ''
+		},
+		subtitle: {
+			text: ''
+		},
+		accessibility: {
+			announceNewData: {
+				enabled: true
+			}
+		},
+		xAxis: {
+			type: 'category'
+		},
+		yAxis: {
+			title: {
+				text: 'Monto $'
+			}
+
+		},
+		legend: {
+			enabled: false
+		},
+		plotOptions: {
+			series: {
+				borderWidth: 0,
+				dataLabels: {
+					enabled: true,
+					format: '$ {point.y:,.0f}'
+				}
+			}
+		},
+
+		tooltip: {
+			headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+			pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>$ {point.y:,.0f}</b><br/>',
+			shared: true,
+			useHTML: true
+		},
+		credits: {
+			enabled: false
+		},
+
+		series: [<%= @quotations_per_channel[:data].to_json.html_safe %>],
+		drilldown: <%= @quotations_per_channel[:drilldown].to_json.html_safe %>
+	});
+</script>

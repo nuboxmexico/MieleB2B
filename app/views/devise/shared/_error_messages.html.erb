@@ -1,0 +1,8 @@
+<% if resource.errors.any? %>
+  <% resource.errors.full_messages.each do |message| %>
+  <script>
+  	$(".toast-bottom-right-custom").remove();
+    toastr['error']('<%= message %>').attr('style', 'width: 400px; font-size: 1.7rem;');
+  </script>
+  <% end %>
+<% end %>

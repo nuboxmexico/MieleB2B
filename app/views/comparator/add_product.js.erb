@@ -1,0 +1,25 @@
+$(".toast-bottom-right-custom").remove();
+<% if @success == true %>
+toastr['info']('Producto agregado al comparador.');
+if ( $('#comparator-link').children().length == 0 ) {
+	$("#comparator-link").append("<%= escape_javascript render(:partial => 'comparator/comparator_card') %>");
+}
+$("#close-alert").click(function(){
+	$(".comparator-card").remove();
+});
+$("#link-to-comparator").click(function(){
+	if($('.check-item:checked').length > 1){
+		window.location.replace("<%= comparator_path %>");
+	}
+});
+<% if @comparator.products.size > 1 %>
+$("#link-to-comparator").attr("disabled", false);
+<% else %>
+$("#link-to-comparator").attr("disabled", true);
+<% end %>
+<% else %>
+<% if @message and !@message.empty? %>
+toastr['error']("<%= @message.try(:html_safe) %>");
+$("#comparator<%= @product.id %>").attr("checked", false);
+<% end %>
+<% end %>

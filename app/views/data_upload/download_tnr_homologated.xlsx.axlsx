@@ -1,0 +1,41 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'TNRs Homologados') do |sheet|
+  headers = ['TNR Miele','Nombre TNR Miele','Travel','KITCHENCENTER', 'Paris Marketplace', 'Mercado Libre', 'Falabella Marketplace', 'Ripley Marketplace','Verde Olivo']
+
+  falabella = Retail.find_by(name: 'Falabella')
+  linio = Retail.find_by(name: 'Linio')
+  travel = Retail.find_by(name: 'Travel')
+  paris = Retail.find_by(name: 'Paris')
+  bci = Retail.find_by(name: 'BCI')
+  itau = Retail.find_by(name: 'Itau')
+  hbt = Retail.find_by(name: 'HBT')
+  kitchencenter = Retail.find_by(name: 'KITCHENCENTER')
+  paris_marketplace = Retail.find_by(name: 'Paris Marketplace')
+  mercado_libre = Retail.find_by(name: 'Mercado Libre')
+  falabella_marketplace = Retail.find_by(name: 'Falabella Marketplace')
+  ripley_marketplace = Retail.find_by(name: 'Ripley Marketplace')
+  verde_olivo = Retail.find_by(name: 'Verde Olivo')
+
+  sheet.add_row headers
+  
+  @products.each do |product|
+    sheet.add_row [
+      product.sku,
+      product.name,
+      #product.retail_products.find_by(retail: falabella).try(:tnr),
+      #product.retail_products.find_by(retail: linio).try(:tnr),
+      product.retail_products.find_by(retail: travel).try(:tnr),
+      #product.retail_products.find_by(retail: paris).try(:tnr),
+      #product.retail_products.find_by(retail: bci).try(:tnr),
+      #product.retail_products.find_by(retail: itau).try(:tnr),
+      #product.retail_products.find_by(retail: hbt).try(:tnr),
+      product.retail_products.find_by(retail: kitchencenter).try(:tnr),
+      product.retail_products.find_by(retail: paris_marketplace).try(:tnr),
+      product.retail_products.find_by(retail: mercado_libre).try(:tnr),
+      product.retail_products.find_by(retail: falabella_marketplace).try(:tnr),
+      product.retail_products.find_by(retail: ripley_marketplace).try(:tnr),
+      product.retail_products.find_by(retail: verde_olivo).try(:tnr),
+    ], types: [:string,:string,:string,:string, :string, :string, :string, :string, :string, :string, :string, :string, :string, :string, :string]
+  end
+end

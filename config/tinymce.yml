@@ -1,0 +1,10 @@
+toolbar:
+  - styleselect | bold italic | undo redo | link, alignleft aligncenter alignright | outdent indent | bulllist numlist
+  - link | preview | media
+plugins:
+  - link
+  - preview
+  - lists
+  - media
+language:
+  - es

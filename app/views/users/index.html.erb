@@ -1,0 +1,143 @@
+<div class="row row-content no-bot">
+	<div class="col-lg-12">
+		<ol class="breadcrumb">
+			<% if current_user.manager? or current_user.administrator? %>
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<% end %>
+			<li>Usuarios</li>
+		</ol>
+	</div>
+</div>
+<div class="row bot-space">
+	<div class="col-lg-6">
+		<h1 class="bold title-section">
+			Usuarios
+		</h1>
+	</div>
+	<div class="col-lg-6 title-section text-right no-right">
+		<% if can? :download_users, User %>
+		<%= link_to 'Descargar Usuarios', download_users_path(format: :xlsx) , id: 'massive-download', class: 'btn btn-miele btn-mobile top-quotation-buttons no-loader' %>
+		<% end %>
+		<% if can? :upload_users, User %>
+		<%= link_to 'Carga masiva de usuarios', upload_users_path , id: 'massive-load', class: 'btn btn-miele btn-mobile top-quotation-buttons' %>
+		<% end %>
+		<% if can? :create_user, User %>
+		<%= link_to 'Crear usuario', new_user_path , id: 'new-user', class: 'btn btn-miele btn-mobile top-quotation-buttons' %>
+		<% end %>
+	</div>
+	<div class="col-lg-3 searcher-div top-space-searcher bot-space">
+		<%= form_tag(users_search_path, method: :get, id:'user-searcher-form') do %>
+		  <% if can? :search_users, User %>
+			<span class="hidden-lg hidden-md" id="filter-icon"><i class="fa fa-filter"></i></span>
+		  <% end %>
+		  <span class="input-group-addon inlineb"><i class="fa fa-search"></i></span>
+		  <input type="text" name="search_user" id="search_users" class="inlineb custom-searcher-bar" autocomplete="true" placeholder="Buscar...">
+		<% end %>
+	</div>
+	
+</div>
+
+<div class="row hidden-xs hidden-sm header-black text-center">
+	<div class="col-md-1">
+		<b>ID Rol</b>
+	</div>
+	<div class="col-md-2">
+		<b>Tienda</b>
+	</div>
+	<div class="col-md-2">
+		<b>Nombre Completo</b>
+	</div>
+	<div class="col-md-2">
+		<b>Correo</b>
+	</div>
+	<div class="col-md-1">
+		<b>Teléfono</b>
+	</div>
+	<div class="col-md-1">
+		<b>Fecha de Creación</b>
+	</div>
+	<div class="col-md-1">
+		<b>Rol</b>
+	</div>
+	<div class="col-md-1">
+		<b>Acciones</b>
+	</div>
+	<div class="col-md-1">
+		<% if current_user.administrator? or current_user.is_finance_manager? %>
+		<b>Desactivar / Activar</b>
+		<% else %>
+		<b>¿Activo?</b>
+		<% end %>
+	</div>
+</div>
+
+<div class="row table-border">
+	<% @users.each do |user| %>
+	<div class="row user-row">
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">ID Rol: </span></b><%= user.try(:miele_role).try(:code) ? user.try(:miele_role).try(:code) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-2 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Tienda: </span></b><%= user.try(:shop) ? user.try(:shop) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-2 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Nombre Completo: </span></b><%= user.try(:list_fullname) ? user.try(:list_fullname) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-2 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Email: </span></b><%= user.try(:email) ? user.try(:email) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Teléfono: </span></b><%= user.try(:phone) ? user.try(:phone) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Fecha Creación: </span></b><%= user.created_at.strftime('%d/%m/%Y') ? user.created_at.strftime('%d/%m/%Y') : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Rol: </span></b><%= user.roles_names %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<% if can? :edit, User %>
+			<%= link_to '<i class="fa fa-user-edit"></i>'.html_safe, edit_user_path(user), class: 'miele-gray-text right-space', id: 'edit-'+user.id.to_s %>
+			<% end %>
+			<% if can? :destroy, User and current_user != user %>
+			<%= link_to user_path(user), method: :delete, class: "miele-gray-text no-loader", id: 'delete-'+user.id.to_s, data: 
+			{ confirm: '¿Estás seguro de eliminar este usuario?',
+				'confirm-button-text': 'Eliminar',
+				'cancel-button-text': 'Cancelar'}  do %>
+				X
+				<% end %>
+			<% end %>
+			</div>
+			<div class="col-md-1 col-xs-12">
+
+				<% if current_user.administrator? or current_user.is_finance_manager? %>
+				<label class="switch">
+					<input type="checkbox" name="toggle" onchange="toggleUser(<%= user.id %>)"<%= user.active ? 'checked' : '' %>>
+					<span class="slider round"></span>
+				</label>
+				<% else %>
+				<%= user.active ? 'Si' : 'No' %>
+				<% end %>
+			</div>
+		</div>
+	<% end %>
+</div>
+	<% page = params[:page] ? params[:page].to_i : 0 
+	start = (page*10 + 1)
+	%>
+	<div class="row">
+		<div class="col-md-5 col-xs-12 up-down-mar">
+			<% if @items > 0 %>
+			<% if @items < 10 %>
+			<br>
+			Mostrando registros del 1 al <%= @items %> de un total de <%= @items %> usuarios.
+			<% else %>
+			<br>
+			Mostrando registros del <%= start.to_s %> al <% (start + 9).to_s %> de un total de <%= @items %> usuarios.
+			<% end %>
+			<% end %>
+		</div>
+		<div class="col-md-7 col-xs-12 pull-right text-right">
+			<%= will_paginate @users, renderer: BootstrapPagination::Rails %>
+		</div>
+	</div>

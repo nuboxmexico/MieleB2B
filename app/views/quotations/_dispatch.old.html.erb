@@ -1,0 +1,66 @@
+<div class="row top-separation-data">
+    <div class="col-lg-3 col-md-6 hidden-xs hidden-sm">
+      <div class="row">
+        <%= form_tag update_custom_quotation_path(@quotation), method: :post, remote: true do %>
+          <label for="quotation[dispatch_guide]" class="title-input move-to-right">Orden de flete (solo regiones)</label>
+          <div class="col-lg-8 col-sm-8 col-xs-12">
+            <p><input type="text" name="quotation[dispatch_order]" class="field-bordered inlineb" id="quotation_dispatch_guide" required="required" placeholder="Escribe aquí ..." value="<%= @quotation.try(:dispatch_order) %>"></p>
+          </div>
+          <div class="col-lg-4 col-sm-4 col-xs-12 no-left-ipad">
+            <button type="submit" class="btn btn-miele inlineb" id="send-dispatch-order">Guardar</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <%= form_tag dispatch_confirm_quotation_path(@quotation), method: :post, multipart: true, id: 'dispatch-confirm-form' do %>
+      <div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-mobile">
+        <label for="quotation[dispatch_type]" class="title-input">Tipo de Despacho</label>
+        <p class="less-bot">
+          <label class="thin-text radio-button" id="confirm">
+            <input type="radio" name="reception" value="confirm" required="true" <%= @quotation.get_state != 'Entregado' ? 'checked' : '' %>> 
+            <span class="label-visible space-radio-button">
+              <span class="fake-radiobutton"></span>
+              Recepción conforme por cliente
+            </span>
+          </label>
+        </p>
+        <p class="less-bot">
+          <label class="thin-text radio-button" id="confirm-courier">
+            <input type="radio" name="reception" value="confirm" required="true">
+            <span class="label-visible space-radio-button">
+              <span class="fake-radiobutton"></span>
+              Recepción conforme a courier
+            </span>
+          </label>
+        </p>
+        <p>
+          <label class="thin-text radio-button" id="pending">
+            <input type="radio" name="reception" value="pending" required="true" <%= @quotation.get_state == 'Entrega pendiente' ? 'checked' : '' %>> 
+            <span class="label-visible space-radio-button">
+              <span class="fake-radiobutton"></span>
+              Recepción con observaciones
+            </span>
+          </label>
+        </p>
+      </div>
+      <div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-mobile" id="backup-files-div">
+        <label for="backup_images[]" class="title-input">Imágenes de respaldo</label>
+        <div class="file-field input-field">
+          <div class="file-drop-area dashed-border">
+            <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+            <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+            <input type="file" name="backup_images[]" multiple="true" accept="image/jpeg, image/png, image/jpg" id="backup_images" class="file-input">
+          </div>
+        </div>
+      </div>
+      <div class="row top-both">
+        <div class="col-lg-8 col-md-5 col-sm-12 col-xs-12">
+          <textarea name="dispatch_observation" class="field-bordered full-width padding-text-area" cols="50" rows="7" placeholder="Observaciones..." required="true" id="observations-dispatch"></textarea>
+          <label id="dispatch_observation-error" class="error" for="dispatch_observation">Este campo es obligatorio.</label>
+        </div>
+        <div class="col-md-3 col-xs-12 col-sm-12 text-right align-to-textarea">
+          <button type="submit" class="btn btn-miele" id="send-dispatch" disabled>Aceptar</button>
+        </div>
+      </div>
+    <% end %>
+  </div>

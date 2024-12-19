@@ -1,0 +1,136 @@
+<div class="quotation-box pad-box">
+    <div class="row">
+        <div class="col-md-9 col-xs-12 text-left">
+            <p class="title-box-checkout">Instalación</p>
+        </div>
+        <div class="col-md-3 col-xs-12 text-right">
+            <%if quotation.instalation_check%>
+                <input onchange="test()" type="checkbox" name="instalation_check_1" id="instalation_check"  checked> <label for="cbox2">Sin instalación</label>
+            <%else%>
+                <input onchange="test()" type="checkbox" name="instalation_check_2" id="instalation_check"> <label for="cbox2">Sin instalación</label>
+            <%end%>
+        </div>
+    </div>
+    <div id="no_install" class="row" style="display:none;">
+        <div class="col-md-12 col-xs-12 text-left">
+            <h1>SOLICITAR A MIELE TEXTO</h1>
+        </div>
+    </div>
+    <div id="yes_install">
+        <div class="row">
+            <div class="col-md-12 col-xs-12 text-left">
+                <br>
+                <p class="sub-title-box-checkout">Número de Unidades Inmobiliarias Totales Ingresadas</p>
+                <br>
+                    <div class="row">
+                    <div class="col-lg-4 col-md-5 col-sm-6 col-xs-12">
+                        <p class="title-input-black-checkout">Unidades Inmobiliarias Totales</p>
+                        <% total_units = 0 %>
+                        <% quotation.unit_real_states.each { |u| total_units += u.quantity unless u.quantity.nil? } %>
+                        <input class="input-big-checkout" type="text" class="field-bordered" id="u_total_show" value=<%= total_units %>>
+                    </div>
+                </div>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-xs-12 text-left">
+                <div class="box-color-lightblue-checkout">
+                        <p class="p-box-color-checkout">Productos con instalación: <span id="span_installation_products"><%=quotation.products_instalation_number%></span></p>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-12 text-left">
+                <div class="box-color-yellow-checkout">
+                        <p class="p-box-color-checkout">Productos por asignar: <span id="span_pending_products"><%=quotation.products_per_assign_number%></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function setInstalationCheck(instalation_check){
+        $.ajax({
+                    url: "/set_instalation_check/",
+                    type : 'patch',
+                    data: {
+                    instalation_check: instalation_check,
+                    id: <%=quotation.id%>
+                    }
+                }).done(function (data) {
+            })
+    }
+
+  function test(){
+        if(document.getElementById("instalation_check").checked){
+            document.getElementById("instalation-div").style.display = "none";
+            document.getElementById("no_install").style.display = "";
+            document.getElementById("yes_install").style.display = "none";
+            $("#show_installation_price").addClass("hidden");
+        }
+        else{
+            document.getElementById("instalation-div").style.display = "";
+            document.getElementById("no_install").style.display = "none";
+            document.getElementById("yes_install").style.display = "";
+            $("#show_installation_price").removeClass("hidden")
+        }
+        setInstalationCheck(document.getElementById("instalation_check").checked);
+    }
+
+    $(document).ready(function(){
+        test();
+    });
+    function update_new_link(){
+        // let val = document.getElementById('u_tit').value;
+        // let s= document.getElementById("all_unit_real_state");
+        // cantidad = parseInt(s.getAttribute("value"))
+        // s.setAttribute("value", (cantidad + 1).toString())
+        // if (parseInt(val) <= cantidad){
+        //      $("#new_link_button").addClass("hidden")
+        // }
+        // else{
+        //     $("#new_link_button").removeClass("hidden");
+        // }
+    }
+
+
+function setTotalUnitsShow() {
+    const inputTotal = document.querySelector("#u_total_show");
+    const quotId = <%= quotation.id %>;
+    $.ajax(
+        {
+        url: `/quotations/${quotId}/unit_real_states`,
+        type : 'get'
+        }).done(function (data) {
+            let totalUnit = 0;
+            if (data.length > 0) {
+                data.forEach((unit) => {
+                    totalUnit += unit.quantity;
+                });
+            }
+            inputTotal.value = totalUnit;
+        })
+}
+
+function setPendingProducts() {
+    const installationSpan = document.querySelector("#span_installation_products");
+    const pendingSpan = document.querySelector("#span_pending_products");
+    const quotId = <%= quotation.id %>;
+    
+    $.ajax(
+        {
+        url: `/quotations/${quotId}/unit_real_states`,
+        type : 'get'
+        }).done(function (data) {
+            let pendingProd = parseInt(installationSpan.innerHTML);
+            if (data.length > 0) {
+                data.forEach((unit) => {
+                    pendingProd -= (parseInt(unit.quantity) * parseInt(unit.products_quantity));
+                });
+            }
+            pendingSpan.innerHTML = pendingProd;
+        })
+}
+
+
+</script>

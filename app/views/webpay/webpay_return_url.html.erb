@@ -1,0 +1,8 @@
+<form action='<%=@urlredirection%>' id="webpay-form" method="post"><input type="hidden" name="token_ws" value='<%=@token%>'>
+		<input type="submit" value="Continuar >>" style="display: none;">
+ </form>
+<br><br>
+
+<script>
+	$("#webpay-form").submit();
+</script>

@@ -1,0 +1,75 @@
+<!-- ITEMS -->
+<% if locals[:quotation].quotation_products.availables.count > 0 %>
+<div class="row bold text-center pt12">
+  <div class="col-pdf-10 pdf-item">Imagen</div>
+  <div class="col-pdf-20 pdf-item">Nombre del Producto</div>
+  <div class="col-pdf-10 pdf-item">TNR</div>
+  <div class="col-pdf-10 pdf-item">Cantidad</div>
+  <div class="col-pdf-15 pdf-item">Precio Lista</div>
+  <div class="col-pdf-20 pdf-item">Precio Propuesto</div>
+  <div class="col-pdf-15 pdf-item">Total</div>
+</div>
+<br>
+<div class="row top-space">
+  <div class="col-xs-12 box-pdf">
+    <% count = 1 %>
+    <% page = 1 %>
+    <% locals[:quotation].quotation_products.availables.order(is_service: :asc).each do |product| %>
+    <% divisor = (page == 1 ? 4 : 6) %>
+    <% if count%divisor == 0 %>
+    <% count = 1 %>
+    <% page += 1 %>
+  </div>
+</div>
+<div class="page-break"></div>
+<br>
+<br>
+<div class="row top-space">
+  <div class="col-xs-12 box-pdf">
+    <div class="row bold text-center pt12">
+      <div class="col-pdf-10 pdf-item">Imagen</div>
+      <div class="col-pdf-20 pdf-item">Nombre del Producto</div>
+      <div class="col-pdf-10 pdf-item">TNR</div>
+      <div class="col-pdf-10 pdf-item">Cantidad</div>
+      <div class="col-pdf-15 pdf-item">Precio Lista</div>
+      <div class="col-pdf-20 pdf-item">Precio Propuesto</div>
+      <div class="col-pdf-15 pdf-item">Total</div>
+    </div>
+    <br>
+    <% end %>
+    <div class="row light-text bot-border">
+      <div class="col-pdf-10 pdf-item text-space-card">
+        <% if Rails.env.production? %>
+          <% if locals[:quotation].bstock %>
+            <%= image_tag image_pdf(product.product.try(:original_product)), class: "pdf-product-img" %>
+          <% else %>
+            <%= image_tag image_pdf(product.product), class: "pdf-product-img" %>
+          <% end %>
+        <% else %>
+          <% if locals[:quotation].bstock %>
+            <%= wicked_pdf_image_tag product.product.try(:original_product).try(:get_product_photo), class: "pdf-product-img" %>
+          <% else %>
+            <%= wicked_pdf_image_tag product.product.get_product_photo, class: "pdf-product-img" %>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="col-pdf-20 pdf-item text-space-card">
+        <p>
+          <%= product.name %>
+        </p>
+      </div>
+      <div class="col-pdf-10 pdf-item text-space-card"><p><%= product.sku %></p></div>
+      <div class="col-pdf-10 pdf-item text-space-card"><p><%= product.quantity %></p></div>
+      <div class="col-pdf-15 pdf-item text-space-card">
+        <p><%= number_to_currency(product.product.price) %></p>
+      </div>
+      <div class="col-pdf-20 pdf-item text-space-card">
+        <p><%= number_to_currency(product.price, locale: (locals[:quotation].currency.try(:downcase) == 'clp' ? :es : :uf )) %></p>
+      </div>
+      <div class="col-pdf-15 pdf-item text-space-card"><p><%= number_to_currency(product.price * product.quantity, locale: (locals[:quotation].currency.try(:downcase) == 'clp' ? :es : :uf )) %></p></div>
+    </div>
+    <% count += 1 %>
+    <% end %> 
+  </div>
+</div>
+<% end %> 

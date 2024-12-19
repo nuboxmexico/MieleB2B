@@ -1,0 +1,14 @@
+<% if @quotation.dispatch_instructions_files.any? %>
+  <div class="row instructions-files-container">
+    <div class="col-xs-12">
+      <p class="title-input">
+        Guías de envíos
+      </p>
+      <% @quotation.dispatch_instructions_files.each do |instructions_file| %>
+        <%= link_to instructions_file.file.url(:original), class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(instructions_file.file_file_name, length: 15) %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,9 @@
+<p>
+    Estimado/a Manager Despacho:
+</p>
+<p>
+    El Manager Finanzas <%= @user.list_fullname %> ha validado un Envío de la cotización <%= @quotation.code %>.
+</p>
+<p>
+    Para gestionar este envío continúe en el siguiente <%= link_to 'link', quotation_url(@quotation) %>.
+</p>

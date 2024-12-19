@@ -1,0 +1,177 @@
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="bold secondary-text">Información Instalación</p>
+		</div>
+	</div>
+	<div class="row top-separation-data">
+		<% if (current_user.is_instalation? or current_user.is_manager_instalation?) %>
+			<%= form_tag update_custom_quotation_path(@quotation), method: :post, remote: true do %>
+				<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+					<label class="full-width" for="quotation_installation_date">
+						Fecha estimada Instalación
+					</label>
+					<input required="required" class="form-control field-bordered width-instalation inlineb" placeholder="DD/MM/AAAA" onkeydown="return false;" value="<%= @quotation.try(:installation_date).try(:strftime, "%d/%m/%Y") %>" type="text" name="quotation[installation_date]" id="quotation_installation_date" data-bv-field="quotation[installation_date]">
+					<button type="submit" class="btn btn-miele inlineb top-save-instalation">
+						Guardar
+					</button>
+				</div>
+			<% end %>
+		<% end %>
+
+		<% if can? :instalation, @quotation %>
+			<%= form_tag instalation_quotation_path(@quotation), method: :post, multipart: true, id: 'instalation-form' do %>
+				<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 top-mobile">
+					<label for="quotation[dispatch_type]" class="title-input">Tipo de Despacho</label>
+					<div class="less-bot">
+						<label class="thin-text radio-button" id="confirm">
+							<input type="radio" name="instalation_confirm" value="confirm" required="true" <%= @quotation.get_state != 'Por Instalar' ? 'checked' : '' %>>
+							<span class="label-visible space-radio-button">
+								<span class="fake-radiobutton"></span>
+								Instalación realizada conforme a cliente
+							</span>
+						</label>
+					</div>
+					<div>
+						<label class="thin-text radio-button" id="pending">
+							<input type="radio" name="instalation_confirm" value="pending" required="true" <%= @quotation.get_state == 'Instalación pendiente' ? 'checked' : '' %>>
+							<span class="label-visible space-radio-button">
+								<span class="fake-radiobutton"></span>
+								Instalación con observaciones
+							</span>
+						</label>
+					</div>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12" id="backup-files-div">
+					<label for="backup_images[]" class="title-input">Imágenes de respaldo</label>
+					<div class="file-field input-field">
+						<div class="file-drop-area dashed-border">
+							<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+							<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+							<input type="file" name="backup_images[]" multiple="true" accept="image/jpeg, image/png, image/jpg" id="backup_images" class="file-input">
+						</div>
+					</div>
+				</div>
+				<div class="row top-both">
+					<div class="col-lg-8 col-md-5 col-sm-6 col-xs-12">
+						<textarea name="instalation_observation" class="field-bordered full-width padding-text-area" cols="50" rows="7" placeholder="Observaciones..." required="true" id="instalation-observations"></textarea>
+					</div>
+					<div class="col-md-3 col-xs-12 col-sm-4 text-right align-to-textarea">
+						<button type="submit" class="btn btn-miele" id="send-instalation">Aceptar</button>
+					</div>
+				</div>
+			<% end %>
+		<% else %>
+			<div class="row padding-row">
+				<div class="col-xs-4">
+					<p class="bold title-input"><b>Incluye activación</b></p>
+					<p class="content-input"><%= @quotation.try(:activation_confirm) ? 'Sí' : 'No' %></p>
+				</div>
+				<div class="col-xs-4">
+					<p class="bold title-input"><b>Fecha Instalación</b></p>
+					<p class="content-input"><%= @quotation.try(:installation_date).try(:strftime, "%d/%m/%Y") %></p>
+				</div>
+			</div>
+		<% end %>
+
+		<% if @quotation.quotation_notes.instalation.size > 0 %>
+			<% @quotation.quotation_notes.instalation.each do |note| %>
+				<div class="line-row-info-xs"></div>
+				<div class="row padding-row">
+					<div class="col-xs-12">
+						<p class="bold title-input">
+							<b>Observación de <%= note.user.fullname %> el día <%= note.created_at.strftime("%d/%m/%Y")%></b>
+						</p>
+						<p class="content-input"><%= note.observation %></p>
+					</div>
+					<% if note.image_notes.size > 0 %>
+						<div class="col-md-12 col-xs-12">
+							<p class="bold title-input"><b>Imágenes de respaldo</b></p>
+							<% note.image_notes.each do |image| %>
+								<%= link_to image.image.url(:original), class: 'btn btn-miele mini-top-space', target: "_blank" do %>
+									<i class="fa fa-file-image"></i> <%= truncate(image.image_file_name, length: 15) %>
+								<% end %>
+							<% end %>
+						</div>
+					<% end %>
+				</div>
+			<% end %>
+		<% end %>
+	</div>
+</div>
+<script>
+	$(document).ready(function(){
+		$('#quotation_installation_date').daterangepicker({
+			singleDatePicker   : true,
+			showDropdowns      : true,
+			autoUpdateInput    : true,
+			drops              : "up",
+			applyButtonClasses : "btn btn-small btn-miele",
+			cancelClass        : "btn btn-flat btn-small",
+			locale: {
+				format      : 'DD/MM/YYYY',
+				applyLabel  : "Aplicar",
+				cancelLabel : "Limpiar",
+				daysOfWeek  : [
+				"Do",
+				"Lu",
+				"Ma",
+				"Mi",
+				"Ju",
+				"Vi",
+				"Sa"
+				],
+				monthNames  : [
+				"Enero",
+				"Febrero",
+				"Marzo",
+				"Abril",
+				"Mayo",
+				"Junio",
+				"Julio",
+				"Agosto",
+				"Septiembre",
+				"Octubre",
+				"Noviembre",
+				"Diciembre"
+				]
+			}
+		});
+		$("#instalation-form").trigger("change");
+		if (document.contains($("#instalation-form")[0])) {
+			if ($("#instalation-form").valid()) {
+				$('#send-instalation').prop('disabled', false);
+			} else {
+				$('#send-instalation').prop('disabled', 'disabled');
+			}
+		}
+	});
+
+	$('#instalation-form input').on('change', function() {
+		if ($("#instalation-form").valid()) {
+			$('#send-instalation').prop('disabled', false);
+		} else {
+			$('#send-instalation').prop('disabled', 'disabled');
+			if(($("#backup_images").get(0).files.length === 0)) {
+				$("#backup_images-error").addClass("hidden");
+				$("#backup_images-error-out").removeClass("hidden");
+			} else {
+				$("#backup_images-error-out").addClass("hidden");
+			}
+		}
+	});
+
+	$('#instalation-form textarea').on('change', function() {
+		if ($("#instalation-form").valid()) {
+			$('#send-instalation').prop('disabled', false);
+		} else {
+			$('#send-instalation').prop('disabled', 'disabled');
+			if(($("#backup_images").get(0).files.length === 0)) {
+				$("#backup_images-error").addClass("hidden");
+				$("#backup_images-error-out").removeClass("hidden");
+			} else {
+				$("#backup_images-error-out").addClass("hidden");
+			}
+		}
+	});
+</script>

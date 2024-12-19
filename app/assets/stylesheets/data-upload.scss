@@ -1,0 +1,57 @@
+@import "variables";
+
+.light-h{
+	font-weight: 300!important;
+}
+
+.title-h{
+	margin-bottom: 10px;
+	margin-top: 50px;
+}
+
+.btn-miele-gray{
+	background: $lines-secondary!important;
+	color: #fff!important;
+}
+
+.btn-miele-gray:hover{
+	background: $lines-secondary!important;
+	color: #fff!important;
+}
+
+.btn-miele-gray:active{
+	background: $lines-secondary!important;
+	color: #fff!important;
+}
+
+.btn-miele-gray:focus{
+	background: $lines-secondary!important;
+	color: #fff!important;
+}
+
+.thin-text{
+	font-weight: 300!important;
+}
+
+.dashed-border{
+	border: dashed 1px #DDDDDD!important; 
+	box-shadow: none!important;
+}
+
+.miele-link:focus{
+	color: $brand-primary!important;
+}
+
+.miele-link:active{
+	color: $brand-primary!important;
+}
+
+.miele-link:hover{
+	color: $brand-primary!important;
+}
+
+.log-list{
+	font-size: 11px;
+	font-weight: 300;
+	color: #707070;
+}

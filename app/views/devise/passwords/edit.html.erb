@@ -1,0 +1,27 @@
+<div class="middle-height">
+  <h2 class="weight300">Cambio de clave</h2>
+
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+  <%= f.hidden_field :reset_password_token %>
+  <div class="row">
+    <div class="col-xs-offset-1 col-xs-10 extra-mob col-md-10 col-md-offset-1">
+      <div class="field text-left">
+        <%= f.label :password, "Nueva clave" %><br />
+        <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
+      </div>
+
+      <div class="field text-left">
+        <%= f.label :password_confirmation, "Repita nueva clave" %><br />
+        <%= f.password_field :password_confirmation, autocomplete: "off" %>
+      </div>
+
+      <div class="actions top-both text-right">
+        <%= f.submit "Guardar", class:' btn btn-miele' %>
+      </div>
+    </div>
+  </div>
+  <% end %>
+
+  <%= render "devise/shared/links" %>
+</div>

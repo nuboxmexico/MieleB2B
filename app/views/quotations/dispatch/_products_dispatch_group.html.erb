@@ -1,0 +1,38 @@
+<div class="border-container">
+    <div class=" row">
+        <div class="col-xs-12 col-md-6 text-center">
+            <p class="title-input">
+                Nombre
+            </p>
+        </div>
+        <div class="col-xs-12  col-md-2 text-center">
+            <p class="title-input">
+                TNR
+            </p>
+        </div>
+        <div class="col-xs-12 col-md-2 text-center">
+            <p class="title-input">
+                Cantidad
+            </p>
+        </div>
+    </div>
+    <br>
+    <div class="product">
+      <% dispatch_group.quotation_products_auxes.each do |p, index| %>
+        <div class=" row">
+          <div class="col-xs-12 col-md-6">
+            <p class="table-item-span"><%= p.name %></p>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <p><%= p.sku %></p>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <span><%= p.quantity %></span>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <a onclick="eliminateAux(<%=p.id%>, <%= cart ? cart.id : nil%>)" class="eliminate-button-not-outline">X</a>
+          </div>
+        </div>
+      <% end %>
+    </div>
+</div>

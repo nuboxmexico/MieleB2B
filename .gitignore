@@ -1,0 +1,14 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+# Ignore bundler config.
+/.bundle
+
+# Ignore all logfiles and tempfiles.
+/log/*
+!/log/.keep
+/tmp/*
+# Ignore test logs
+/coverage/*
+.byebug_history
+/spec/examples.txt
+/config/version
+/public/system

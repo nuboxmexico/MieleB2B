@@ -1,0 +1,214 @@
+<div class="quotation-box padding-box text-left">
+  <% if user_signed_in? and @quotation.channel != 'Proyectos' %>
+
+    <div class="row padding-row">
+      <div class="col-md-4 col-xs-12">
+        <p class="bold title-input">Cotización Referida</p>
+        <% if @quotation.partner_selected_commission %>
+        <p class="content-input"><%= "#{@quotation.partner_selected_commission.code} - #{@quotation.partner_selected_commission.name}" %></p>
+        <% else %>
+        <p class="content-input">Sin Partner Referido</p>
+        <% end %>
+      </div>
+    </div>
+    <div class="line-row-info"></div>
+
+    <div class="row">
+      <div class="col-md-12 col-xs-12 text-left">
+        <p class="bold secondary-text">
+          <%= (@quotation.user == @quotation.referred_user) ? 'Cotización asociada a' : 'RUT asociado a' %>   
+        </p>
+      </div>
+    </div>
+    <div class="row padding-row">
+      <div class="col-md-4 col-xs-12">
+        <p class="bold title-input">Nombre Vendedor</p>
+        <p class="content-input"><%= @quotation.referred_user.try(:fullname) %></p>
+      </div>
+      <div class="col-md-2 col-xs-12">
+        <p class="bold title-input">Área Vendedor</p>
+        <p class="content-input"><%= @quotation.referred_user.try(:sale_channel).try(:name) ? @quotation.referred_user.try(:sale_channel).try(:name) : '-' %></p>
+      </div>
+    </div>
+    <div class="line-row-info"></div>
+  <% end %>
+
+  <div class="row <%= (user_signed_in? and @quotation.channel != 'Proyectos') ? 'top-separation-data' : '' %>">
+    <div class="col-md-12 col-xs-12 text-left">
+      <p class="bold secondary-text">Datos Personales</p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-4 col-xs-12">
+      <p class="bold title-input">Nombre Cliente</p>
+      <p class="content-input"><%= @quotation.customer_name %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Correo</p>
+      <p class="content-input"><%= @quotation.email ? @quotation.email : '-' %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">RUT</p>
+      <p class="content-input"><%= @quotation.rut ? @quotation.rut : '-' %></p>
+    </div>
+    <div class="col-md-4 col-xs-12">
+      <p class="bold title-input">Número de Teléfono</p>
+      <p class="content-input"><%= @quotation.phone ? @quotation.phone : '-' %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Tipo Calle</p>
+      <p class="content-input"><%= @quotation.try(:personal_address_street_type) ? @quotation.personal_address_street_type : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Dirección Personal</p>
+      <p class="content-input"><%= @quotation.try(:personal_address) ? @quotation.personal_address : '-' %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Nº</p>
+      <p class="content-input"><%= @quotation.try(:personal_address_number) ? @quotation.personal_address_number : '-' %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Depto</p>
+      <p class="content-input"><%= @quotation.personal_dpto_number ? @quotation.personal_dpto_number : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Comuna</p>
+      <p class="content-input"><%= @quotation.try(:personal_commune).try(:name_with_region) ? @quotation.personal_commune.name_with_region : '-' %></p>
+    </div>
+    <div class="col-md-4 col-xs-12">
+      <p class="bold title-input">Nombre Proyecto</p>
+      <p class="content-input"><%= @quotation.try(:project_name) ? @quotation.project_name : '-' %></p>
+    </div>
+    <% if @quotation.retirement_date %>
+      <div class="col-md-2 col-xs-12">
+        <p class="bold title-input">Fecha Retiro</p>
+        <p class="content-input"><%= @quotation.retirement_date.strftime("%d/%m/%Y") %></p>
+      </div>
+    <% end %>
+  </div>
+  <% if @quotation.quotation_products.to_dispatch.size > 0 or @quotation.channel == 'Proyectos' %>
+  <div class="line-row-info"></div>
+  <div class="row top-separation-data">
+    <div class="col-md-12 col-xs-12 text-left">
+      <p class="bold secondary-text"><%= @quotation.channel == 'Proyectos' ? 'Dirección Despacho / Instalación' : 'Datos de Envío' %></p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Tipo Calle</p>
+      <p class="content-input"><%= @quotation.try(:dispatch_address_street_type) ? @quotation.dispatch_address_street_type : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Dirección Despacho</p>
+      <p class="content-input"><%= @quotation.dispatch_address ? @quotation.dispatch_address : '-' %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Nº</p>
+      <p class="content-input"><%= @quotation.dispatch_address_number ? @quotation.dispatch_address_number : '-' %></p>
+    </div>
+    <div class="col-md-2 col-xs-12">
+      <p class="bold title-input">Depto</p>
+      <p class="content-input"><%= @quotation.dispatch_dpto_number ? @quotation.dispatch_dpto_number : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Comuna</p>
+      <p class="content-input"><%= @quotation.try(:dispatch_commune).try(:name_with_region) ? @quotation.try(:dispatch_commune).try(:name_with_region) : '-' %></p>
+    </div>
+    <% if QuotationState.instalator.include?(@quotation.quotation_state) %>
+      <div class="col-md-4 col-xs-12">
+        <p class="bold title-input">Fecha Estimada Despacho</p>
+        <p class="link-to-tab" data-to="dispatch-tab">
+          Ver fechas <i class="fas fa-external-link-alt"></i>
+        </p>
+      </div>
+    <% elsif @quotation.estimated_dispatch_date %>
+      <div class="col-md-4 col-xs-12">
+        <% if can? :edit_estimated_date, @quotation %>
+          <%= form_for @quotation do |f| %>
+            <div class="form-group">
+              <%= f.label :estimated_dispatch_date, 'Fecha estimada Despacho', class: 'full-width bold title-input' %>
+              <%= f.text_field :estimated_dispatch_date, class: 'form-control field-bordered width-instalation inlineb date-picker', value: (@quotation.estimated_dispatch_date ? @quotation.estimated_dispatch_date.strftime('%d/%m/%Y') : nil), required: true, placeholder: 'DD/MM/AAAA' %>
+              <%= f.submit 'Guardar', class: 'btn btn-miele inlineb top-save-instalation' %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="bold title-input">Fecha Estimada Despacho</p>
+          <p class="content-input">
+            <%= @quotation.estimated_dispatch_date.strftime("%d/%m/%Y") %>
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <% end %>
+  <% if @quotation.quotation_products.to_install.any? %>
+    <div class="line-row-info"></div>
+    <div class="row top-separation-data">
+      <div class="col-md-12 col-xs-12 text-left">
+        <p class="bold secondary-text">Datos de Instalación</p>
+      </div>
+    </div>
+    <div class="row padding-row">
+      <div class="col-md-2 col-xs-12">
+        <p class="bold title-input">Tipo Calle</p>
+        <p class="content-input"><%= @quotation.try(:instalation_address_street_type) ? @quotation.instalation_address_street_type : '-' %></p>
+      </div>  
+      <div class="col-md-3 col-xs-12">
+        <p class="bold title-input">Dirección Instalación</p>
+        <p class="content-input"><%= @quotation.try(:instalation_address) ? @quotation.try(:instalation_address) : '-' %></p>
+      </div>
+      <div class="col-md-2 col-xs-12">
+        <p class="bold title-input">Nº</p>
+        <p class="content-input"><%= @quotation.try(:instalation_address_number) ? @quotation.try(:instalation_address_number) : '-' %></p>
+      </div>
+      <div class="col-md-2 col-xs-12">
+        <p class="bold title-input">Depto</p>
+        <p class="content-input"><%= @quotation.try(:instalation_dpto_number) ? @quotation.try(:instalation_dpto_number) : '-' %></p>
+      </div>
+      <div class="col-md-3 col-xs-12">
+        <p class="bold title-input">Comuna</p>
+        <p class="content-input"><%= @quotation.try(:instalation_commune).try(:name_with_region) ? @quotation.try(:instalation_commune).try(:name_with_region) : '-' %></p>
+      </div>
+      <% if QuotationState.instalator.include?(@quotation.quotation_state) %>
+        <div class="col-md-4 col-xs-12">
+          <p class="bold title-input">Fecha Estimada Instalación</p>
+          <p class="link-to-tab" data-to="instalation-tab">
+            Ver fechas <i class="fas fa-external-link-alt"></i>
+          </p>
+        </div>
+      <% elsif @quotation.installation_date %>
+        <div class="col-md-4 col-xs-12">
+          <% if can? :edit_estimated_date, @quotation %>
+            <%= form_for @quotation do |f| %>
+              <div class="form-group">
+                <%= f.label :installation_date, 'Fecha Estimada Instalación', class: 'full-width bold title-input' %>
+                <%= f.text_field :installation_date, class: 'form-control field-bordered width-instalation inlineb date-picker', value: (@quotation.installation_date ? @quotation.installation_date.strftime('%d/%m/%Y') : nil), required: true, placeholder: 'DD/MM/AAAA' %>
+                <%= f.submit 'Guardar', class: 'btn btn-miele inlineb top-save-instalation' %>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="bold title-input">Fecha Estimada Instalación</p>
+            <p class="content-input">
+              <%= @quotation.installation_date.strftime("%d/%m/%Y") %>
+            </p>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="col-md-2 col-xs-12">
+      </div>
+    </div>
+  <% end %>
+  <% if @quotation.observations.present? %>
+  <div class="line-row-info"></div>
+  <div class="row top-separation-data">
+    <div class="col-md-12 col-xs-12 text-left">
+      <p class="bold secondary-text">Observaciones</p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-6 col-xs-12">
+      <p class="content-input"><%= @quotation.try(:observations) %></p>
+    </div>
+  </div>
+  <% end %>
+</div>

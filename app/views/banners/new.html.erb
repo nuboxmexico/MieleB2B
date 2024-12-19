@@ -1,0 +1,40 @@
+<style>
+	.error{
+		margin-left: 10px;
+		margin-top: 2px;
+	}
+</style>
+<div class="row row-content">
+	<div class="col-lg-12 col-xs-12">
+		<ol class="breadcrumb">
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<li><a href="<%= banners_path %>">Banners</a></li>
+			<li>Nuevo Banner</li>
+		</ol>
+	</div>
+	<div class="col-xs-12">
+		<h1 class="bold">Crear Banner Promocional</h1>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-12 bot-space">
+		<div class="box-content">
+			<%= bv_form_for(@banner, html: { class: 'bform', multipart: true}) do |form| %>
+			<div class="card-shadow-body">
+				<%= render 'banners/form', form: form %>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<script>
+	$("#new_banner").change(function(){
+		if($(this).valid() && ($("#banner-image-load").get(0).files.length > 0) && ($("#banner-mobile-load").get(0).files.length > 0)){
+			$('#submit-banner').prop('disabled', false);
+		} else {
+			$('#submit-banner').prop('disabled', true);
+		}
+	});
+</script>

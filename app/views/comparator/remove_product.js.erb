@@ -1,0 +1,11 @@
+<% if @success == true %>
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Producto eliminado del comparador.');
+<% end %>
+<% if @comparator.products.size < 1 %>
+$(".comparator-card").remove();
+<% elsif @comparator.products.size == 1 %>
+$("#link-to-comparator").attr("disabled", true);
+<% elsif @comparator.products.size > 1 %>
+$("#link-to-comparator").attr("disabled", false);
+<% end %>

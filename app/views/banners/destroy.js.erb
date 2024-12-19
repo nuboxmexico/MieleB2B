@@ -1,0 +1,11 @@
+<% if @success == true %>
+$("#banner-<%= params[:id] %>").remove();
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Banner eliminado con éxito');
+<% if Banner.all.size == 0 %>
+$("#banners").remove();
+<% end %>
+<% else %>
+$(".toast-bottom-right-custom").remove();
+toastr['error']('No se ha podido eliminar el banner.');
+<% end %>

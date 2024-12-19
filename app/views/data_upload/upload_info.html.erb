@@ -1,0 +1,787 @@
+<style>
+	ul li{
+		color: $brand-primary!important;
+	}
+</style>
+<br>
+<div class="row">
+	<div class="col-md-12 col-xs-12">
+		<% if !session.nil? and !session[:errors].nil? and session[:errors].first == -1 %>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="warning-msg custom-margin" role="alert">
+					<i class="fa fa-exclamation-triangle"></i> <b>Las cabeceras son erróneas</b>
+				</div>
+			</div>
+		</div>
+		<% elsif !session.nil? and !session[:errors].nil? and session[:errors].first == -2 %>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="warning-msg custom-margin" role="alert">
+					<i class="fa fa-exclamation-triangle"></i> <b>El formato del archivo es incorrecto</b>
+				</div>
+			</div>
+		</div>
+		<% elsif !session.nil? and !session[:errors].nil? and session[:errors].first == -3 %>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="warning-msg custom-margin" role="alert">
+					<i class="fa fa-exclamation-triangle"></i> <b>Los siguientes correos no se encuentran registrados: </b>
+					<%= session[:errors][1].join(',') %>
+				</div>
+			</div>
+		</div>
+		<% elsif !session.nil? and !session[:errors].nil? and session[:errors].first == -4 %>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="warning-msg custom-margin" role="alert">
+					<i class="fa fa-exclamation-triangle"></i> <b>Los siguientes TNRs no se encuentran registrados: </b>
+					<%= session[:errors][1].join(',') %>
+				</div>
+			</div>
+		</div>
+		<% elsif !session.nil? and !session[:errors].nil? and session[:errors].size != 0 %>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="warning-msg custom-margin" role="alert">
+					<i class="fa fa-exclamation-triangle"></i> <b>Las siguientes filas presentaron problemas en la carga: </b>
+					<%= session[:errors].join(',') %>
+				</div>
+			</div>
+		</div>
+		<% end %>
+		<% session[:errors] = nil %>
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<ol class="breadcrumb no-bot">
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<li>Carga de datos</li>
+		</ol>
+	</div>
+</div>
+
+<% if can? :load_quotation_project, DataUpload %>
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Proyectos</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Carga de Cotizaciones</h4>
+
+			<%= form_tag load_quotation_project_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="quotations_project_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los TNR que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/project" id="project-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-quotations-project">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+<% end %>
+
+
+<% if can? :load_homologate_tnr, DataUpload %>
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Retail</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Homologar TNRs</h4>
+
+			<%= form_tag load_homologate_tnr_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="tnr_retail_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los TNR que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/tnr_retail" id="homologate-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar <span class="hidden-xs">TNRs Homologados</span>'.html_safe, download_tnr_homologated_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-tnr-homologated' %>
+					<button type="submit" class='btn-quotation' id="load-tnr-retail">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+<% end %>
+
+<% if can? :load_oc_retail, DataUpload %>
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Carga OC Retail</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Carga OC</h4>
+
+			<%= form_tag load_oc_retail_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="oc_retail_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de las órdenes de compra que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/oc_retail" id="oc-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>                                                      
+			<p class="text-light thin-text"><span class="miele-text">*Recuerde Homologar los TNRs antes de hacer una carga OC Retail.</span></p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-oc-retail">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+<% end %>
+<% if can? :manage, DataUpload or can? :load_products, DataUpload %>
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Productos</h3>
+	</div>
+</div>
+<% end %>
+
+<div class="row">
+	<% if can? :load_products, DataUpload %>
+	<div class="col-md-6 col-xs-12 no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Productos</h4>
+
+			<%= form_tag upload_products_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="products_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los productos que deseas cargar. Puedes guiarte por nuestra  <b><a href="/products/template" id="products-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar <span class="hidden-xs">Info </span>Productos'.html_safe, download_products_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-products' %>
+					<button type="submit" class='btn-quotation' id="load-products">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+	<% if can? :upload_mandatory, DataUpload %>
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Productos mandatorios</h4>
+
+			<%= form_tag upload_mandatory_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="mandatory_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los productos que deseas cargar. Puedes guiarte por nuestra  <b><a href="/products/mandatory" id="mandatory-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-mandatories">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+</div>
+
+<% if can? :manage, DataUpload %>
+<div class="row top-space">
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<% if @stock_logs.size > 0 %>
+			<div class="pull-right">
+				<i class="fa fa-eye gray-text pt16"></i>
+			</div>
+			<% end %>
+			<br>
+			<h4 class="bold top-space text-center">Stock</h4>
+
+			<%= form_tag upload_stock_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="stock_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los productos con su stock que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/stock" id="stock-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar Inventario', download_stock_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-stock' %>
+					<button type="submit" class='btn-quotation' id="load-stock">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<div class="col-md-6 col-xs-12 no-sides top-mobile">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Comparador Productos</h4>
+			<%= form_tag load_comparator_info_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" multiple="true"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="comparator_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los productos que deseas comparar. Puedes guiarte por nuestra  <b><a href="/template/comparator" id="comparator-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-comparator">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Imágenes</h3>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Imágenes Productos</h4>
+			<%= form_tag upload_product_photos_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file[]" required="true" multiple="true"  accept="image/jpeg, image/png" id="product_photo_upload" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Las imágenes deben estar en formato PNG, indicando en el nombre del archivo el TNR.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-product-images">
+						Cargar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Imágenes Técnicas de Productos</h4>
+			<%= form_tag upload_technical_images_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file[]" required="true" multiple="true"  accept="image/jpeg, image/png" id="technical_images_upload" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Las imágenes deben estar en formato PNG, indicando en el nombre del archivo el TNR, seguido de guión bajo e <b>ins</b> (ejemplo: <b>219813_ins.png</b>).</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-technical-images">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Promociones</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Descuentos</h4>
+			<%= form_tag upload_discounts_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="discounts_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los productos que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/discounts" id="products-discounts-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar Descuentos', download_discounts_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-discounts' %>
+					<button type="submit" class='btn-quotation' id="load-discounts">
+						Cargar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Recepción de correos automáticos</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Destinatarios</h4>
+			<%= form_tag upload_addressees_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="addressees_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los productos que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/addressees" id="products-addressees-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar Destinatarios', download_addressees_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-addressees' %>
+					<button type="submit" class='btn-quotation' id="load-addressees">
+						Cargar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+<% end %>
+<% if can? :load_commission_levels, DataUpload or can? :load_miele_roles, DataUpload %>
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Centros de Costo</h3>
+	</div>
+</div>
+<% end %>
+<div class="row">
+	<% if can? :load_miele_roles, DataUpload %>
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">ID de Usuarios</h4>
+			<%= form_tag load_miele_roles_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="miele_role_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los ID de usuarios que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/miele_roles" id="miele-roles-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar Id Usuarios', download_miele_roles_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-miele-roles' %>
+					<button type="submit" class='btn-quotation' id="load-miele-roles">
+						Cargar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+	<% if can? :load_commission_levels, DataUpload %>
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Tabla de Comisiones</h4>
+			<%= form_tag load_commission_levels_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="commissions_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los centros de costo que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/commissions" id="commissions-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar Tabla <span class="hidden-xs">Comisiones</span>'.html_safe, download_commissions_table_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-commissions-table' %>
+					<button type="submit" class='btn-quotation' id="load-commissions">
+						Cargar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+</div>
+<div class="row top-space">
+	<% if can? :manage, DataUpload %>
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Centro de costo</h4>
+			<%= form_tag load_cost_center_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="cost_center_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los centros de costo que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/cost_center" id="cost-center-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= link_to 'Descargar Centros <span class="hidden-xs">de Costo</span>'.html_safe, download_cost_center_path(format: :xlsx), class: 'btn btn-miele-gray btn-upload no-loader', id: 'download-cost-center' %>
+					<button type="submit" class='btn-quotation' id="load-cost-centers">
+						Cargar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+	<% if can? :manage, DataUpload %>
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Margen de cotizaciones Proyectos</h4>
+			<br>
+			<p class="text-light thin-text">En este campo se define el porcentaje de margen mínimo aceptado por cada cotización de proyecto generada.</p>
+			<br>
+			<%= form_tag load_save_margen_path, method: :post, multipart: true do %>
+			<div class="row">
+				<div class="col-xs-12 col-md-6">
+					<label class='control-label bold' >Solo ingresar número no signo “%”</label>
+					<input name="margen" id="margen-input" type="number" class="field-bordered" min="0" max="100">
+				</div>
+			</div>
+			<br>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation'>
+						Actualizar
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+</div>
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Identificación Miele Core</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Id de Clientes</h4>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<p class="btn btn-miele-gray btn-input-file" style="width: 100%; margin-right: 10px;" >
+						<%=  Customer.where(core_id: nil).count.to_s + ' Core Miele IDs por actualizar.' %>
+					</p>
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text"> No se debe subir archivo. La actualización es automática.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= form_tag update_customer_core_ids_path, method: :patch do %>
+						<button type="submit" class='btn-quotation' id="update-customer-core-ids">
+							Actualizar
+						</button>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Id de Productos</h4>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<p class="btn btn-miele-gray btn-input-file" style="width: 100%; margin-right: 10px;" >
+						<%=  Product.where(core_id: nil).count.to_s + ' Core Miele IDs por actualizar.' %>
+					</p>
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text"> No se debe subir archivo. La actualización es automática.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<%= form_tag update_product_core_ids_path, method: :patch do %>
+						<button type="submit" class='btn-quotation' id="update-product-core-ids">
+							Actualizar
+						</button>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<% if can? :manage, DataUpload %>
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Despacho e Instalaciones</h3>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-6 col-xs-12 no-sides top-mobile">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Reglas Instalaciones Proyectos</h4>
+			<%= form_tag load_project_installation_value_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" multiple="true"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="comparator_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Subir solo archivo con formato de carga de Clientes. Puedes guiarte por nuestra  <b><a href="/template/project_installation_values" id="comparator-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-comparator">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-xs-12 no-sides top-mobile">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Descuentos Instalaciones Proyectos</h4>
+			<%= form_tag load_project_installation_discount_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" multiple="true"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="comparator_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Subir solo archivo con formato de carga de Clientes. Puedes guiarte por nuestra  <b><a href="/template/project_installation_discounts" id="comparator-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-comparator">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<br>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 no-sides top-mobile">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Reglas Despacho</h4>
+			<%= form_tag load_dispatch_rule_path, method: :post, multipart: true do %>
+			<br>
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" multiple="true"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="comparator_load" class="file-input">
+				</div>
+			</div>
+			<br>
+			<p class="text-light thin-text">Subir solo archivo con formato de carga de Clientes. Puedes guiarte por nuestra  <b><a href="/template/dispatch_rules" id="comparator-template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-comparator">
+						Cargar			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12">
+		<h3 class="light-h title-h">Sincronización Miele Core</h3>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6 col-xs-12 top-mobile no-sides">
+		<div class="box-content">
+			<br>
+			<h4 class="bold top-space text-center">Productos</h4>
+			<br>
+			<br>
+			<p class="text-light thin-text"> 
+				Se sincronizan los productos con la plataforma Miele Core y <span class="miele-text miele-link">se manda un correo con el reporte de sincronizacion.<span> 
+			</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<br>
+					<br>
+					<br>
+					<%= form_tag synchronize_products_with_miele_core_path, method: :patch do %>
+						<button type="submit" class='btn-quotation' id="synchronize-products-miele-core">
+							Actualizar
+						</button>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%end%>
+
+<script>
+	$(document).ready(function(){
+		homologateBoxHeights(".box-content");
+	});
+	$( document ).tooltip({
+		items: ".fa-eye",
+		content: "<%= stock_logs(@stock_logs).html_safe %>"
+	});
+
+	function sendMargen(){
+		var margen = document.getElementById('margen-input').value;
+		console.log(margen)
+		$.ajax({
+            url: "/upload/save_margen",
+            type : 'post',
+            data: { margen: margen
+            }
+        }).done(function (data) {
+			console.log("mensaje de exito :s")
+  		})
+	}
+</script>

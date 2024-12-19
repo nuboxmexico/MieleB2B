@@ -1,0 +1,162 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id %>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4 class="dispatch-group-subtitle">
+        Grupo de envío N°<%= dispatch_group_counter + 1 %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    <div class="collapse" id="<%= id %>" data-type="dispatch">
+      <% dispatch_group.dispatch_guides.each do |dispatch_guide| %>
+        <%= link_to dispatch_guide.document.url(:original), class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(dispatch_guide.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, DispatchGuide and quotation.post_in_preparation_status? %>
+          <%= link_to dispatch_guide_path(dispatch_guide), method: :delete, class: "btn btn-delete no-loader", data: { 
+              confirm: '¿Estás seguro de eliminar el archivo '+dispatch_guide.document_file_name+'?',
+              'confirm-button-text': 'Eliminar',
+              'cancel-button-text': 'Cancelar'
+            }  do %>
+             <i class="fa fa-times"></i>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= form_for dispatch_group, html: {multipart: true} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+              <%= f.label :dispatch_date, 'Fecha de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_date, class: 'field-bordered inlineb date-picker', :required => true, id: "dispatch-group-date-input-patch-#{dispatch_group.id}", value: (dispatch_group.dispatch_date ? dispatch_group.dispatch_date.strftime('%d/%m/%Y') : nil) %>
+            </div>
+            <p>Agregar productos manualmente</p>
+           <!-- Button trigger modal -->
+            <button onclick="setIdModal(<%=dispatch_group.id%>)" id= "myInput" type="button" class="btn btn-miele" data-toggle="modal" data-target="#exampleModal" style="width: 100% !important; padding-left: 0px !important; padding-right: 0px !important;">
+              Seleccionar productos
+            </button>
+          </div>
+          <div class="col-xs-12 col-md-9">
+            <%if dispatch_group.quotation_products_auxes.empty?%>
+              <p>aún no has agregado productos</p>
+            <%else%>
+              <div>
+                <%= render partial: 'quotations/dispatch/products_dispatch_group', locals: {cart: quotation, dispatch_group: dispatch_group} %>
+              </div>
+            <%end%>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group actions-container text-right">
+              <a onclick="delete_cart(<%=dispatch_group.id%>)" class="btn btn-flat">
+                Eliminar
+              </a>
+              
+              <a  class="btn btn-miele save-dispatch" onclick="updateDispatch(<%=quotation.id%>, <%=dispatch_group.id%>)">
+                Guardar
+              </a>
+
+            
+                <%= f.hidden_field :quotation_id, value: quotation.id %>
+              
+            </div>
+          </div>
+
+          <div class="col-xs-12 text-right">
+            <span id="dispatch_group_cost_label-<%= dispatch_group.id %>" class="title-input-dispatch-value"> Valor de grupo de env&iacute;o: 
+              <span <%= "id=dispatch_group_cost_value-#{dispatch_group.id}" %> class="currency-change title-input-dispatch-value" data-currency="uf">
+                <%= number_with_delimiter(dispatch_group.get_individual_cost.round(2)) %>
+              </span>
+            <span>
+          </div>
+
+        </div>
+        
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
+<script>
+function delete_cart(id){
+      $.ajax({
+          url: "/dispatch_groups/delete_dispatch_group_project_show",
+          type : 'post',
+          data: { dispatch_group_id: id }
+      }).done(function (data) {
+          document.getElementById('new_dispatch_group_button').style.display = "";
+      })
+  }
+
+function updateDispatch(quotation_id, dispatch_group_id){
+  var data = {
+      dispatch_group: {
+        dispatch_date: document.getElementById('dispatch-group-date-input-patch-'+dispatch_group_id).value,
+        quotation_id: quotation_id
+      }
+    }
+  $.ajax({
+          url: `/dispatch_groups/update_show/${dispatch_group_id}`,
+          type : 'patch',
+          data: data
+      }).done(function (data) {
+        document.getElementById('new_dispatch_group_button').style.display = "";
+        $("#new_dispatch_group_box").empty();
+          
+  })
+}
+
+function updateDispatchQuantity(id, total_quantity){
+    var quantity = parseInt(document.getElementById("quantity_cart_item_"+id).value)
+    document.getElementById("dispatch_quantity_cart_item_"+id).innerHTML = (total_quantity-quantity) + " por asignar";
+}
+
+function addProducts(length){
+  var i = 0
+  var checks = document.getElementsByClassName("check_cart_item")
+  var quantities_value = document.getElementsByClassName("quantity_cart_item")
+  var modal = document.getElementById("modal")
+  var dispatch_group_id = modal.value
+  var ids = []
+  var quantities = []
+  while ( i < length) {
+      if (checks[i].checked){
+          ids.push(checks[i].value)
+          quantities.push(quantities_value[i].value)
+      }
+      i++
+  }
+
+  $.ajax({
+      url: "/dispatch_groups/update_dispatch_quantity_show",
+      type : 'post',
+      data: {
+          id: dispatch_group_id, 
+          cart_items_id: ids,
+          quantities: quantities
+      }
+  }).done(function (data) {
+  })
+}
+
+function setIdModal(dispatch_group_id){
+  var modal = document.getElementById("modal")
+  modal.value = dispatch_group_id
+}
+
+
+
+function eliminateAux(aux_id, cart_id){
+  $.ajax({
+      url: "/dispatch_groups/delete_aux_show",
+      type : 'post',
+      data: { aux_id: aux_id,
+              cart_id: cart_id
+      }
+  }).done(function (data) {
+  })
+}
+
+</script>

@@ -1,0 +1,13 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'ID Usuarios') do |sheet|
+  headers = ['ID','Nombre','Clasificación Socio Comercial','Borrar']
+  sheet.add_row headers
+  
+  @miele_roles.each do |role|
+    sheet.add_row [role.code,
+                   role.name,
+                   role.classification,
+                   ''], types: [:string,:string,:string,:string]
+  end
+end

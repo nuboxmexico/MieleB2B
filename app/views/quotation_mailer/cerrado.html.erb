@@ -1,0 +1,30 @@
+<% if @is_for_miele %>
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron retirados el día <%= Date.today.strftime("%d/%m/%Y") %> en su totalidad.
+	<ul>
+		<% @quotation.quotation_products.availables.each do |item| %> 
+		<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+		<% end %>
+	</ul>
+</p>
+<p>N° V1: <%= @quotation.v1 %></p>
+<p>
+	Puedes ver todo el detalle de las observaciones y archivos adjuntos en la pestaña "Activación" de tu cotización <%= link_to 'aquí.', quotation_url(@quotation) %>
+</p>
+<% else %>
+<p>
+	Estimado(a) <%= @quotation.name %>, 
+</p>
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron entregados y/o despachados.
+	<ul>
+		<% @quotation.quotation_products.availables.each do |item| %> 
+		<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+		<% end %>
+	</ul>
+</p>
+<p>
+	Muchas gracias por preferirnos. Esperamos que tu compra te motive a conocer más del universo Miele en alguna de nuestras tiendas o en <a href="www.miele.cl">www.miele.cl</a>.
+</p>
+<p>#LifeBeyondOrdinary.</p>
+<% end %>

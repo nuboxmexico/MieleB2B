@@ -1,0 +1,32 @@
+<% if @is_for_miele %>
+  <p>
+    Estimado(a) <%= @quotation.user.name %>, 
+  </p>
+  <p>
+    Los siguientes artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron instalados en su totalidad.
+    <ul>
+      <% @dispatch_group.available_products.each do |product| %> 
+      <li><%= "<b>#{product.sku}</b> #{product.name}".html_safe %> </li>
+      <% end %>
+    </ul>
+  </p>
+  <p>
+    Puedes ver todos los detalles en la pestaña "Instalación" de tu cotización <%= link_to 'aquí.', quotation_url(@quotation) %>
+  </p>
+<% else %>
+  <p>
+    Estimado(a) <%= @quotation.name %>, 
+  </p>
+  <p>
+    Los siguientes artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron instalados en su totalidad.
+    <ul>
+      <% @dispatch_group.available_products.each do |product| %> 
+      <li><%= "<b>#{product.sku}</b> #{product.name}".html_safe %> </li>
+      <% end %>
+    </ul>
+  </p>
+  <p>
+    Muchas gracias por preferirnos. Esperamos que tu compra te motive a conocer más del universo Miele en alguna de nuestras tiendas o en <a href="www.miele.cl">www.miele.cl</a>.
+  </p>
+  <p>#LifeBeyondOrdinary.</p>
+<% end %>

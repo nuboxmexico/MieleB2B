@@ -1,0 +1,227 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id + "in_preparation"%>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4 class="dispatch-group-subtitle">
+        Envío N° <%= dispatch_group_counter + 1 %>
+        <%= get_state_label(dispatch_group.state, 'full') %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    
+    
+    <div class="collapse" id="<%= id + "in_preparation"%>" data-type="dispatch">
+
+      <div class="row">
+
+        <div class="col-xs-12 col-md-4">
+          <% dispatch_group.dispatch_guides.each do |dispatch_guide| %>
+            <%= link_to dispatch_guide.document.url(:original), class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+              <i class="fa fa-file-image"></i> <%= truncate(dispatch_guide.document_file_name, length: 15) %>
+            <% end %>
+            <% if can? :destroy, DispatchGuide and @quotation.post_in_preparation_status? %>
+              <%= link_to dispatch_guide_path(dispatch_guide), method: :delete, class: "btn btn-delete no-loader", data: { 
+                  confirm: '¿Estás seguro de eliminar el archivo '+dispatch_guide.document_file_name+'?',
+                  'confirm-button-text': 'Eliminar',
+                  'cancel-button-text': 'Cancelar'
+                }  do %>
+                <i class="fa fa-times"></i>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+
+          <div class="col-xs-12 col-md-8 download-guide">          
+            <span class="title-input">Estado: 
+              <% unless dispatch_group.finance_validation %>  
+                <span class="state-label sent-state">Pendiente de Validar por Finanzas</span>
+              <% else %>
+                <span class="state-label dispatched-state">Validado por Finanzas</span>
+              <% end %>
+
+              <% if current_user.is_finance_manager? %>
+                <%= link_to 'Validar', validate_by_finance_path(dispatch_group), method: :post, class: "btn btn-miele #{"disabled" if dispatch_group.finance_validation}", disabled: dispatch_group.finance_validation %>
+              <% else %>
+                <a class="btn btn-miele disabled" disabled="disabled" rel="nofollow" data-method="post" href="#">Validar</a>
+              <% end %>
+            </span>
+          </div>
+        
+      </div>
+      
+
+      <%= form_for dispatch_group, html: {multipart: true} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-md-4">
+            <div class="form-group">
+              <%= f.label :dispatch_order, 'Guía de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_order, class: 'field-bordered inlineb g_d_spec', placeholder: 'Escribe aquí ...' %>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-8">
+            <div class="form-group">
+              <%= f.label :dispatch_date, 'Fecha de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_date, class: 'field-bordered inlineb date-picker', value: (dispatch_group.dispatch_date ? dispatch_group.dispatch_date.strftime('%d/%m/%Y') : nil) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">        
+          <div class="col-xs-12 col-md-4">
+            <div class="form-group">
+              <%= f.label :technician_id, 'Técnico', class: 'title-input asd' %>
+              <% if defined?(technicians_new)%>
+                <%= f.select :technician_id, technicians_new, class: 'field-bordered inlineb', placeholder: 'Escribe aquí ...' %>
+              <% else %>
+                <%= f.select :technician_id, @technicians_show, class: 'field-bordered inlineb', placeholder: 'Escribe aquí ...' %>
+              <% end %>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-8">
+            <!--
+            <div class="form-group">
+              <%= f.label :installation_date, 'Fecha de instalación', class: 'title-input' %>
+              <%= f.text_field :installation_date, class: 'field-bordered inlineb', readonly: true, value: (dispatch_group.installation_date ? dispatch_group.try(:installation_date).strftime('%d/%m/%Y') : dispatch_group.quotation.try(:installation_date){ |date| date.strftime('%d/%m/%Y') }) %>
+            </div>
+            -->
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 col-md-4">
+            <div class="form-group">
+              <%= f.label :dispatch_guides, 'Guía de despacho', class: 'title-input' %>
+              <div class="file-field input-field">
+                <div class="file-drop-area dashed-border">
+                  <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+                  <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+                  <%= f.file_field :dispatch_guides, id: 'dispatch_guide_documents', class: 'file-input', accept: 'application/pdf', multiple: true %>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :provider_type, 'Tipo de Proveedor', class: 'title-input asd' %>
+              <%= f.select :provider_type, ["Interno", "Externo"], include_blank: 'Seleccione un tipo ...', class: 'field-bordered inlineb' %>
+            </div>
+
+          </div>
+          <div class="col-xs-12 col-md-8">
+            <div class="form-group">
+              <%= f.fields_for :notes, dispatch_group.notes.dispatch.last do |note_form| %>
+                <%= note_form.label :observation, 'Observaciones', class: 'title-input' %>
+                <%= note_form.text_area :observation, class: 'field-bordered full-width padding-text-area' %>
+                <%= note_form.hidden_field :user_id, value: current_user.id %>
+                <%= note_form.hidden_field :category, value: note_form.object.category %>
+              <% end %>
+            </div>
+            <%= render partial: 'quotations/dispatch/notes', locals: { notes: dispatch_group.notes, id: "dispatched-note-#{dispatch_group_counter}" } %>
+          </div>
+        </div>
+    <label class="title-input">Productos a despachar</label>
+    <p></p>
+    <div class="border-container">
+      <div class=" row">
+    <div class="col-xs-12 col-md-5 text-center">
+      <p class="title-input">
+        Nombre
+      </p>
+    </div>
+    <div class="col-xs-12  col-md-2 text-center">
+      <p class="title-input">
+        TNR
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-2 text-center">
+      <p class="title-input">
+        ID
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-2 text-center">
+      <p class="title-input">
+        Estado
+      </p>
+    </div>
+    </div>
+      <div class="product">
+        <% unless  @selected_detail_quotation_products.nil? %>
+          <% @selected_detail_quotation_products.each do |detail| %>
+            <div class=" row">
+              <div class="col-xs-12 col-md-5">
+                <span><%= detail.name %></span>
+              </div> 
+              <div class="col-xs-12 col-md-2 text-center">
+                <span><%= detail.tnr %></span>
+              </div>
+              <div class="col-xs-12 col-md-2 text-center">
+                <span><%= detail.serial_id %></span>
+              </div>
+              <div class="col-xs-12 col-md-2 text-center">
+                <span><%= detail.state %></span>
+              </div>
+            </div>
+          <% end %>
+          <%else%>
+            <% dispatch_group.detail_quotation_products.each do |detail| %>
+            <div class=" row">
+              <div class="col-xs-12 col-md-5">
+                <span><%= detail.name %></span>
+              </div> 
+              <div class="col-xs-12 col-md-2 text-center">
+                <span><%= detail.tnr %></span>
+              </div>
+              <div class="col-xs-12 col-md-2 text-center">
+                <span><%= detail.serial_id %></span>
+              </div>
+              <div class="col-xs-12 col-md-2 text-center">
+                <span><%= detail.state %></span>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-6 col-xs-12">
+
+        <% if dispatch_group.quotation.for_project? %>
+        <div class="text-left mtop-3">
+          <p class="title-input">Valor Productos + Despachos (IVA incluido): 
+            <span class="currency-change" data-currency="uf">
+                <%= number_with_delimiter(dispatch_group.calculate_cost_for_dispatch_tab.round(2)) %>
+            </span>
+          </p>
+        </div>
+
+        <% end %>
+
+      </div>
+  
+      <div class="col-md-6 col-xs-12">
+        <div class="form-group actions-container text-right">
+          <button class="btn btn-flat fake-destroy-dispatch-group" data-new="<%= dispatch_group.new_record? %>">
+            Eliminar
+          </button>
+          <%= link_to 'Eliminar', dispatch_group, method: :delete, class: 'btn btn-flat destroy-dispatch-group hidden' %>
+          
+          <%= f.submit submit_label, class: 'btn btn-miele save-dispatch' %>
+
+          <% if dispatch_group.persisted? %>
+
+            <% if dispatch_group.finance_validation %>
+              <%= link_to 'Despachar', change_dispatch_group_state_path(dispatch_group, 'Despachado'), method: :post, class: "btn btn-miele send-dispatch #{"disabled" unless dispatch_group.can_dispatch?}", disabled: !dispatch_group.can_dispatch? %>
+            <% else %>
+              <%= link_to 'Despachar', change_dispatch_group_state_path(dispatch_group, 'Despachado'), method: :post, class: "btn btn-miele send-dispatch disabled", disabled: true %>
+            <% end %>
+
+          <% else %>
+            <%= f.hidden_field :quotation_id, value: @quotation.id %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+      <% end %>
+    </div>
+  </div>
+</div>

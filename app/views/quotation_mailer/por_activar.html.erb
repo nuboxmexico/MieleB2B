@@ -1,0 +1,29 @@
+<% if @is_for_miele %>
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron instalados en su totalidad, se debe asignar cotización a <b>Home Economist.</b>
+	<ul>
+		<% @quotation.quotation_products.to_install.each do |item| %> 
+		<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+		<% end %>
+	</ul>
+</p>
+<p>
+	Puedes ver todos los detalles en la pestaña "Home Program" de tu cotización <%= link_to 'aquí.', quotation_url(@quotation) %>
+</p>
+<% else %>
+<p>
+	Estimado(a) <%= @quotation.name %>, 
+</p>
+<p>
+	Los artículos pertenecientes a cotización N° <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %> fueron instalados en su totalidad y están listos para ser activados a través del servicio de <b>Home Program.</b>
+	<ul>
+		<% @quotation.quotation_products.to_install.each do |item| %> 
+		<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+		<% end %>
+	</ul>
+</p>
+<p>
+	Un <b>Home Economist</b> de Miele se pondrá en contacto para coordinar el día y la hora que mas te acomode para disfrutar de esta experiencia.
+</p>
+<p>#LifeBeyondOrdinary.</p>
+<% end %>

@@ -1,0 +1,182 @@
+<div class="box-cart-right no-top bot-space">
+  <h3 class="title-section">Total</h3>
+  <div class="row line-hr"></div>
+
+  <% @cart.cart_items.order(created_at: :asc).each do |product| %>
+    <div class="row product-detail-list text-light" id="product-list-<%= product.id%>"> 
+      <div class="col-xs-7 text-light"> 
+        <div class="col-xs-2 no-sides-all">
+          <span class="quantity-counter"><%= "#{product.quantity} x" %></span> 
+        </div>
+        <div class="col-xs-10 no-sides-all">
+          <span class="name-product-second-step"><%= product.name %></span>
+        </div>
+      </div>
+      <div class="col-xs-5 text-right">
+        <% if current_user.sale_channel.try(:name) == "Proyectos" %> 
+        <span <%= "id=cart-item-cost-#{product.id}" %> class="currency-change" data-currency="uf" >
+          <%= number_with_delimiter((product.price * product.quantity).round(2)) %>
+        </span>
+        <%else%>
+        <span <%= "id=cart-item-cost-#{product.id}" %> class="currency-change" data-currency="<%= display_quotation_currency(currency) %>" >
+          <%= number_with_delimiter((product.price * product.quantity).round()) %>
+        </span>
+        <%end%>
+      </div>
+    </div>
+    <br>
+  <% end %>
+  <div id="installation-disclaimer">
+  </div>
+  <div class="row line-hr"></div>
+  <div class="row text-light">
+    <!-- discount for section -->
+    <div id="show_installation_price">
+      <div class="col-xs-7">
+        <span id="label_installation_price"></span> 
+      </div> 
+      <div class="col-xs-5 text-right">
+        <span id="quotation-installation-price" class="currency-change" data-currency="<%= current_user.sale_channel.try(:name) == "Proyectos" ? "uf" : display_quotation_currency(currency) %>" >
+        </span>
+      </div>
+    </div>
+    <div id="show_dispatch_price">
+      <div class="col-xs-7">
+        <span id="label_dispatch_price"></span> 
+      </div> 
+      <div class="col-xs-5 text-right">
+        <span id="quotation-dispatch-price" class="currency-change" data-currency="<%= current_user.sale_channel.try(:name) == "Proyectos" ? "uf" : display_quotation_currency(currency) %>" >
+        </span>
+      </div>
+    </div>
+    <div class="col-xs-7">
+      <span>Sub Total</span> 
+    </div>
+    <% if current_user.sale_channel.try(:name) == "Proyectos" %> 
+    <div class="col-xs-5 text-right">
+      <span id="quotation-subtotal-price" class="currency-change" data-currency="uf" >
+      <%= number_with_delimiter(@cart.total_cost.round(2)) %>
+      </span>
+    </div>
+    <%else%>
+     <div class="col-xs-5 text-right">
+      <span <%= "id=quotation-subtotal-price-#{@cart.id}" %> class="currency-change" data-currency="<%= display_quotation_currency(currency) %>" >
+        <%= number_with_delimiter(@cart.total_cost.round()) %>
+      </span>
+    </div>
+    <%end%>
+    
+    <% if @cart.cart_items.where(is_service: true).size != @cart.cart_items.size %>
+    <div class="col-xs-8">
+      <div id="installation-info">
+      </div>
+    </div>
+    <div class="col-xs-4 text-right" id="installation-value">
+    </div>
+    <div class="col-xs-8">
+      <div id="dispatch-info">
+      </div>
+    </div>
+    <div class="col-xs-4 text-right" id="dispatch-value">
+    </div>
+    <div class="col-xs-12 inlineb" id="code-dispatch"></div>
+    <div class="col-xs-7">
+      <% if !@cart.bstock %>
+      <span id="discount-info-section">
+        <% if @cart.total_section_discount > 0 && !(current_user.sale_channel.try(:name) == "Proyectos") %>
+        Dcto. por Tramo -<%= (Quotation.cost_next_section(@cart.cart_items, @cart.cart_items.where(discount_type: 'miele'))[2]*100).to_i %>%
+        <% end %>
+      </span> 
+    </div>
+    <div class="col-xs-5 text-right">
+      <% if !@cart.bstock %>
+      <% if @cart.total_section_discount > 0 && !(current_user.sale_channel.try(:name) == "Proyectos") %>
+        <span <%= "id=quotation-discount-section-#{@cart.id}" %> class="miele-text currency-change" data-currency="<%= display_quotation_currency(currency) %>">
+          <%= number_with_delimiter((@cart.total_section_discount * -1).round()) %>
+        </span>
+      <% end %>
+    </div>
+    <div class="col-xs-7">
+      <span id="discount-info-miele">
+        <% if @cart.total_miele_discount > 0 && !(current_user.sale_channel.try(:name) == "Proyectos") %>
+          Dcto. Politica Comercial de Lavadoras, Secadoras y Sistemas de Planchado -<%= Quotation.discount_miele(@cart.cart_items)[0] %>%
+        <% end %>
+      </span> 
+      <% end %>
+    </div>
+    <div class="col-xs-5 text-right">
+      <% if @cart.total_miele_discount > 0 && !(current_user.sale_channel.try(:name) == "Proyectos") %>
+        <span <%= "id=quotation-discount-miele-#{@cart.id}" %> class="miele-text currency-change" data-currency="<%= display_quotation_currency(currency) %>">
+          <%= number_with_delimiter((@cart.total_miele_discount * -1 ).round()) %>
+        </span>
+      <% end %>
+      <% end %>
+    </div>
+    <div class="col-xs-7">
+      <% if @cart.promotional_code && !(current_user.sale_channel.try(:name) == "Proyectos")%> 
+        <span>Código descuento <%= @cart.promotional_code.code %> (-<%= @cart.promotional_code.percent%>%)</span>
+      <% end %>
+    </div>
+    <div class="col-xs-5 text-right">
+      <% if @cart.promotional_code && !(current_user.sale_channel.try(:name) == "Proyectos")%> 
+        <span <%= "id=quotation-discount-code-#{@cart.id}"%> class="miele-text currency-change" data-currency="<%= display_quotation_currency(currency) %>"> 
+          - <%= number_with_delimiter(@cart.discount_per_code.round()) %>
+        </span>
+      <% end %>
+    </div>
+    <div class="col-xs-7" id="dispatch-code-info">
+    </div>
+    <div class="col-xs-5 text-right miele-text" id="dispatch-code-value">
+    </div>
+    <% end %>
+  </div>
+  <div class="row line-hr"></div>
+
+
+
+    <!--
+    <% unless current_user.sale_channel.try(:name) == "Proyectos" %>
+      <h4 class="text-right no-bot-margin currency-change" data-currency="<%= display_quotation_currency(currency) %>" <%= "id=cart-total-cost-#{@cart.id}" %> >
+        <%= number_with_delimiter(@cart.total_per_pay.round() ) %>
+        <% unless current_user.sale_channel.try(:name) == "Proyectos" %>
+          <span class="min-text">(IVA Incluído)</span>
+        <% end %>
+      </h4>
+    <%else%>
+      <h4 id="cart-total-cost" class="text-right no-bot-margin currency-change" data-currency="uf" <%= "id=cart-total-cost-#{@cart.id}" %> >
+        <%= number_with_delimiter(@cart.total_per_pay.round(2) ) %>
+      </h4>
+    <% end %>
+    -->
+
+  <% if current_user.is_project_manager? %>
+    <h4 id="cart-total-cost" class="text-right no-bot-margin "   >
+      Adelanto (Neto): 
+      <span class="currency-change" data-currency="uf" id=<%= "cart-total-cost-#{@cart.id}" %>>
+        <%= number_with_delimiter(@cart.total_per_pay.round(2)) %>
+      </span>
+    </h4>
+
+    <h5 class="text-right mar-bot-mobile min-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" id=<%= "cart-deb-#{@cart.id}" %> >
+      Saldo (Neto): 
+      <span class="currency-change" data-currency="uf"><%= number_with_delimiter((@cart.total - @cart.total_per_pay).round(2)) %></span>
+    </h5>
+  
+  <% else %>
+    <h4 class="text-right no-bot-margin currency-change" data-currency="<%= display_quotation_currency(currency) %>" <%= "id=cart-total-cost-#{@cart.id}" %> >
+    <%= number_with_delimiter(@cart.total_per_pay.round() ) %>
+      <span class="min-text">(IVA Incluído)</span>
+    </h4>
+
+    <h5 class="text-right mar-bot-mobile min-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" <%= "id=cart-deb-#{@cart.id}" %> >
+      Saldo: <span class="currency-change" data-currency="$"><%= number_with_delimiter((@cart.total - @cart.total_per_pay).round()) %> </span>
+    </h5>
+  
+  <% end %>
+
+  <!--
+  <h5 class="text-right mar-bot-mobile min-text <%= @cart.pay_percent == 100 ? 'hidden' : ''%>" <%= "id=cart-deb-#{@cart.id}" %> >
+    Saldo: <span class="currency-change" data-currency=<%=current_user.is_project_manager? ? "uf" : "$"%>> <%= current_user.is_project_manager? ? number_with_delimiter((@cart.total - @cart.total_per_pay).round(2)) : number_with_delimiter((@cart.total - @cart.total_per_pay).round()) %> </span>
+  </h5>
+  -->
+</div>

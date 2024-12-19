@@ -1,0 +1,111 @@
+<div class="quotation-box padding-box products-pending-of-dispatch-container dispatch-group-container">
+  <h4>Productos pendientes de envío</h4>
+  <% if current_user.can_manage_project_quotations? or current_user.is_manager_dispatch? %>
+    <%= render 'quotations/dispatch/instructions_files' %>
+  <% end %>
+
+  <div class="border-container">
+  <div class=" row">
+    <div class="col-xs-12 col-md-5 text-center">
+      <p class="title-input">
+        Nombre
+      </p>
+    </div>
+    <div class="col-xs-12  col-md-2 text-center">
+      <p class="title-input">
+        TNR
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-2 text-center">
+      <p class="title-input">
+        ID
+      </p>
+    </div>
+    <div class="col-xs-12 col-md-2 text-center">
+      <p class="title-input">
+        Estado
+      </p>
+    </div>
+    </div>
+    
+    <div class="product">
+    <% if !@detail_quotation_products.blank?%>
+      <% @detail_quotation_products.each do |detail, index| %>
+        <div class=" row">
+          <div class="col-xs-12 col-md-5">
+            <div class="checkbox">
+              <label class="activation-tnr">
+                <input type="checkbox" class="check-item input-checkBox" id="detail_<%= detail.id %>" value="<%= detail.id %>" required="required">
+                <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                <span class="table-item-span"><%= detail.name %></span>
+              </label>
+            </div>  
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <p><%= detail.tnr %></p>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <span><%= detail.serial_id %></span>
+          </div>
+          <div class="col-xs-12 col-md-2 text-center table-item-span">
+            <span><%= detail.state %></span>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class=" row">
+        No hay productos pendientes de envío
+      </div>
+    <% end %>
+
+    </div>
+  </div>
+    <div class=" row">
+    <div class="col-xs-12">
+      <p class="title-input" style="margin-top:20px;">¿Requiere activación? <%= @quotation.activation_confirm ? "Sí" : "No" %> </p>
+    </div>
+  </div>
+</div>
+
+<% if @detail_quotation_products.length > 0 %>
+  <div class="pending-products-alert">
+    <p>
+      <i class="fas fa-info-circle"></i>
+      Hay productos pertenecientes a la cotización que no tienen un envío asignado
+    </p>
+  </div>
+<% end %>
+
+<% if current_user.is_dispatch? || current_user.is_manager_dispatch? %>
+    <%= render 'quotations/dispatch/new_link' %>
+<% end %>
+
+<script>
+
+  function validate_new_dispatch_link(){
+    const checkbox_products = document.getElementsByClassName("input-checkBox");
+    for (var i=0;i<checkbox_products.length;i++){
+      if(checkbox_products[i].checked){
+        $(".add-dispatch-group-container").removeClass("hidden")
+        return
+      }
+
+      console.log(checkbox_products[i].disabled)
+
+      if(checkbox_products[i].disabled){
+        $(".add-dispatch-group-container").addClass("hidden")
+      }
+    }
+    $(".add-dispatch-group-container").addClass("hidden")
+  }
+  // Validacion Inicial en la Carga o Recarga de la pagina
+  validate_new_dispatch_link()
+
+  // Validacion Posterior en los cambios de los checkbox
+  const checkbox_products = document.getElementsByClassName("input-checkBox");
+  for (var i=0;i<checkbox_products.length;i++){
+    checkbox_products[i].addEventListener('click',(event) => {
+      validate_new_dispatch_link()
+    })
+  }
+</script> 

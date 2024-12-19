@@ -1,0 +1,40 @@
+<% @quotations.each_with_index do |quotation, index| %>
+	<% if quotation.channel == 'Retail' %>
+		<%= render partial: 'quotations/quotation_card_retail', locals: {quotation: quotation} %>
+	<% elsif quotation.channel == 'Proyectos' %>
+		<%= render partial: 'quotations/quotation_card_project', locals: {quotation: quotation} %>
+	<% else %>
+		<%= render partial: 'quotations/quotation_card', locals: {quotation: quotation} %>
+	<% end %>
+<% end %>
+<div class="row">
+	<div class="col-md-5 col-xs-12 up-down-mar">
+		<% page = params[:page] ? params[:page].to_i : 0 
+		start = (page*10 + 1)
+		%>
+		<% if @items > 0 %>
+			<% if @items < 10 %>
+				<br>
+				Mostrando registros del 1 al <%= @items %> de un total de <%= @items %> cotizaciones.
+			<% else %>
+			<br>
+			Mostrando registros del <%= start.to_s %> al <% (start + 9).to_s %> de un total de <%= @items %> cotizaciones.
+			<% end %>
+		<% end %>
+	</div>
+	<% if params[:action] == 'filter_by_date' and !current_user.administrator? and !current_user.is_project? %>
+		<div class="col-md-4 col-xs-12 up-down-mar text-right">
+			<br>
+			<% if current_user.sale_channel.try(:name) == 'Retail' %>
+				<b>Total del periodo:</b> <%= number_to_currency(@total_per_period) %>
+			<% else %>
+				<b>Suma de comisiones en el periodo:</b> <%= number_to_currency(@total_per_period) %>
+			<% end %>
+		</div>
+	<% end %>
+</div>
+<div class="row">
+	<div class="col-md-7 col-md-offset-5 col-xs-12 pull-right text-right">
+		<%= will_paginate @quotations, renderer: BootstrapPagination::Rails %>
+	</div>
+</div>

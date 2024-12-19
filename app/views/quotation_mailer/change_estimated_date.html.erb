@@ -1,0 +1,5 @@
+<p>
+  Se ha modificado la <%= @changed_date %> de la cotización N° <%= (@quotation.is_retail? ? @quotation.oc_number : @quotation.code) %>
+</p>
+
+<p>Puedes ver todo el detalle de la cotización <%= link_to 'aquí.', quotation_url(@quotation), target: '_blank' %></p>

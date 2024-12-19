@@ -1,0 +1,66 @@
+<% if can? :dispatch_activation, @quotation %>
+	<div id="dispatch-groups-container">
+		<% @quotation.dispatch_groups.order(id: :asc).each_with_index do |dispatch_group, counter| %>
+			<%= render partial: dispatch_group.partial_to_display(current_user), locals: { dispatch_group: dispatch_group, submit_label: 'Guardar', dispatch_group_counter: counter, dispatch_group_iteration_last: (@quotation.dispatch_groups.count - 1) == counter, id: "dispatch-in-#{tab}-#{counter}"} %>
+		<% end %>
+	</div>
+
+	<%# <%= render 'quotations/dispatch/new_link' %>
+
+	<script>
+		$('#dispatch-form input').on('change', function() {
+			if ($("#dispatch-form").valid()) {
+				$('#send-dispatch').prop('disabled', false);  
+				$("#dispatch_guide_documents-error-out").addClass("hidden");
+			} else {
+				$('#send-dispatch').prop('disabled', 'disabled');
+				if(($("#dispatch_guide_documents").get(0).files.length === 0)) {
+					$("#dispatch_guide_documents-error").addClass("hidden");
+					$("#dispatch_guide_documents-error-out").removeClass("hidden");
+				}
+			}
+		});
+		$(document).ready(function(){
+			$('#quotation_estimated_dispatch_date').daterangepicker({
+				singleDatePicker   : true,
+				showDropdowns      : true,
+				autoUpdateInput    : true,
+				drops              : "up",
+				applyButtonClasses : "btn btn-small btn-miele",
+				cancelClass        : "btn btn-flat btn-small",
+				locale: {
+					format      : 'DD/MM/YYYY',
+					applyLabel  : "Aplicar",
+					cancelLabel : "Limpiar",
+					daysOfWeek  : [
+					"Do",
+					"Lu",
+					"Ma",
+					"Mi",
+					"Ju",
+					"Vi",
+					"Sa"
+					],
+					monthNames  : [
+					"Enero",
+					"Febrero",
+					"Marzo",
+					"Abril",
+					"Mayo",
+					"Junio",
+					"Julio",
+					"Agosto",
+					"Septiembre",
+					"Octubre",
+					"Noviembre",
+					"Diciembre"
+					]
+				}
+			});
+		});
+	</script>
+<% else %>
+	<% @quotation.dispatch_groups.order(id: :asc).each_with_index do |dispatch_group, counter| %>
+		<%= render partial: 'quotations/dispatch/show', locals: { dispatch_group: dispatch_group, submit_label: 'Guardar', dispatch_group_counter: counter, dispatch_group_iteration_last: (@quotation.dispatch_groups.count - 1) == counter, id: "dispatch-in-dispatch-tab-#{counter}"} %>
+	<% end %>
+<% end %>

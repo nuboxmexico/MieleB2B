@@ -1,0 +1,30 @@
+<div class="row banner-row text-left-imp" id="banner-<%= banner.id %>">
+ <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+  <p class="hidden-lg hidden-md"><b>Desktop</b></p>
+  <p class="light-quotation"><%= image_tag(banner.banner_image.url(:thumbnail), class:'banner-preview') %></p>
+</div>
+<div class="col-lg-2 col-md-2 col-xs-12 col-sm-12">
+  <p class="hidden-lg hidden-md"><b>Mobile</b></p>
+  <p class="light-quotation"><%= image_tag(banner.banner_mobile.url(:thumbnail), class:'banner-preview') %></p>
+</div>
+<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+  <p class="hidden-lg hidden-md"><b>URL</b></p>
+  <p class="light-quotation"><%= truncate(banner.url, length: 45) %></p>
+</div>
+<div class="col-lg-1 col-md-1 col-xs-12 col-sm-12">
+  <p class="hidden-lg hidden-md"><b>Fecha Inicio</b></p>
+  <p class="light-quotation"><%= banner.start_date.strftime("%d/%m/%Y") %></p>
+</div>
+<div class="col-lg-1 col-md-1 col-xs-12 col-sm-12">
+  <p class="hidden-lg hidden-md"><b>Fecha término</b></p>
+  <p class="light-quotation"><%= banner.end_date.strftime("%d/%m/%Y") %></p>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-1 col-lg-1 text-center-left">
+  <%= link_to '/banners/'+banner.id.to_s, method: :delete, class: "miele-text remove-#{banner.id}", data: 
+  { confirm: '¿Estás seguro de eliminar este banner promocional?',
+    'confirm-button-text': 'Eliminar',
+    'cancel-button-text': 'Cancelar'}, remote: true  do %>
+    X
+    <% end %>
+  </div>
+</div>

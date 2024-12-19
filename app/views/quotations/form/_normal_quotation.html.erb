@@ -1,0 +1,485 @@
+<div class="row label-bold quotation-form-container">
+  <% unless current_user.is_mca? %>
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-lg-6 col-xs-12">
+          <%= form.select :partner_referred_id, options_for_select(MieleRole.where.not(classification: nil).pluck(:name, :id), (@quotation.try(:partner_referred_id) ? @quotation.try(:partner_referred_id) : nil)), { include_blank: 'Ninguno' } %>
+          <div class="checkbox">
+            <label class="activation-tnr">
+              <input type="checkbox" class="check-item" name="quotation[preferential_customer]" id="quotation_preferential_customer" value="true" <%= @quotation.try(:preferential_customer) ? 'checked' : '' %>>
+              <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+              <span>Venta Preferencial</span>
+            </label>
+          </div>
+        </div>
+        <div class="col-lg-6 col-xs-12" id="linked-quotation">
+        </div>
+      </div>
+    </div>
+
+    <div class="row line-hr"></div>
+  <% end %>
+
+  <div class="col-xs-12">
+    <div class="row">
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :rut, 'Rut', class: 'control-label required' %>
+        <%= form.text_field :rut, required: true, autocomplete: true, class: "field-bordered", placeholder: "11111111-1", oninput: "checkRut(this);" %>
+        <label id="quotation_rut-error" class="error hidden" for="quotation_rut">Este campo es obligatorio.</label>
+      </div>
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :project_name, 'Nombre Proyecto', class: 'control-label' %>
+        <%= form.text_field :project_name, class: "field-bordered", placeholder: "Nombre Proyecto" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <div class="row">
+      <!-- nombre -->
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :name, 'Nombre', class: 'control-label required' %>
+        <%= form.text_field :name, required: true, class: "field-bordered", placeholder: "Nombre" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :lastname, 'Apellido Paterno', class: 'control-label required' %>
+        <%= form.text_field :lastname, required: true, class: "field-bordered", placeholder: "Apellido Paterno" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :second_lastname, 'Apellido Materno', class: 'control-label' %>
+        <%= form.text_field :second_lastname, class: "field-bordered", placeholder: "Apellido Materno" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :mobile_phone, 'Teléfono celular', class: 'control-label required' %>
+        <%= form.text_field :mobile_phone, class: "field-bordered", placeholder: "111111111", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :phone, 'Teléfono fijo', class: 'control-label' %>
+        <%= form.text_field :phone, class: "field-bordered", placeholder: "111111111", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <div class="row">
+      <!-- email -->
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :email, 'Correo Electrónico', class: 'control-label required' %>
+        <%= form.email_field :email, required: true, class: "field-bordered", 'data-bv-emailAddress-message': 'correo inválido', placeholder: "correo@mail.cl" %>
+      </div>
+      <div class="col-lg-6 col-xs-12">
+        <%= form.label :cost_center_id, 'Centro de costo', class: 'control-label' %>
+        <%= form.select :cost_center_id, options_for_select(CostCenter.all.collect{ |cc| [cc.code.to_s+' - '+cc.name, cc.id] }, current_user.try(:cost_center_id)), { required: true } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-md-6 col-xs-12">
+        <div class="row">
+          <!-- personal_address -->
+          <div class="quotation-address">
+            <%= form.label :personal_address, 'Dirección Personal', class: 'control-label' %>
+            <%= form.text_field :personal_address, required: true, class: "field-bordered", placeholder: "Dirección" %>
+          </div>
+          <!-- personal_address_number -->
+          <div class="quotation-number">
+            <%= form.label :personal_address_number, 'N°', class: 'control-label' %>
+            <%= form.text_field :personal_address_number, required: true, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+          </div>
+          <!-- dispath_dpto_number -->
+          <div class="quotation-dpto-number">
+            <%= form.label :personal_dpto_number, 'Dpto', class: 'control-label' %>
+            <%= form.text_field :personal_dpto_number, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xs-12">
+        <div class="row">
+          <!-- personal_address_commune -->
+          <div class="select2-address select2-full-border" id="personal-commune-content">
+            <%= form.label :personal_commune_id, 'Comuna', class: 'control-label' %>
+            <%= form.select :personal_commune_id, options_for_select(Commune.all.collect{ |commune| [commune.name_with_region, commune.id] }, (@quotation ? @quotation.personal_commune_id : 0)), { include_blank: 'Seleccione una ...', required: true }, OnChange: "ValidateSelec2('personal')" %>
+            <small class="selec2-error help-block mtop-0">No puede estar vacío</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- DUE DATA-->
+  <% if @cart.cart_items.where(dispatch: true).size > 0 %>
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-md-6 col-xs-12">
+        <div class="row">
+          <!-- dispatch_address -->
+          <div class="quotation-address">
+            <%= form.label :dispatch_address, 'Dirección Despacho', class: 'control-label' %>
+            <%= form.text_field :dispatch_address, required: true, class: "field-bordered", placeholder: "Dirección" %>
+          </div>
+          <!-- dispatch_address_number -->
+          <div class="quotation-number">
+            <%= form.label :dispatch_address_number, 'N°', class: 'control-label' %>
+            <%= form.text_field :dispatch_address_number, required: true, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+          </div>
+          <!-- dispath_dpto_number -->
+          <div class="quotation-dpto-number">
+            <%= form.label :dispatch_dpto_number, 'Dpto', class: 'control-label' %>
+            <%= form.text_field :dispatch_dpto_number, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+          </div>
+        </div>
+        <div class="checkbox no-top">
+          <label for="repeat-personal-dispatch" class="label-repeat">
+            <input type="checkbox" value="1" name="repeat" class="repeat-value" data-value="dispatch" data-from="personal" id="repeat-personal-dispatch">
+            <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+            Usar dirección personal
+          </label>
+        </div>
+      </div>
+      <div class="col-md-6 col-xs-12">
+        <div class="row">
+          <!-- dispatch_address_commune -->
+          <div class="select2-address select2-full-border" id="dispatch-commune-content">
+            <%= form.label :dispatch_commune_id, 'Comuna', class: 'control-label' %>
+            <%= form.select :dispatch_commune_id, options_for_select(Commune.all.collect{ |commune| [commune.name_with_region, commune.id] }, (@quotation ? @quotation.dispatch_commune_id : 0)), { include_blank: 'Seleccione una ...', required: true }, OnChange: "ValidateSelec2('dispatch')" %>
+            <small class="selec2-error help-block mtop-0">No puede estar vacío</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+  <% if @cart.cart_items.where(dispatch: false).size > 0 %>
+  <div class="col-lg-6 col-xs-12">
+    <%= form.label :retirement_date, 'Fecha de Retiro', class: 'control-label' %>
+    <%= form.text_field :retirement_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;", value: Time.now.try(:strftime, "%d/%m/%Y") %>
+  </div>
+  <% end %>
+  <!-- fecha estimada despacho -->
+  <% if @cart.cart_items.where(dispatch: true).size > 0 %>
+  <div class="col-lg-6 col-xs-12 estimated-dispatch-date">
+    <%= form.label :estimated_dispatch_date, 'Fecha estimada de Despacho', class: 'control-label' %>
+    <%= form.text_field :estimated_dispatch_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;", value: Time.now.try(:strftime, "%d/%m/%Y") %>
+  </div>
+  <% end %>
+  <% if @cart.cart_items.where(instalation: true).size > 0 %>
+  <div class="col-lg-6 col-xs-12">
+    <%= form.label :installation_date, 'Fecha de Instalación', class: 'control-label' %>
+    <%= form.text_field :installation_date, required: true, class: "field-bordered", placeholder: "DD/MM/AAAA", OnKeyDown: "return false;", value: Time.now.try(:strftime, "%d/%m/%Y") %>
+  </div>
+  <% end %>
+  <div class="col-lg-6 col-xs-12">
+    <div class="warning-msg">
+      Cotización válida durante <%= Product.offer_deadline(@cart.cart_items.pluck(:product_id), (current_user.manager? or current_user.seller?) ? [current_user.sale_channel.id] : SaleChannel.all.pluck(:id))[1] %> días
+    </div>
+  </div>
+  <% if @cart.cart_items.where(dispatch: false).size > 0 %>
+  <div class="col-lg-6 col-xs-12">
+    <div class="warning-msg">
+      Productos se retiran en tienda Miele Experience Center de Vitacura - Retiro puede estar sujeto a disponibilidad y horarios.
+    </div>
+  </div>
+  <% end %>
+  <% if Product.where(id: @cart.cart_items.pluck(:product_id)).where(built_in: true).size > 0 %>
+  <div class="col-lg-6 col-xs-12">
+    <div class="alert-msg">
+      Hay uno o más productos en la cotización que tienen fecha de entrega 60 días a partir del 100% del pago.
+    </div>
+  </div>
+  <% end %>
+  <% if @cart.cart_items.where(instalation: true).size > 0 %>
+  <div class="row line-hr"></div>
+  <div class="col-md-12 col-xs-12 bot-space">
+    <a class="collapsed row-toggle inlineb" role="button" data-toggle="collapse" data-parent="#accordion" href="#instalation-collapse" aria-expanded="false" aria-controls="instalation-collapse" id="instalation-collapsable"><h5>Dirección de Instalación +</h5></a>
+  </div>
+  <div id="instalation-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+    <div class="col-md-6 col-xs-12">
+      <div class="row">
+        <!-- instalation_address_street_type -->
+        <div style="float:left;width:110px;padding:0 5px 0 10px;">
+          <%= form.label :instalation_address_street_type, 'Tipo', class: 'control-label' %>
+          <%= form.select :instalation_address_street_type, options_for_select([ "Calle", "Avenida", "Pasaje", "Diagonal"]), { include_blank: 'Seleccione...' }, {class: 'select2-input-for-project', style:"width:100px;"} %>
+        </div>
+        <!-- instalation_address -->
+        <div class="quotation-address">
+          <%= form.label :instalation_address, 'Dirección Instalación', class: 'control-label' %>
+          <%= form.text_field :instalation_address, required: true, class: "field-bordered", placeholder: "Dirección" %>
+        </div>
+        <!-- instalation_address_number -->
+        <div class="quotation-number">
+          <%= form.label :instalation_address_number, 'N°', class: 'control-label' %>
+          <%= form.text_field :instalation_address_number, required: true, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+      <div class="row">
+        <!-- instalation_dpto_number -->
+        <div class="quotation-dpto-number">
+          <%= form.label :instalation_dpto_number, 'Dpto', class: 'control-label' %>
+          <%= form.text_field :instalation_dpto_number, class: "field-bordered", placeholder: "123", 'data-bv-regexp-message': 'Número inválido', 'data-bv-greaterThan-message': ' ', 'data-bv-numeric-message': 'Caracterés inválidos' %>
+        </div>
+        <!-- instalation_address_commune -->
+        <div class="select2-address select2-full-border" id="instalation-commune-content">
+          <%= form.label :instalation_commune_id, 'Comuna', class: 'control-label' %>
+          <%= form.select :instalation_commune_id, options_for_select(Commune.all.collect{ |commune| [commune.name_with_region, commune.id] }, (@quotation ? @quotation.instalation_commune_id : 0)), { include_blank: 'Seleccione una ...', required: true }, OnChange: "ValidateSelec2('instalation')" %>
+          <small class="selec2-error help-block">no puede estar vacío</small>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-xs-12">
+        <div class="col-md-5 col-xs-12 text-light pt11">
+          <div class="checkbox no-top">
+            <label for="repeat-personal-instalation" class="label-repeat">
+              <input type="checkbox" value="1" name="repeat" class="repeat-value" data-value="instalation" data-from="personal" id="repeat-personal-instalation">
+              <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+              Usar dirección personal
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% if @cart.cart_items.where(dispatch: true).size > 0 %>
+    <div class="row">
+      <div class="col-md-12 col-xs-12">
+        <div class="col-md-5 col-xs-12 text-light pt11">
+          <div class="checkbox no-top">
+            <label for="repeat-dispatch-instalation" class="label-repeat">
+              <input type="checkbox" value="1" name="repeat" class="repeat-value" data-value="instalation" data-from="dispatch" id="repeat-dispatch-instalation">
+              <span class="cr"><i class="cr-icon fas fa-check"></i></span>
+              Usar dirección de despacho
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% end %>
+  </div>
+  <% end %>
+
+  <div class="row line-hr"></div>
+
+  <!-- advertencia -->
+  <div class="col-lg-12 col-xs-12 bot-space">
+    <div class="btn-group">
+      <label id="boleta-label" class="btn btn-toggle document-type-option <%= !@quotation ? 'btn-toggle-active' : '' %>">
+        <input type="radio" name="quotation[document_type]" style="display: none;"
+        id="boleta-btn" autocomplete="off" value="boleta" checked> Boleta
+      </label>
+      <label id="factura-label" class="btn btn-toggle document-type-option <%= (@quotation and @quotation.try(:document_type) == 'factura') ? 'btn-toggle-active' : '' %>">
+        <input type="radio" name="quotation[document_type]" style="display: none;"
+        id="factura-btn" autocomplete="off" value="factura"> Factura
+      </label>
+    </div>
+  </div>
+
+  <%= render 'quotations/form/bill_address', form: form %>
+
+  <div class="row line-hr"></div>
+
+  <!-- descripción -->
+  <div class="col-xs-12">
+    <%= form.label :observations, 'Observaciones', class: 'control-label' %>
+    <%= form.text_area :observations, rows: 4, class: "text-area-shadow-0 field-bordered full-width" %>
+  </div>
+</div>
+
+<% if @cart.promotional_code %>
+  <%= hidden_field_tag 'quotation[promotional_code_id]', @cart.promotional_code.id %>
+<% end %>
+<%= hidden_field_tag 'quotation[sale_channel_id]', current_user.sale_channel_id %>
+<%= hidden_field_tag 'quotation[miele_role_id]', current_user.miele_role_id %>
+<%= hidden_field_tag 'quotation[bstock]', @cart.bstock %>
+<%= hidden_field_tag 'quotation[apply_discount]', @cart.apply_discount %>
+<%= hidden_field_tag 'quotation[currency]', quotation_currency_from_params %>
+
+<script>
+  var business_name, business_sector, business_rut, billing_address, billing_address_number, billing_dpto_number, billing_commune_id = '';
+  $("#quotation_cost_center_id").select2();
+  $('#quotation_dispatch_commune_id').on('select2:select', function (e) {
+    $.post('/quotations/<%= @cart.id.to_s %>/check_dispatch/'+e.params.data.id+'.js')
+  });
+  <% if params[:action] == 'edit' and @quotation.try(:dispatch_commune_id) %>
+  $.post('/quotations/<%= @cart.id.to_s %>/check_dispatch/<%= @quotation.dispatch_commune_id %>.js')
+  <% end %>
+  $(".repeat-value").change(function(){
+    console.log($("#quotation_"+$(this).attr("data-from")+"_address_street_type").val())
+    if($(this).prop("checked")){
+      $("#quotation_"+$(this).attr("data-value")+"_address_street_type").val($("#quotation_"+$(this).attr("data-from")+"_address_street_type").val());
+      $("#quotation_"+$(this).attr("data-value")+"_address").val($("#quotation_"+$(this).attr("data-from")+"_address").val());
+      $("#quotation_"+$(this).attr("data-value")+"_address_number").val($("#quotation_"+$(this).attr("data-from")+"_address_number").val());
+      $("#quotation_"+$(this).attr("data-value")+"_dpto_number").val($("#quotation_"+$(this).attr("data-from")+"_dpto_number").val());
+      $("#quotation_"+$(this).attr("data-value")+"_commune_id").val($("#quotation_"+$(this).attr("data-from")+"_commune_id").val());
+      $("#quotation_"+$(this).attr("data-value")+"_commune_id").trigger("change");
+      if($(this).attr("data-value") == 'dispatch'){
+        $.post('/quotations/<%= @cart.id.to_s %>/check_dispatch/'+$("#quotation_dispatch_commune_id").val()+'.js');
+      }
+    } else {
+      $("#quotation_"+$(this).attr("data-value")+"_address_street_type").val("");
+      $("#quotation_"+$(this).attr("data-value")+"_address").val("");
+      $("#quotation_"+$(this).attr("data-value")+"_address_number").val("");
+      $("#quotation_"+$(this).attr("data-value")+"_dpto_number").val("");
+      $("#quotation_"+$(this).attr("data-value")+"_commune_id").val("");
+      $("#quotation_"+$(this).attr("data-value")+"_commune_id").trigger("change");
+      if($(this).attr("data-value") == 'dispatch'){
+        $("#dispatch-info").html("");
+        $("#dispatch-value").html("");
+      }
+    }
+  });
+
+  function setBillingParams(){
+    $("#quotation_business_name").val(business_name);
+    $("#quotation_business_rut").val(business_rut);
+    $("#quotation_business_sector").val(business_sector);
+    $("#quotation_billing_address").val(billing_address);
+    $("#quotation_billing_address_number").val(billing_address_number);
+    $("#quotation_billing_dpto_number").val(billing_dpto_number);
+    $("#quotation_billing_commune_id").val(billing_commune_id);
+    $("#quotation_billing_commune_id").trigger("change");
+    $("#quotation_billing_commune_id").parent().removeClass('has-error');
+  }
+
+
+  $('#factura-label').click(function () {
+    $("#boleta-label").removeClass("btn-toggle-active");
+    $("#factura-label").addClass("btn-toggle-active");
+    $("#document-type").val("factura");
+    $("#bill-address-container").removeClass("hidden");
+    $("#quotation_business_name").attr("required", "true");
+    $("#quotation_business_rut").attr("required", "true");
+    $("#quotation_billing_address").attr("required", "true");
+    $("#quotation_billing_address_number").attr("required", "true");
+    $("#quotation_billing_commune_id").attr("required", "true");
+    setBillingParams();
+    ValidateSelec2('billing');
+    if($(this).valid() && ($('.bform').find('.has-error').length == 0)){
+      $('#submit-quotation').prop("disabled", false);
+    } else {
+      $('#submit-quotation').prop("disabled", true);
+    }
+  });
+  $('#boleta-label').click(function () {
+    $("#factura-label").removeClass("btn-toggle-active");
+    $("#boleta-label").addClass("btn-toggle-active");
+    $("#document-type").val("boleta");
+    $("#bill-address-container").addClass("hidden");
+    $("#quotation_business_name").removeAttr("required");
+    $("#quotation_business_name").removeAttr("aria-required");
+    $("#quotation_business_name").val("");
+    $("#quotation_business_rut").removeAttr("required");
+    $("#quotation_business_rut").removeAttr("aria-required");
+    $("#quotation_business_rut").val("");
+    $("#quotation_billing_address").removeAttr("required");
+    $("#quotation_billing_address").removeAttr("aria-required");
+    $("#quotation_billing_address").val("");
+    $("#quotation_billing_address_number").removeAttr("required");
+    $("#quotation_billing_address_number").removeAttr("aria-required");
+    $("#quotation_billing_address_number").val("");
+    $("#quotation_billing_dpto_number").removeAttr("aria-required");
+    $("#quotation_billing_dpto_number").val("");
+    $("#quotation_billing_commune_id").removeAttr("required");
+    $("#quotation_billing_commune_id").removeAttr("aria-required");
+    $("#quotation_billing_commune_id").val("");
+    $("#quotation_billing_commune_id").trigger("change");
+    $("#quotation_billing_commune_id").parent().removeClass('has-error');
+    if($(this).valid() && ($('.bform').find('.has-error').length == 0)){
+      $('#submit-quotation').prop("disabled", false);
+    } else {
+      $('#submit-quotation').prop("disabled", true);
+    }
+  });
+
+  $('.document-type-option').click(function(){
+    $("#business-data").removeClass("hidden");
+    $('.repeat-value').prop('checked', false);
+
+  })
+
+  function fill_form_quotation(item){
+    $("#quotation_name").val(item.name);
+    $("#quotation_phone").val(item.phone);
+    $("#quotation_mobile_phone").val(item.mobile_phone);
+    $("#quotation_email").val(item.email);
+    $("#quotation_lastname").val(item.lastname);
+    $("#quotation_second_lastname").val(item.second_lastname);
+    $("#quotation_personal_address_street_type").val(item.personal_address_street_type)
+    $("#quotation_personal_address_street_type").trigger('change');;
+    $("#quotation_personal_address").val(item.personal_address);
+    $("#quotation_personal_address_number").val(item.personal_address_number);
+    $("#quotation_personal_dpto_number").val(item.personal_dpto_number);
+    $("#quotation_personal_commune_id").val(item.personal_commune_id);
+    $("#quotation_personal_commune_id").trigger('change');
+    $("#linked-quotation").html(item.linked_to);
+
+    <% if @cart.cart_items.where(dispatch: true).size > 0 %>
+      $("#quotation_dispatch_address_street_type").val(item.dispatch_address_street_type);
+      $("#quotation_dispatch_address_street_type").trigger('change');
+      $("#quotation_dispatch_address").val(item.dispatch_address);
+      $("#quotation_dispatch_address_number").val(item.dispatch_address_number);
+      $("#quotation_dispatch_dpto_number").val(item.dispatch_dpto_number);
+      $("#quotation_dispatch_commune_id").val(item.dispatch_commune_id);
+      $("#quotation_dispatch_commune_id").trigger('change');
+      $.post('/quotations/<%= @cart.id.to_s %>/check_dispatch/'+$("#quotation_dispatch_commune_id").val()+'.js');
+    <% end %>
+
+    <% if @cart.cart_items.where(instalation: true).size > 0 %>
+    $("#quotation_instalation_address").val(item.instalation_address);
+    $("#quotation_instalation_address_number").val(item.instalation_address_number);
+    $("#quotation_instalation_dpto_number").val(item.instalation_dpto_number);
+    $("#quotation_instalation_commune_id").val(item.instalation_commune_id);
+    $("#quotation_instalation_commune_id").trigger('change');
+    <% end %>
+    business_name = item.business_name;
+    business_sector = item.business_sector;
+    business_rut = item.business_rut;
+    billing_address = item.billing_address;
+    billing_address_number = item.billing_address_number;
+    billing_dpto_number = item.billing_dpto_number;
+    billing_commune_id = item.billing_commune_id;
+    setBillingParams();
+
+    $("#quotation_rut").val(item.rut);
+    $("#quotation_rut").trigger("change");
+  }
+
+  $("#quotation_rut").autocomplete({
+    source: function( request, response ) {
+      $.ajax( {
+        url: "/customers/search.json",
+        dataType: "json",
+        data: {
+          rut: $("#quotation_rut").val()
+        },
+        success: function( data ) {
+          response( data );
+        },
+
+      });
+    },
+    select: function( event, ui ) {
+      event.preventDefault();
+      fill_form_quotation(ui.item);
+    },
+    minLength: 2
+  }).autocomplete( "instance" )._renderItem = function( ul, item ) {
+    return $( "<li>" )
+    .append('<div>'+item.rut+' - '+item.fullname+'</div>')
+    .appendTo( ul );
+  };
+</script>

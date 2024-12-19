@@ -1,0 +1,9 @@
+<p>
+	Estimado(a) <%= @quotation.user.fullname %>, 
+</p>
+<p>
+	La cotización N° <%= @quotation.code %> fue enviada con éxito el día <%= @quotation.created_at.strftime("%d/%m/%Y") %> a <%= @quotation.email %>
+</p>
+<p>
+	Puedes revisar la cotización <%= link_to 'en el siguiente link', quotation_url(@quotation), target: "_blank" %>.
+</p>

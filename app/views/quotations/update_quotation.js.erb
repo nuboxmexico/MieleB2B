@@ -1,0 +1,7 @@
+<% if @success == true %>
+$(".toast-bottom-right-custom").remove();
+toastr['info']('<%= t(@updated) %> actualizada con éxito.');
+<% else %>
+$(".toast-bottom-right-custom").remove();
+toastr['error']('No es posible actualizar la orden de flete. Vuelva a intentarlo.');
+<% end %>

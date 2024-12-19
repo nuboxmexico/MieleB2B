@@ -1,0 +1,224 @@
+<div>
+
+    <div class="quotation-box pad-box" id="unit_div_<%= unit_real_state.id %>">
+        <div class="row">
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Tipo Unidad Inmobiliaria</p>
+                <input class="input-real_state" type="text" name="u_tit" multiple="true" id=<%="type_unit_"+unit_real_state.id.to_s%> value="<%= unit_real_state.config_type %>">
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">N&uacute;mero</p>
+                <input class="input-real_state validate_uniq_number" type="text" name="u_tit" multiple="true" id=<%="number_unit_"+unit_real_state.id.to_s%> value="<%= unit_real_state.config_number %>">
+            </div>
+        </div>
+
+        <br>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p class="title-input-real_state">Productos asociados</p>
+            <div>
+                <a href="?p=<%= unit_real_state.id %>#configUnitRealStateModal" data-toggle="modal" data-unit_real_state-id="<%= unit_real_state.id %>" style="font-weight: normal;">
+                    <div class="add_products_to_unit_real_state"><i class="fa fa-plus"></i> Agregar productos</div>
+                </a>
+            </div>
+        </div>
+
+        <div style="border: 1px solid #EEEEEE">
+            <div class="row hidden-xs hidden-sm text-center">
+                <div class="col-md-5 title-products title-input">
+                    Nombre
+                </div>
+                <div class="col-md-3 title-products title-input">
+                    TNR
+                </div>
+                <div class="col-md-2 title-products title-input">
+                    Cantidad
+                </div>
+                <div class="col-md-2 title-products title-input">
+                    
+                </div>
+            </div>
+
+
+            <% unit_real_state.product_in_unit_real_states.each do |product_in_unit| %>  
+                <div class="row hidden-xs hidden-sm text-center" style="margin-bottom: 5px;" id="prod_in_unit_div_<%= unit_real_state.id %>_<%= product_in_unit.id %>">
+                    <div class="col-md-5 content-input">
+                        <%= product_in_unit.name %>
+                    </div>
+                    <div class="col-md-3 content-input">
+                        <%= product_in_unit.sku %>
+                    </div>
+                    <div class="col-md-2 content-input" id="quantity_product_in_real_state_unit-<%= product_in_unit.id %>">
+                        <span class="quantityorigin_<%= unit_real_state.id %>" id="quantityorigin_<%= product_in_unit.quotation_product_id %>"><%= product_in_unit.quantity %><span>
+                    </div>
+                    <div class="col-md-2 content-input">
+                        <a href="#!" onclick="deleteProductInUnit(<%= product_in_unit.id %>, <%= unit_real_state.id %>)">
+                            <i class="fa fa-times bold change-color"></i>
+                        </a>
+                    </div>
+                </div>
+            <% end %>
+
+            <br>
+        </div>
+
+        <br>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <a href="#!" onclick="deleteCfgUnit(<%= unit_real_state.id %>)" style="font-weight: bold;">
+                    <div class="delete_config_unit_real_state"><i class="fa fa-times"></i> Eliminar unidad inmobiliaria</div>
+                </a>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 10px;">
+                    <span style="margin-right: 5px;"><strong>Clonar</strong></span>
+
+                    <input class="input-real_state" style="width: 40px; padding-left: 5px !important; padding-right: 0px !important;" type="number" id="clonetimes_<%= unit_real_state.id %>" min="1" max="" value="" onchange="">
+
+                    <a class="btn btn-miele btn-miele-rounded-circle <%= 'disabled' unless unit_real_state.product_in_unit_real_states.count > 0 %>" onclick="clone(<%= unit_real_state.id %>)"> 
+                        <i class="fa fa-check bold"></i>
+                    </a>
+
+                </div>
+
+                <a class="btn btn-miele save-dispatch" onclick="updateCfgUnit(<%= unit_real_state.id %>)">
+                    Guardar
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function deleteCfgUnit(id){
+        $.ajax({
+                url: `/config_unit_real_states/${id}`,
+                type : 'delete'
+            }).done(function (data) {                    
+            })
+    }
+
+    function updateCfgUnit(id){
+        var isValid = validateUniqNumber(id);
+        if (isValid) {
+            var data = {
+            config_unit_real_state: {
+                config_type: document.getElementById('type_unit_'+id).value,
+                config_number: document.getElementById('number_unit_'+id).value,
+                quotation_id: <%=quotation.id%>
+                }
+            }
+            $.ajax({
+                    url: `/config_unit_real_states/${id}`,
+                    type : 'patch',
+                    data: data
+                }).done(function (data) {
+            })
+        } else {
+            var numberElem = document.getElementById(`number_unit_${id}`);
+            numberElem.classList.toggle("wrong_input");
+            setTimeout(() => { numberElem.classList.toggle("wrong_input"); }, 1000);
+        }
+    }
+
+    function validateUniqNumber(id) {
+        var allNumberElems = document.querySelectorAll('.validate_uniq_number');
+        var newNumber = document.getElementById(`number_unit_${id}`).value;
+        var allNumberArr = [];
+        allNumberElems.forEach(function(elem) { allNumberArr.push(elem.value); } );
+        
+        var indexMyNumber = allNumberArr.findIndex(item => item === newNumber);
+        allNumberArr.splice(indexMyNumber, 1);
+
+        if (allNumberArr.includes(newNumber)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function deleteProductInUnit(id, unitId) {
+        $.ajax({
+            url: `/product_in_unit_real_state/${id}`,
+            type : 'delete'
+            }).done(function (data) {
+            })
+    }
+
+
+    async function clone(unitId) {
+        const timesToCloneElem = document.querySelector(`#clonetimes_${unitId}`);
+        const timesToClone = parseInt(timesToCloneElem.value);
+
+        if (!isNaN(timesToClone)) {
+            if (await allowClone(unitId, timesToClone)) {
+                const data = { config_unit_id: unitId, times_to_clone: timesToClone };
+                $.ajax({
+                    url: "/clone_unit",
+                    type : 'post',
+                    data: data
+                }).done(function (data) {
+                })
+            } else {
+                swal({
+                    title: "Alerta",
+                    text: 'No es posible clonar esta unidad inmobiliaria debido a que uno o más productos ya no tienen más unidades por asignar.',
+                    type: "warning",
+                    showCancelButton: false,
+                    confirmButtonText: "Cerrar",
+                    cancelButtonText: "Cancelar"
+                });
+            }
+        } else {
+            swal({
+                title: "Datos insuficientes",
+                text: 'Es necesario que ingrese el número de veces que desea clonar la unidad inmobiliaria.',
+                type: "warning",
+                showCancelButton: false,
+                confirmButtonText: "Cerrar",
+                cancelButtonText: "Cancelar"
+            });
+        }
+    }
+
+    async function allowClone(unitId, timesToClone) {
+        const quantityOriginElems = document.querySelectorAll(`.quantityorigin_${unitId}`);
+        let isAllowed = true;
+
+        await asyncForEach(quantityOriginElems, async (item) => {
+            const htmlId = item.id
+            const quotProdId = parseInt(htmlId.split('_')[1]);
+            const quantityOrigin = parseInt(item.innerText);
+            const quantityNeeded = quantityOrigin * timesToClone;
+            const response = await getToAssignQuant(quotProdId);
+            if (response) {
+                const quantityAvailable = response.quantity;
+                if (quantityNeeded > quantityAvailable) {
+                    isAllowed = false;
+                }
+            }
+        })
+        return isAllowed;
+    }
+
+    async function getToAssignQuant(quotProdId) {
+        const result = await fetch(`${window.location.origin}/get_updated_to_assign_quantity/${quotProdId}`)
+            .then(response => response.json())
+            .then(data => {
+                return data;
+            })
+            .catch(error => { return null });
+        return result;
+        }
+
+    async function asyncForEach(array, callback) {
+        for (let index = 0; index < array.length; index++) {
+            await callback(array[index], index, array);
+        }
+    }
+
+</script>

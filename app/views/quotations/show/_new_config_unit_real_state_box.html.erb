@@ -1,0 +1,116 @@
+<div>
+
+    <div class="quotation-box pad-box">
+        <div class="row">
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">Tipo Unidad Inmobiliaria</p>
+                <input class="input-real_state" type="text" name="u_tit" multiple="true" id="type_unit" value="<%= nil %>">
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <p class="title-input-real_state">N&uacute;mero</p>
+                <input class="input-real_state" type="text" name="u_tit" multiple="true" id="number_unit" value="<%= nil %>">
+            </div>
+        </div>
+
+        <br>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p class="title-input-real_state">Productos asociados</p>
+            <div>
+                <a href="#!" data-toggle="" data-unit_real_state-id="0" onclick="warning()" style="font-weight: normal;">
+                    <div class="add_products_to_unit_real_state"><i class="fa fa-plus"></i> Agregar productos</div>
+                </a>
+            </div>
+        </div>
+
+        <div style="border: 1px solid #EEEEEE">
+            <div class="row hidden-xs hidden-sm text-center">
+                <div class="col-md-5 title-products title-input">
+                    Nombre
+                </div>
+                <div class="col-md-3 title-products title-input">
+                    TNR
+                </div>
+                <div class="col-md-2 title-products title-input">
+                    Cantidad
+                </div>
+                <div class="col-md-2 title-products title-input">
+                    
+                </div>
+            </div>
+
+
+            <br>
+        </div>
+
+        <br>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>                
+                <a href="#!" onclick="deleteCfgUnitAux()" style="font-weight: bold;">
+                    <div class="delete_config_unit_real_state"><i class="fa fa-times"></i> Eliminar unidad inmobiliaria</div>
+                </a>
+            </div>
+            
+            <a class="btn btn-miele save-dispatch" onclick="createCfgUnit(<%=@quotation.id%>)">
+                Guardar
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+  function deleteCfgUnitAux() {
+    document.getElementById('add_config_unit_real_state_project').style.display = "";
+    $("#all_new_config_unit_real_state").empty();
+  }
+
+  function createCfgUnit(quotation_id) {
+    var isValid = validateUniqNumber();
+    if (isValid) {
+        var data = {        
+            config_unit_real_state: {
+                config_type: document.getElementById('type_unit').value,
+                config_number: document.getElementById('number_unit').value,
+                quotation_id: quotation_id
+            }
+        }
+        $.ajax({
+                url: "/config_unit_real_states",
+                type : 'post',
+                data: data
+            }).done(function (data) {
+                $("#all_new_config_unit_real_state").empty(); 
+                document.getElementById('add_config_unit_real_state_project').style.display = "";
+        })
+    } else {
+        var numberElem = document.getElementById('number_unit');
+        numberElem.classList.toggle("wrong_input");
+        setTimeout(() => { numberElem.classList.toggle("wrong_input"); }, 1000);
+    }
+  }
+
+    function validateUniqNumber() {
+        var oldNumberElems = document.querySelectorAll('.validate_uniq_number');
+        var newNumber = document.getElementById('number_unit').value;
+        var oldNumberArr = [];
+        oldNumberElems.forEach(function(elem) { oldNumberArr.push(elem.value); } );
+        if (oldNumberArr.includes(newNumber)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function warning() {
+        swal({
+            title: "Agregar productos",
+            text: 'Es necesario que guarde la unidad inmobiliaria antes de agregar productos.',
+            type: "warning",
+            showCancelButton: false,
+            confirmButtonText: "Continuar",
+            cancelButtonText: "Cancelar"
+            });
+    }
+</script>

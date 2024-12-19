@@ -1,0 +1,1085 @@
+<style>
+	input[type=number]::-webkit-inner-spin-button,
+	input[type=number]::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	.nav > li > a {
+		padding-bottom: 18px !important;
+	}
+	
+	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus{
+		border-bottom: 3px solid #8C0314 !important;
+	}
+</style>
+<div class="row row-content">
+	<div class="col-xs-12">
+		<ol class="breadcrumb white-background">
+			<% if current_user.manager? or current_user.administrator? %>
+				<li><a href="<%= root_path %>">Inicio</a></li>
+			<% end %>
+			<li><a href="<%= business_units_path %>">Business Units</a></li>
+			<li><a href="<%= products_path(business_unit: @product.families.find_by(family_id: nil).name) %>"><%= @product.families.find_by(family_id: nil).name %></a></li>
+			<li><%= @product.name %></li>
+		</ol>
+	</div>
+</div>
+<div class="row">
+	<% if @product.images.size > 0 %>
+	<div class="col-md-2 col-lg-2 col-xs-4 col-sm-3 text-right">
+		<div class="swiper-container" id="mobile-swiper">
+			<div class="swiper-wrapper">
+				<% @product.images.each do |image| %>
+				<div class="swiper-slide"><%= image_tag(image.image.url(:original), class:'thumbnail-img')%></div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+	<% end %>
+	<div class="col-md-4 col-xs-8 col-sm-4">
+		<div class="principal-box-image">
+			<% if @product.display_price(current_user)[0] and !@product.outlet %>
+			<span class="black-card-photo">-<%= @product.display_price(current_user)[2].to_f.round(1) %>%</span>
+			<% end %>
+			<%= image_tag(@product.get_product_photo, class:'product-image')%>
+		</div>
+	</div>
+	<% if params[:bstock] %>
+		<%= render 'products/bstock_details' %>
+	<% else %>
+		<%= render 'products/details' %>
+	<% end %>
+</div>
+<br>
+</main>
+<div class="content-wrapper-product">
+	<main class="container-product">
+		<div class="row hidden-sm hidden-xs top-space">
+			<div class="col-md-12 col-lg-12 text-center">
+				<h3 class="extra-info-title">Todas las ventajas de un producto Miele</h3>
+			</div>
+			<br>
+		</div>
+		<div class="row hidden-sm hidden-xs top-space">
+			<div class="col-md-6 col-lg-6 left-description">
+				<% if @product.features %>
+					<%= @product.features.html_safe %>
+				<% end %>
+				<% if @product.technical_specs %>
+					<%= @product.technical_specs.html_safe %>
+				<% end %>
+			</div>
+			<div class="col-md-6 col-lg-6 border-left-product-info more-pad-sides" id="accordion-desktop">
+				<% if @product.specs %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Especificaciones
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#specs-desktop">
+							<i class="fa fa-angle-down open-tab miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="specs-desktop" class="panel-collapse collapse in padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="specs_icon" data-name="specs">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="specs">
+						<%= @product.specs.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="specs_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :specs, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.product_functions %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Funciones
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#product_functions-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="product_functions-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="product_functions_icon" data-name="product_functions">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="product_functions">
+						<%= @product.product_functions.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="product_functions_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :product_functions, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.drink_specialty %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Especialidades de bebidas
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#drink_specialty-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="drink_specialty-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="drink_specialty_icon" data-name="drink_specialty">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="drink_specialty">
+						<%= @product.drink_specialty.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="drink_specialty_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :drink_specialty, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.basket_design %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Diseño de los cestos
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#basket_design-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="basket_design-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="basket_design_icon" data-name="basket_design">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="basket_design">
+						<%= @product.basket_design.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="basket_design_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :basket_design, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.wash_program %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Programa de lavado
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#wash_program-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="wash_program-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="wash_program_icon" data-name="wash_program">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="wash_program">
+						<%= @product.wash_program.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="wash_program_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :wash_program, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.dry_program %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Programa de secado
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#dry_program-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="dry_program-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="dry_program_icon" data-name="dry_program">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="dry_program">
+						<%= @product.dry_program.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="dry_program_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :dry_program, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.maintenance_care %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Cuidado y mantenimiento
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#maintenance_care-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="maintenance_care-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="maintenance_care_icon" data-name="maintenance_care">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="maintenance_care">
+						<%= @product.maintenance_care.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="maintenance_care_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :maintenance_care, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.security %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Seguridad
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#security-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="security-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="security_icon" data-name="security">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="security">
+						<%= @product.security.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="security_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :security, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.efficiency_sustain %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Eficiencia y sostenibilidad
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#efficiency_sustain-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="efficiency_sustain-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="efficiency_sustain_icon" data-name="efficiency_sustain">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="efficiency_sustain">
+						<%= @product.efficiency_sustain.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="efficiency_sustain_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :efficiency_sustain, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+				<% if @product.accessories %>
+				<div class="row padding-title-info">
+					<div class="col-md-10 col-lg-10">
+						Accesorios y suministros
+					</div>
+					<div class="col-md-2 col-lg-2 text-right">
+						<a data-toggle="collapse" data-parent="#accordion-desktop" href="#accessories-desktop">
+							<i class="fa fa-angle-down miele-text pt28 text-right"></i>
+						</a>
+					</div>
+				</div>
+				<div id="accessories-desktop" class="panel-collapse collapse padding-content">
+					<% if can? :update, Product %>
+					<div class="row bot-space">
+						<div class="pull-right">
+							<button type="button" class="btn btn-edit-product btn-edit" id="accessories_icon" data-name="accessories">
+								<i class="fa fa-pen miele-text"></i>
+							</button>
+						</div>
+					</div>
+					<% end %>
+					<div id="accessories">
+						<%= @product.accessories.try(:html_safe) %>
+					</div>
+					<% if can? :update, Product %>
+					<div id="accessories_edit" class="hidden">
+						<%= form_for @product, remote: true do |f| %>
+						<div class="row">
+							<%= f.text_area :accessories, :class => "tinymce", :rows => 10, :cols => 60 %>
+						</div>
+						<div class="row">
+							<div class="pull-right">
+								<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+							</div>
+						</div>
+						<% end %>
+					</div>
+					<% end %>
+				</div>
+				<div class="border-bottom-separation"></div>
+				<% end %>
+			</div>
+		</div>
+
+		<div class="panel-group no-bot hidden-md hidden-lg" id="accordion-mobile">
+			<% if @product.specs %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Especificaciones
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#specs-mobile">
+									<i class="fa fa-angle-down open-tab miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="specs-mobile" class="panel-collapse collapse in">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="specs_icon-mobile" data-name="specs">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="specs-mobile-info">
+							<%= @product.specs.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="specs_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :specs, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.features %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Características
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#features-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="features-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<%= @product.features.html_safe %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.technical_specs %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Especificaciones técnicas
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#technical_specs-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="technical_specs-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<%= @product.technical_specs.html_safe %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.product_functions %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Funciones
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#functions-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="functions-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="product_functions_icon-mobile" data-name="product_functions">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="product_functions-mobile-info">
+							<%= @product.product_functions.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="product_functions_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :product_functions, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.drink_specialty %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Especialidad de bebidas
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#drink_specialty-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="drink_specialty-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="drink_specialty_icon-mobile" data-name="drink_specialty">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="drink_specialty-mobile-info">
+							<%= @product.drink_specialty.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="drink_specialty_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :drink_specialty, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.basket_design %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Diseño de los cestos
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#basket_design-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="basket_design-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="basket_design_icon-mobile" data-name="basket_design">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="basket_design-mobile-info">
+							<%= @product.basket_design.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="basket_design_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :basket_design, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.wash_program %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Programa de lavado
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#wash_program-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="wash_program-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="wash_program_icon-mobile" data-name="wash_program">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="wash_program-mobile-info">
+							<%= @product.wash_program.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="wash_program_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :wash_program, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.dry_program %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Programa de secado
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#dry_program-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="dry_program-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="dry_program_icon-mobile" data-name="dry_program">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="dry_program-mobile-info">
+							<%= @product.dry_program.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="dry_program_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :dry_program, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.maintenance_care %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Cuidado y mantenimiento
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#maintenance_care-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="maintenance_care-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="maintenance_care_icon-mobile" data-name="maintenance_care">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="maintenance_care-mobile-info">
+							<%= @product.maintenance_care.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="maintenance_care_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :maintenance_care, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.security %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Seguridad
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#security-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="security-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="security_icon-mobile" data-name="security">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="security-mobile-info">
+							<%= @product.security.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="security_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :security, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.efficiency_sustain %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Eficiencia y sostenibilidad
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#sustain-mobile">
+									<i class="fa fa-angle-down  miele-text pt28 text-right"></i>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="sustain-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="efficiency_sustain_icon-mobile" data-name="efficiency_sustain">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="efficiency_sustain-mobile-info">
+							<%= @product.efficiency_sustain.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="efficiency_sustain_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :efficiency_sustain, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+			<% if @product.accessories %>
+			<div class="panel panel-default back-gray-panel">
+				<div class="head-accordion">
+					<h4 class="panel-title panel-title-product">
+						<div class="row">
+							<div class="col-xs-10 col-sm-10">
+								Accesorios y suministros
+							</div>
+							<div class="col-xs-2 col-sm-2">
+								<a data-toggle="collapse" data-parent="#accordion-mobile" href="#accessories-mobile">
+									<span class="text-right"><i class="fa fa-angle-down  miele-text pt28 text-right"></i></span>
+								</a>
+							</div>
+						</div>
+					</h4>
+				</div>
+				<div id="accessories-mobile" class="panel-collapse collapse">
+					<div class="panel-product">
+						<% if can? :update, Product %>
+						<div class="row bot-space">
+							<div class="pull-right">
+								<button type="button" class="btn btn-edit-product btn-edit btn-mobile" id="accessories_icon-mobile" data-name="accessories">
+									<i class="fa fa-pen miele-text"></i>
+								</button>
+							</div>
+						</div>
+						<% end %>
+						<div id="accessories-mobile-info">
+							<%= @product.accessories.try(:html_safe) %>
+						</div>
+						<% if can? :update, Product %>
+						<div id="accessories_edit_mobile" class="hidden">
+							<%= form_for @product, remote: true do |f| %>
+							<div class="row">
+								<%= f.text_area :accessories, :class => "tinymce", :rows => 10, :cols => 60 %>
+							</div>
+							<div class="row">
+								<div class="pull-right">
+									<%= f.submit 'Guardar', class: 'btn btn-miele top-space submit-edit' %>
+								</div>
+							</div>
+							<% end %>
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% end %>
+		</div>
+
+
+
+
+		<br>
+		<script>
+			<% if @product.images.size > 0 %>
+			var swiper = new Swiper('#mobile-swiper', {
+				direction: 'vertical',
+				slidesPerView: 3,
+				spaceBetween: 20
+			});
+
+			$(".thumbnail-img").click(function(){
+				$(".product-image").prop("src", $(this).prop("src"));
+			})
+			<% end %>
+			var stock = <%= @product.stock %>
+			function increaseValue() {
+				var value = parseInt(document.getElementById('number').value, 10);
+				value = isNaN(value) ? 0 : value;
+				if(<%= current_user.can_manage_project_quotations? %> || (value + 1 <= stock)){
+					value++;
+					document.getElementById('number').value = value;
+				}
+			}
+
+			function decreaseValue() {
+				var value = parseInt(document.getElementById('number').value, 10);
+				value = isNaN(value) ? 0 : value;
+				value < 1 ? value = 1 : '';
+				value--;
+				if(value > 0){
+					document.getElementById('number').value = value;
+				}
+			}
+
+			$(".pt28").click(function(){
+				if($(this).hasClass('open-tab')){
+					$(this).removeClass('open-tab');
+				} else {
+					$(this).addClass('open-tab');
+				}
+			})
+
+			$(document).ready(function(){
+				$(".btn-edit").click(function(){
+					if($("#"+$(this).data("name")).hasClass("hidden")){
+						$("#"+$(this).data("name")+"_edit").addClass("hidden");
+						$("#"+$(this).data("name")).removeClass("hidden");
+						$(this).html("<i class='fa fa-pen miele-text'></i>");
+					} else {
+						$("#"+$(this).data("name")+"_edit").removeClass("hidden");
+						$("#"+$(this).data("name")).addClass("hidden");
+						$(this).html("<i class='fa fa-times miele-text'></i>");
+					}
+				});
+				$(".btn-mobile").click(function(){
+					if($("#"+$(this).data("name")+"-mobile-info").hasClass("hidden")){
+						$("#"+$(this).data("name")+"_edit_mobile").addClass("hidden");
+						$("#"+$(this).data("name")+"-mobile-info").removeClass("hidden");
+						$(this).html("<i class='fa fa-pen miele-text'></i>");
+					} else {
+						$("#"+$(this).data("name")+"_edit_mobile").removeClass("hidden");
+						$("#"+$(this).data("name")+"-mobile-info").addClass("hidden");
+						$(this).html("<i class='fa fa-times miele-text'></i>");
+					}
+				});
+			});
+		</script>
+
+		<%= tinymce %>

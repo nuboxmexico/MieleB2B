@@ -1,0 +1,75 @@
+<% if params[:controller] == 'products' and params[:action] == 'business_units' and @banners.size > 0 %>
+<section id="info-carousel" class="carousel slide carousel-main" data-ride="carousel">
+  <div class="row row-header">
+    <div class="text-left toggle-banner-custom">
+      <a href="#" class="sidebar-toggle height-custom" data-toggle="offcanvas" role="button" id="toggle-bu">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+    </div>
+    <div class="text-center">
+     <%= link_to image_tag('logo.png', alt: 'miele', class: 'logo-miele'), root_path, class: "brand-logo-link", id: 'logo-miele' %> 
+   </div>
+   <div class="text-right cart-separation">
+    <% if can? :index, Cart %>
+    <%= link_to "<i class='fas fa-shopping-cart'></i><span id='items-in-cart' class='badge badge-cart'>#{current_user.cart_products}</span>".html_safe, cart_path, id: "shopping-cart" %>
+    <% end %>
+  </div>
+</div>
+<!-- Wrapper for slides -->
+<!-- Indicators -->
+<ol class="carousel-indicators">
+  <% (0..@banners.size-1).each do |i| %>
+  <% if i == 0 %>
+  <li data-target="#info-carousel" data-slide-to="0" class="active"></li>
+  <% else %>
+  <li data-target="#info-carousel" data-slide-to="<%= i %>"></li>
+  <% end %>
+  <% end %>
+</ol>
+<% i = 0 %>
+<div class="carousel-inner" role="listbox">
+  <% @banners.each do |banner| %>
+  <div class="item <%= i == 0 ? 'active' : '' %> text-center">
+    <% if banner.url %>
+    <%= link_to image_tag(banner.banner_image.url(:original), class: "img-responsive hidden-xs"), banner.url %>
+    <%= link_to image_tag(banner.banner_mobile.url(:original), class: "img-responsive hidden-lg hidden-md hidden-sm"), banner.url %>
+    <% else %>
+    <%= image_tag(banner.banner_image.url(:original), class: "img-responsive hidden-xs")%>
+    <%= image_tag(banner.banner_mobile.url(:original), class: "img-responsive hidden-lg hidden-md hidden-sm")%>
+    <% end %>
+  </div>
+  <% i = i + 1 %>
+  <% end %>
+</div>
+</section>
+<% else %>
+<header class="main-header">
+  <nav class="navbar navbar-static-top <%= (params[:controller] == 'products' and params[:action] == 'show') ? 'white-background' : '' %>">
+    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li class="brand-logo">
+          <%= link_to image_tag('logo.png', alt: 'miele', class: 'logo-miele'), root_path, class: "brand-logo-link", id: 'logo-miele' %> 
+        </li>
+        <li>
+          <% if can? :index, Cart %>
+          <%= link_to "<i class='fas fa-shopping-cart'></i><span id='items-in-cart' class='badge badge-cart'>#{current_user.cart_products}</span>".html_safe, cart_path, id: "shopping-cart", class: ((params[:controller] == 'products' and params[:action] == 'show') ? 'white-background' : '') %>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<% end %>
+
+<script>
+  $("#toggle-bu").click(function(){
+    if($("#info-carousel").hasClass("banner-custom-transition")){
+      $("#info-carousel").removeClass("banner-custom-transition");
+    } else {
+      $("#info-carousel").addClass("banner-custom-transition");
+    }
+  });
+</script>

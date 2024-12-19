@@ -1,0 +1,72 @@
+<div class="row row-content">
+	<div class="col-xs-12 no-left">
+		<ol class="breadcrumb">
+			<% if current_user.manager? or current_user.administrator? %>
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<% end %>
+			<li><a href="<%= users_path %>">Usuarios</a></li>
+			<li>Carga de usuarios</li>
+		</ol>
+	</div>
+</div>
+
+<% if !session.nil? and !session[:errors].nil? and session[:errors].first == -1 %>
+<div class="row">
+	<div class="col-xs-6">
+		<div class="warning-msg custom-margin" role="alert">
+			<i class="fa fa-exclamation-triangle"></i> <b>Las cabeceras son erróneas</b>
+		</div>
+	</div>
+</div>
+<% elsif !session.nil? and !session[:errors].nil? and session[:errors].first == -2 %>
+<div class="row">
+	<div class="col-xs-6">
+		<div class="warning-msg custom-margin" role="alert">
+			<i class="fa fa-exclamation-triangle"></i> <b>El formato del archivo es incorrecto</b>
+		</div>
+	</div>
+</div>
+<% elsif !session.nil? and !session[:errors].nil? and session[:errors].size != 0 %>
+<div class="row">
+	<div class="col-xs-6">
+		<div class="warning-msg custom-margin" role="alert">
+			<i class="fa fa-exclamation-triangle"></i> <b>Las siguientes filas presentaron problemas en la carga: </b>
+			<%= session[:errors].join(',') %>
+		</div>
+	</div>
+</div>
+<% end %>
+<% session[:errors] = nil %>
+
+<div class="row">
+	<div class="col-xs-12 col-md-6 no-left no-right">
+		<div class="box-content">
+			<h4 class="bold top-space text-center">Carga masiva de usuarios</h4>
+			<%= form_tag load_users_path, method: :post, multipart: true do %>
+			<br>
+
+			<div class="file-field input-field">
+				<div class="file-drop-area dashed-border">
+					<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+					<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+					<input type="file" name="file" required="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="users_upload" class="file-input">
+				</div>
+			</div>
+
+			<div class="file-field input-field">
+				
+			</div>
+			<br>
+			<p class="text-light thin-text">Debes subir un archivo <span class="miele-text">.XLSX</span> con los datos de los usuarios que deseas cargar. Puedes guiarte por nuestra  <b><a href="/template/users" id="users_template" data-download="template" class="miele-text miele-link bold">plantilla de carga <i class="fa fa-file-download"></i></a></b>.</p>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-right">
+					<button type="submit" class='btn-quotation' id="load-users">
+						Cargar usuarios			
+					</button>
+				</div>
+			</div>
+			<% end %>
+		</div>
+	</div>
+</div>

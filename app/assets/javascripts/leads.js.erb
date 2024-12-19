@@ -1,0 +1,76 @@
+$(document).ready(function() {
+  $('.lead-form #add-product').click(function(e){
+    e.preventDefault();
+    var products_quantity = $('.product-inputs').size();
+    $.get('/leads/add/product_form.js', {tag_id: products_quantity, currency: $('#lead-currency').val()});
+  })
+
+  $('#product-inputs-container').on('change, keyup', '.product-quantity, .product-price', function() {
+    calculatePricesForProduct($(this).parent().parent());
+    calculateTotalPrices();
+  });
+
+  $('#lead-currency').change(function(){
+    $('.total-net-price').attr('data-currency', $(this).val());
+    $('.total-tax-value').attr('data-currency', $(this).val());
+    $('.total-price').attr('data-currency', $(this).val());
+    $('.net-price').attr('data-currency', $(this).val());
+    $('.price').attr('data-currency', $(this).val());
+  });
+
+  $('#leads-daterange-filter').on('apply.daterangepicker', function(ev, picker) {
+    var dates = $(this).val().split(' - ');
+    window.location.href = '/leads/download.xlsx?start_date='+dates[0]+'&finish_date='+dates[1];
+  });
+
+  $('#lead-to-quotation-btn').click(function(e){
+    e.preventDefault();
+    var link = e.target.attributes.href.textContent;
+    if ($(this).data('existing-skus')) {
+      swal({
+        title: "Hay TNRs en este Lead que ya están registrados en Miele Customers",
+        text: 'Esto podría implicar cambios en el nombre de los productos cuyos TNR ya están registrados',
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Continuar",
+        cancelButtonText: "Cancelar"
+      })
+        .then(function (result) {
+          window.location.href = link;
+        }, function(dismiss){
+          // Captura el rechazo de la promesa
+        });
+    }
+    else {
+      window.location.href = link;    
+    }
+  });
+
+  $('.product-inputs input.product-price').each(function(){
+    var input = $(this);
+    inputCurrencyFormat(input[0]);
+    calculatePricesForProduct(input.parent().parent());
+    calculateTotalPrices();
+  });
+});
+
+function calculatePricesForProduct(product_container) {
+  var price = product_container.find('.product-price[type="hidden"]').val();
+  var quantity = product_container.find('.product-quantity').val();
+  product_container.find('.total-net-price').html(numberWithDelimiter(price * quantity));
+  product_container.find('.total-tax-value').html(numberWithDelimiter((price * quantity) * 0.19));
+  product_container.find('.total-price').html(numberWithDelimiter((price * quantity) * 1.19));
+}
+
+function calculateTotalPrices() {
+  var total_net_price = 0;
+  $('.product-inputs').each(function(){
+    var price = parseFloat($(this).find('.product-price[type="hidden"]').val());
+    var quantity = parseFloat($(this).find('.product-quantity').val());
+    total_net_price += price * quantity;
+  })
+  
+  $('#lead-totals .net-price').html(numberWithDelimiter(total_net_price));
+  $('#lead-totals .tax-value').html(numberWithDelimiter(total_net_price * 0.19));
+  $('#lead-totals .price').html(numberWithDelimiter(total_net_price * 1.19));
+}

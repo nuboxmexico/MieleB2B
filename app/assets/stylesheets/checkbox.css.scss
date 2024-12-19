@@ -1,0 +1,41 @@
+@import "variables";
+
+.checkbox{
+  color: $lines-primary;
+  font-size: 11px;
+}
+
+.checkbox label:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.checkbox .cr {
+  position: relative;
+  display: inline-block;
+  border: 1px solid $lines-primary;
+  width: 1.3em;
+  height: 1.3em;
+  float: right;
+  margin-left: .5em;
+  border-radius: 4px;
+}
+
+.checkbox .cr .cr-icon {
+  position: absolute;
+  font-size: .8em;
+  line-height: 0;
+  top: 50%;
+  left: 15%;
+}
+
+.checkbox label input[type="checkbox"] { display: none; }
+.checkbox label input[type="checkbox"]+.cr>.cr-icon { opacity: 0; }
+.checkbox label input[type="checkbox"]:checked+.cr>.cr-icon { opacity: 1; }
+.checkbox label input[type="checkbox"]:disabled+.cr { opacity: .5; }
+
+.checkbox label {
+  padding-left: 0!important;
+  font-weight: normal!important;
+}

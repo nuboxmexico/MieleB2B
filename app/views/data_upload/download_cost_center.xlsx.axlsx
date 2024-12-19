@@ -1,0 +1,12 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'Centros de Costo') do |sheet|
+	headers = ['ID','CostCentre', 'Borrar']
+	sheet.add_row headers
+
+	@cost_centers.each do |cost_center|
+		sheet.add_row [cost_center.code,
+			cost_center.name,
+			''], types: [:string,:string,:string]
+		end
+	end

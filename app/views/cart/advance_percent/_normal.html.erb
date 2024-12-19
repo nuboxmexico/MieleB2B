@@ -1,0 +1,10 @@
+<div class="btn-group">
+  <label id="pay-50" class="btn btn-mini btn-toggle <%= @cart.pay_percent == 50 ? 'btn-toggle-active' : ''%>">
+    <input type="radio" name="cart[pay_percent]" style="display: none;"
+    id="percent-50" autocomplete="off" value="50" checked> 50%
+  </label>
+  <label id="pay-100" class="btn btn-mini btn-toggle <%= @cart.pay_percent == 100 ? 'btn-toggle-active' : ''%>">
+    <input type="radio" name="cart[pay_percent]" style="display: none;"
+    id="percent-100" autocomplete="off" value="100"> 100%
+  </label>
+</div>

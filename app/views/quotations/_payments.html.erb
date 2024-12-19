@@ -1,0 +1,88 @@
+<% @quotation.payments.where(state: 'complete').each_with_index do |payment, i| %>
+<div class="line-row-info"></div>
+<div class="row">
+	<div class="col-md-12 col-xs-12 text-left top-both">
+		<p class="bold secondary-text">Método de Pago N° <%= i+1 %></p>
+	</div>
+</div>
+<div class="row padding-row">
+	<% if can? :destroy, Payment and ['En curso', 'Pendiente'].include?(@quotation.get_state) %>
+	<%= link_to payment_path(payment), method: :delete, class: "gray-text pt14 no-loader pull-right", data: 
+	{ confirm: '¿Estás seguro de eliminar este pago?',
+		'confirm-button-text': 'Eliminar',
+		'cancel-button-text': 'Cancelar'}  do %>
+		<i class="fa fa-trash"></i>
+		<% end %>
+		<% end %>
+		<div class="col-md-2 col-xs-12">
+			<p class="bold title-input">Tipo de Pago</p>
+			<p class="miele-text"><%= payment.try(:payment_type).try(:capitalize) %></p>
+		</div>
+		<div class="col-md-2 col-xs-12">
+			<p class="bold title-input">Monto Pagado</p>
+			<!--
+			<p class="miele-text"><%= number_to_currency(payment.ammount, unit: payment.quotation.currency.upcase) %></p>
+			-->
+			<span class="currency-change miele-text" data-currency=<%= @quotation.for_project? ? "uf" : "clp" %> > <%= @quotation.for_project? ? payment.ammount.round(2) : payment.ammount.round(0) %> </span>
+
+		</div>
+		<% if payment.backup_document.present? %>
+		<div class="col-md-3 col-xs-12">
+			<p class="bold title-input">Archivo de respaldo</p>
+			<%= link_to payment.backup_document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+			<i class="fa fa-file-image"></i> <%= truncate(payment.backup_document_file_name, length: 15) %>
+			<% end %>
+		</div>
+		<% end %>
+
+		<div class="col-md-4 col-xs-12">
+			<p class="bold title-input">Estado: 
+				<% unless payment.finance_validation %>  
+				<span class="state-label sent-state">Pendiente por Validar Finanzas</span>
+				<% else %>
+				<span class="state-label dispatched-state">Validado por Finanzas</span>
+				<% end %>
+			</p>
+
+			<div>
+				<% if current_user.is_finance_manager? %>
+				<%= link_to 'Validar', validate_payment_path(payment), method: :post, class: "btn btn-miele space-btn #{"disabled" if payment.finance_validation}", disabled: payment.finance_validation %>
+				<% else %>
+				<%= link_to 'Validar', validate_payment_path(payment), method: :post, class: "btn btn-miele space-btn disabled", disabled: true %>
+				<% end %>
+          	</div>
+		</div>
+
+		<% if payment.payment_type == 'webpay' and payment.webpay_data.present? %>
+		<% data = payment.webpay_data.gsub('[','').gsub(']','').gsub('"','').split(',') %>
+		<div class="col-md-3 col-xs-12">
+			<p class="bold title-input">Código Autorización Transbank</p>
+			<p class="miele-text"><%= data[4] %></p>
+		</div>
+		<div class="col-md-3 col-xs-12">
+			<p class="bold title-input">Fecha de transacción</p>
+			<p class="title-input"><%= payment.created_at.strftime("%d/%m/%Y") %></p>
+		</div>
+	</div>
+	<div class="row padding-row">
+		<div class="col-md-3 col-xs-12">
+			<p class="bold title-input">Tipo de Pago</p>
+			<p class="title-input"><%= 'Débito' if data[5].to_s.strip == 'VD' %></p>
+			<p class="title-input"><%= 'Crédito' if data[5].to_s.strip != 'VD' %> </p>
+		</div>
+		<div class="col-md-3 col-xs-12">
+			<p class="bold title-input">Tipo de cuota</p>
+			<p class="title-input"><%= 'Venta Débito' if data[5].to_s.strip == 'VD' %></p>
+			<p class="title-input"><%= 'Sin Cuotas' if data[5].to_s.strip == 'VN' %></p>
+			<p class="title-input"><%= 'Cuotas normales' if data[5].to_s.strip == 'VC' %></p>
+			<p class="title-input"><%= 'Sin interés' if data[5].to_s.strip == 'SI' %></p>
+			<p class="title-input"><%= 'Sin interés' if data[5].to_s.strip == 'S2' %></p>
+			<p class="title-input"><%= 'Sin interés' if data[5].to_s.strip == 'NC' %></p>
+		</div>
+		<div class="col-md-3 col-xs-12">
+			<p class="bold title-input">Número de cuotas</p>
+			<p class="title-input"><%= data[10] %></p>
+		</div>
+		<% end %>
+	</div>
+	<% end %>

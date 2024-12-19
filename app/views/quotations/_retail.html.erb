@@ -1,0 +1,69 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row">
+    <div class="col-md-12 col-xs-12 text-left">
+      <p class="bold secondary-text">Datos Cliente</p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Nombre Cliente</p>
+      <p class="content-input"><%= @quotation.customer_name %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Correo</p>
+      <p class="content-input"><%= @quotation.email ? @quotation.email : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">RUT</p>
+      <p class="content-input"><%= @quotation.rut ? @quotation.rut : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Número de Teléfono</p>
+      <p class="content-input"><%= @quotation.phone ? @quotation.phone : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Dirección Despacho</p>
+      <p class="content-input"><%= @quotation.dispatch_address ? @quotation.dispatch_address : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Comuna</p>
+      <p class="content-input"><%= @quotation.try(:dispatch_commune).try(:name_with_region) ? @quotation.try(:dispatch_commune).try(:name_with_region) : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Ciudad</p>
+      <p class="content-input"><%= @quotation.dispatch_city ? @quotation.dispatch_city : '-' %></p>
+    </div>
+  </div>
+  <div class="line-row-info"></div>
+  <div class="row top-separation-data">
+    <div class="col-md-12 col-xs-12 text-left">
+      <p class="bold secondary-text">Datos Pedido</p>
+    </div>
+  </div>
+  <div class="row padding-row">
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Fecha Emisión</p>
+      <p class="content-input"><%= @quotation.created_at.strftime("%d/%m/%Y") %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Fecha Despacho Pactada</p>
+      <p class="content-input"><%= @quotation.try(:agreed_dispatch_date).try(:strftime, "%d/%m/%Y") %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Fecha Reparto Cliente</p>
+      <p class="content-input"><%= @quotation.try(:estimated_dispatch_date).try(:strftime, "%d/%m/%Y") %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Nombre Receptor</p>
+      <p class="content-input"><%= @quotation.try(:receiver_name) ? @quotation.try(:receiver_name) : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">Observaciones</p>
+      <p class="content-input"><%= @quotation.observations ? @quotation.observations : '-' %></p>
+    </div>
+    <div class="col-md-3 col-xs-12">
+      <p class="bold title-input">UPC</p>
+      <p class="content-input"><%= @quotation.upc ? @quotation.upc : '-' %></p>
+    </div>
+  </div>
+</div>

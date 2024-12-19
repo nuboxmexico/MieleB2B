@@ -1,0 +1,75 @@
+@import "variables";
+@mixin range-slider($width, $height, $input-top, $input-bg-color, $input-thumb-color, $float:none, $input-height:20px, $input-border-radius:14px) {
+  position: relative;
+  width: $width;
+  height: $height;
+  float: $float;
+  text-align: center;
+}
+div.range-slider {
+  @include range-slider(100%, 100%, 100%, #F1EFEF, #413F41, left);
+}
+
+section.range-slide {
+  display: inline-flex;
+  width: 100%
+}
+
+.rangeMinValue, .rangeMaxValue {
+  width: 34px;
+}
+
+
+$track-w: 12.5em;
+$track-h: .25em;
+$thumb-d: 1.5em;
+
+@mixin track() {
+    box-sizing: border-box;
+    border: none;
+    width: $track-w; height: 0.3em;
+    background: #707070;
+}
+
+@mixin thumb() {
+    box-sizing: border-box;
+    position: relative;
+    top: 6px;
+    z-index: 10;
+    border: none;
+    width: 0.7em; height: 0.7em;
+    border-radius: 50%;
+    background: $brand-primary;
+}
+
+[type='range'] {
+    &, &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+    }
+    position: absolute;
+    margin: 0;
+    border-bottom: none!important;
+    padding: 0;
+    overflow: hidden;
+    width: $track-w; height: $thumb-d;
+    background: transparent;
+    font: 1em/1 arial, sans-serif;
+
+    &::-webkit-slider-runnable-track {
+        @include track
+    }
+    &::-moz-range-track { @include track }
+    &::-ms-track { @include track }
+
+    &::-webkit-slider-thumb {
+        margin-top: .5*($track-h - $thumb-d);
+        @include thumb
+    }
+    &::-moz-range-thumb { @include thumb }
+    &::-ms-thumb {
+        margin-top: 0;
+        @include thumb
+    }
+
+    &::-ms-tooltip { display: none }
+  }

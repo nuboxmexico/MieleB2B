@@ -1,0 +1,361 @@
+<% item = CartItem.find_by(id: product.id) %>
+<div class="panel panel-default cart-item-container" id="card<%= product.id %>">
+  <div class="<%= alert_card(product) %> panel-heading order-<%= product.order_item %> item<%= product.id %>" role="tab">
+    <div class="row">
+      <div class="col-md-1 col-xs-3 no-sides-all text-center">
+        <% if @cart.bstock %>
+          <%= image_tag(product.product.try(:original_product).try(:get_product_photo), alt: 'producto', class:'image-cart') %>
+        <% else %>
+          <%= image_tag(product.product.get_product_photo, alt: 'producto', class:'image-cart') %>
+        <% end %>
+        <% if product.linked_mandatory %>
+          <span class="mandatory-link"><i class="fa fa-link"></i></span>
+        <% end %>
+      </div>
+      <div class="col-md-2 col-xs-5 no-right-pad top-pad text-left">
+        <p><%= product.name %> </p>
+        <% if item.product.stock <= 2 and !@cart.bstock and item.product.stock > 0%>
+          <p class="miele-text pt10-mobile"><%= t("last_products_label") %></p>
+        <% elsif item.product.stock_break && item.backorderable %>
+          <p class="miele-text pt10-mobile"><%= t("backorderable_label")%></p>
+        <% elsif @cart.bstock and !product.is_service %>
+          <p class="pt10-mobile">EAN: <%= product.product.ean %></p>
+        <% end %>
+        <p class="hidden-lg hidden-md"><span class="hidden-lg hidden-md">TNR</span> <%= product.product.sku %></p>
+        <span class="hidden-lg hidden-md"><%= cart_offer_price(product).html_safe %></span>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-left-center">
+        <%= product.sku %> 
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-right-center miele-text">
+        <span class="hidden-lg hidden-md miele-text">Tipo <br></span> <%= product.product.product_type ? product.product.product_type : product.product.sku == 'PEM' || product.product.sku == 'SERV01' ? 'Servicio' : '*Asignar' %>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-right-center">
+        <span class="hidden-lg hidden-md">Mandatorio<br></span> <%= product.product.mandatory ? 'Si' : 'No' %>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-left-center">
+        <span class="hidden-lg hidden-md">Despacho <br></span>
+        <label class="radio-inline radio-button <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'radio-disabled' : '' %>" id="dispatch<%= product.id.to_s%>-true">
+          <input type="radio" name="dispatch<%= product.id.to_s %>"  data-id="<%= product.id.to_s %>" value="true" class="dispatch-radio" <%= item.dispatch ? 'checked' : ''%> <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'disabled' : '' %>>
+          <span class="label-visible">
+            <span class="fake-radiobutton"></span>
+            Si
+          </span>
+        </label>
+        <label class="radio-inline radio-button <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'radio-disabled' : '' %>" id="dispatch<%= product.id.to_s%>-false">
+          <input type="radio" name="dispatch<%= product.id.to_s %>" data-id="<%= product.id.to_s %>" value="false" class="dispatch-radio" <%= !item.dispatch ? 'checked' : ''%> <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'disabled' : '' %>>
+          <span class="label-visible">
+            <span class="fake-radiobutton"></span>
+            No
+          </span>
+        </label>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-left-center">
+        <span class="hidden-lg hidden-md">Instalación <br></span>
+        <label class="radio-inline radio-button <%= (item.is_service or item.product.instalation) ? 'radio-disabled' : '' %>" id="instalation<%= product.id.to_s%>-true">
+          <input type="radio" name="instalation<%= product.id.to_s %>" data-id="<%= product.id.to_s %>" value="true" class="instalation-radio" <%= product.instalation ? 'checked' : ''%> <%= (item.is_service or item.product.instalation) ? 'disabled' : '' %>>
+          <span class="label-visible">
+            <span class="fake-radiobutton"></span>
+            Si
+          </span>
+        </label>
+        <label class="radio-inline radio-button <%= (item.is_service or item.product.instalation) ? 'radio-disabled' : '' %>" id="instalation<%= product.id.to_s%>-false">
+          <input type="radio" name="instalation<%= product.id.to_s %>" data-id="<%= product.id.to_s %>" value="false"  class="instalation-radio" <%= !product.instalation ? 'checked' : ''%> <%= (item.is_service or item.product.instalation) ? 'disabled' : '' %>>
+          <span class="label-visible">
+            <span class="fake-radiobutton"></span>
+            No
+          </span>
+        </label>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm text-right-center cart-quantity-content">
+        <span class="hidden-lg hidden-md bot-space">Cantidad <br></span>
+        <div class="text-center cart-stepper-container inlineb">
+          <% if !item.is_service and !@cart.bstock %>
+            <div class="cart-stepper">
+              <%= link_to '<i class="fa fa-angle-up row-angle-after"></i>'.html_safe , plus_product_to_cart_path(product) , id: "btn-plus-#{product.id}" ,method: :post, remote: true %>
+            </div>
+          <% end %>
+          <div class="item-quantity <%= (item.is_service or @cart.bstock) ? 'move-quantity-down'.html_safe : ''%>">
+            <span class="cart-quantity-<%= product.id.to_s %> cart-item-quantity"><%= product.quantity %></span>
+          </div>
+          <% if !item.is_service and !@cart.bstock %>
+            <div class="cart-stepper">
+              <%= link_to '<i class="fa fa-angle-down row-angle-after"></i>'.html_safe, minus_product_to_cart_path(product), id: "btn-minus-#{product.id}" ,method: :post, remote: true %> 
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-center">
+        <% if current_user.is_project_manager? %>
+          <p class="edit-cart-item-price">
+            <%= text_field_tag "cart_items[#{counter}][price]", number_with_delimiter(product.price.round(2)), class: 'cart-item-price-input field-bordered', data: {container_id: "card#{product.id}", item_id: product.id}, min: 0, OnChange: "ValidateSelec2()" %>
+            <p class="cart-item-price-list">
+              <% if @cart.bstock %>
+                Precio de lista: UF <%= bstock_offer_price(product) %>
+              <% else %>
+                Precio de lista:<br/> UF <%= number_with_delimiter(euro_to_UF(product.price_eur).round(2)) %>  <%#clp_to_UF(product.price)%>
+              <% end %>
+            </p>
+          </p>
+        <% else %>
+          <% if @cart.bstock %>
+            <%= bstock_offer_price(product) %>
+          <% else %>
+            <%= cart_offer_price(product).html_safe %>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="col-md-1 no-sides-all hidden-xs hidden-sm top-pad text-center">
+        <% if @cart.bstock %>
+          <span class="cart-item-cost-<%= product.id %> cart-item-total-price currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+            <%= number_with_delimiter(product.price.round(0)  * product.quantity) %>
+          </span>
+        <% else %>
+          <span class="cart-item-cost-<%= product.id %> cart-item-total-price currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+            <%if current_user.is_project?%>
+              <%= number_with_delimiter((product.price * product.quantity).round(2)) %>
+            <%else%>
+              <%= number_with_delimiter(product.product.display_price(current_user)[1] * product.quantity) %>
+            <%end%>
+          </span>
+        <% end %>
+        <%if current_user.is_project?%>
+          <br><br>
+          <span class="cart-item-margen-<%= product.id %>">
+          Margen: <%=calculate_margen(product.id)%>%
+          </span>
+        <%end%>
+      </div>
+      <div class="col-md-1 no-sides-all col-xs-3 top-pad">
+        <div class="row">
+          <div class="col-md-1 hidden-sm hidden-xs">
+            <%= link_to remove_product_path(product), method: :delete, class: "miele-gray-text remove-#{product.id}", data: 
+            { confirm: '¿Estás seguro de eliminar este producto del carro?',
+              text: (product.product.mandatory ? 'Al eliminar este producto NO funcionara de manera correcta para el tipo de instalación requerida y se perderá la garantía' : ''),
+              'confirm-button-text': 'Eliminar',
+              'cancel-button-text': 'Cancelar'} ,
+              remote: true do %>
+              X
+              <% end %>
+            </div>
+            <div class="col-md-4 col-xs-5">
+              <% if product.product.instalations.size > 0  %>
+              <p>
+                <span class="miele-text" data-toggle='tooltip' title='Se debe agregar un producto mandatorio'>
+                  <i class="fa fa-exclamation-circle"></i>
+                </span>
+              </p>
+              <% end %>
+              <% if product.product.display_price(current_user)[0] %>
+              <p>
+                <span class="miele-text" data-toggle='tooltip' title='Promoción válida por <%= (product.product.display_price(current_user)[3] - Date.today).to_i.to_s %> días'>
+                  <i class="fa fa-clock"></i>
+                </span>
+              </p>
+              <% end %>
+              <% if product.product.built_in %>
+              <p>
+                <span class="miele-text" data-toggle='tooltip' title='La entrega es posterior a 60 días'>
+                  <i class="fa fa-truck"></i>
+                </span>
+              </p>
+              <% end %>
+              <% if product.product.sku == '1000' %>
+              <p>
+                <span class="miele-text" data-toggle='tooltip' title='Visita requerida para cotizar ductos'>
+                  <%= image_tag('pipe.svg', class: 'file-icon')%>
+                </span>
+              </p>
+              <% end %>
+            </div>
+            <div class="col-md-2 col-xs-5 move-up-row">
+              <a class="collapsed <%= product.product.instalations.size > 0 ? 'row-toggle-cart' : 'row-toggle' %> right-space-icon up-row  <%= product.product.instalations.size > 0 ? '' : 'hidden-lg hidden-md' %>" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<%= product.id %>" aria-expanded="false" aria-controls="collapse<%= product.id %>" id="row<%= product.id %>" data-id="<%= product.id %>">
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="collapse<%= product.id %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+      <div class="panel-body">
+        <div class="row hidden-lg hidden-md">
+          <div class="col-xs-6 col-sm-6">
+            <p>Mandatorio</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p><%= product.product.mandatory ? 'Si' : 'No' %></p>
+          </div>
+        </div>
+        <div class="row hidden-lg hidden-md">
+          <div class="col-xs-6 col-sm-6">
+            <p>Mandatorio</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p><%= product.product.mandatory ? 'Si' : 'No' %></p>
+          </div>
+        </div>
+        <div class="row hidden-lg hidden-md">
+          <div class="col-xs-6 col-sm-6">
+            <p>Despacho</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p>
+              <label class="radio-inline radio-button <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'radio-disabled' : '' %>" id="dispatch<%= product.id.to_s%>-true">
+                <input type="radio" name="dispatch-mobile<%= product.id.to_s %>"  data-id="<%= product.id.to_s %>" value="true" class="dispatch-radio" <%= item.dispatch ? 'checked' : ''%> <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'disabled' : '' %>>
+                <span class="label-visible">
+                  <span class="fake-radiobutton"></span>
+                  Si
+                </span>
+              </label>
+              <label class="radio-inline radio-button <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'radio-disabled' : '' %>" id="dispatch<%= product.id.to_s%>-false">
+                <input type="radio" name="dispatch-mobile<%= product.id.to_s %>" data-id="<%= product.id.to_s %>" value="false" class="dispatch-radio" <%= !item.dispatch ? 'checked' : ''%> <%= (current_user.is_mca? or item.is_service or !item.product.can_retire) ? 'disabled' : '' %>>
+                <span class="label-visible">
+                  <span class="fake-radiobutton"></span>
+                  No
+                </span>
+              </label>
+            </p>
+          </div>
+        </div>
+        <div class="row hidden-lg hidden-md">
+          <div class="col-xs-6 col-sm-6">
+            <p>Instalación</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p>
+              <label class="radio-inline radio-button <%= (item.is_service or item.product.instalation) ? 'radio-disabled' : '' %>" id="instalation<%= product.id.to_s%>-true">
+                <input type="radio" name="instalation-mobile<%= product.id.to_s %>" data-id="<%= product.id.to_s %>" value="true" class="instalation-radio" <%= product.instalation ? 'checked' : ''%> <%= (item.is_service or item.product.instalation) ? 'disabled' : '' %>>
+                <span class="label-visible">
+                  <span class="fake-radiobutton"></span>
+                  Si
+                </span>
+              </label>
+              <label class="radio-inline radio-button <%= (item.is_service or item.product.instalation) ? 'radio-disabled' : '' %>" id="instalation<%= product.id.to_s%>-false">
+                <input type="radio" name="instalation-mobile<%= product.id.to_s %>" data-id="<%= product.id.to_s %>" value="false"  class="instalation-radio" <%= !product.instalation ? 'checked' : ''%> <%= (item.is_service or item.product.instalation) ? 'disabled' : '' %>>
+                <span class="label-visible">
+                  <span class="fake-radiobutton"></span>
+                  No
+                </span>
+              </label>
+            </p>
+          </div>
+        </div>
+
+        <div class="row hidden-lg hidden-md">
+          <% if item.is_service %>
+          <div class="col-xs-6 col-sm-6">
+            <p>Cantidad</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p>1</p>
+          </div>
+          <% else %>
+          <div class="col-xs-6 col-sm-6">
+            <p class="<%= (!item.is_service and !@cart.bstock) ? 'top-move-quantity-title' : '' %>">Cantidad</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p>
+              <% if !item.is_service and !@cart.bstock %>
+                <div class="text-center cart-stepper-container inlineb">
+                  <div class="cart-stepper">
+                    <%= link_to '<i class="fa fa-angle-up row-angle-after"></i>'.html_safe , plus_product_to_cart_path(product) , id: "btn-plus-#{product.id}" ,method: :post, remote: true %>
+                  </div>
+                  <div class="item-quantity">
+                    <span class="cart-quantity-<%= product.id.to_s %> cart-item-quantity"><%= product.quantity %></span>
+                  </div>
+                  <div class="cart-stepper">
+                    <%= link_to '<i class="fa fa-angle-down row-angle-after"></i>'.html_safe, minus_product_to_cart_path(product), id: "btn-minus-#{product.id}" ,method: :post, remote: true %> 
+                  </div>
+                </div>
+              <% else %>
+              1
+              <% end %>
+            </p>
+          </div>
+          <% end %>
+        </div>
+        <div class="row hidden-lg hidden-md">
+          <div class="col-xs-6 col-sm-6">
+            <p>Precio</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <% if @cart.bstock %>
+            <p><%= bstock_offer_price(product) %></p>
+            <% else %>
+            <p><%= cart_offer_price(product).html_safe %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="row hidden-lg hidden-md">
+          <div class="col-xs-6 col-sm-6">
+            <p>Total</p>
+          </div>
+          <div class="col-xs-6 col-sm-6">
+            <p>
+              <% if @cart.bstock %>
+                <span class="cart-item-cost-<%= product.id %> currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+                  <%= number_with_delimiter(product.price.round(0)  * product.quantity) %>
+                </span>
+              <% else %>
+                <span class="cart-item-cost-<%= product.id %> currency-change" data-currency=<%=current_user.is_project? ? "uf" : "$"%>>
+                  <%= number_with_delimiter(product.product.display_price(current_user)[1] * product.quantity) %>
+                </span>
+              <% end %>
+            </p>
+          </div>
+        </div>
+        <div class="row hidden-lg hidden-md text-center">
+          <%= link_to remove_product_path(product), method: :delete, class: "btn btn-miele top-mobile remove-#{product.id}", data: 
+          { confirm: '¿Estás seguro de eliminar este producto del carro?',
+            text: (product.product.mandatory ? 'Al eliminar este producto NO funcionara de manera correcta para el tipo de instalación requerida y se perderá la garantía' : ''),
+            'confirm-button-text': 'Eliminar',
+            'cancel-button-text': 'Cancelar'} ,
+            remote: true do %>
+            Eliminar
+            <% end %>
+          </div>
+          <% if product.product.instalations.any?  %>
+            <div class="line-row-info hidden-lg hidden-md top-mobile"></div>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 hidden-lg hidden-md top-mobile">
+                <p class="bold">Productos Mandatorios</p>
+              </div>
+            </div>
+            <div class="row top-mobile">
+              <div class="col-md-1 hidden-xs hidden-sm">
+              </div>
+              <div class="col-md-4 col-xs-12 text-left">
+                <%= label :instalation, 'Tipo de Instalación'%>
+                <%= select_tag :instalation, options_for_select(product.product.instalations.all.collect{ |ins| [ins.name, ins.id.to_s] }, (product.product_instalation ? product.instalation_id : 0)), class:'inlineb select2 width90', id: 'instalation'+product.id.to_s %>
+              </div>
+              <div class="col-md-6 col-xs-12 text-left top-mobile">
+                <%= form_tag add_mandatory_to_cart_path, remote: true, class:'inlineb full-width', method: :post do %>
+                <div class="row">
+                  <div class="col-md-6 col-xs-12">
+                    <%= label :instalation, 'Producto Mandatorio'%>
+                    <div id="mandatory<%= product.id.to_s %>"></div>
+                    <%= hidden_field_tag 'parent_id', product.id %>
+                    <span id="instalation-parent-<%= product.id.to_s %>"></span>
+                  </div>
+                  <div class="col-md-6 col-xs-12 text-center-left">
+                    <button type="submit" class="btn btn-miele align-button" id="add-mandatory-<%= product.id.to_s %>">Agregar</button>
+                  </div>
+                </div>
+                <% end %>
+              </div>
+              <div class="col-md-1">
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <script>
+      $("#instalation<%= product.id.to_s %>").change(function(){
+        getMandatories($(this).val(), <%= product.id.to_s %>);
+      });
+      $("#row<%= product.id %>").click(function(){
+        $("#card<%= product.id %>").toggleClass('fade-back');
+      });
+    </script>

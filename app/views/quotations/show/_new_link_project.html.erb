@@ -1,0 +1,12 @@
+  <div class="add-dispatch-group-container">
+    <%= link_to new_dispatch_group_project_show_path(quotation_id: @quotation.id, detail_quotation_products:""), id: 'add-dispatch-group-project', :onclick => "setDisabledProject()", remote: true, method: :post do %>
+      <i class="fa fa-plus"></i> Nuevo envío
+    <% end %>
+  </div>
+
+  <script>
+    function setDisabledProject(){
+      document.getElementById('new_dispatch_group_button').style.display = "none";
+    }
+  </script>
+

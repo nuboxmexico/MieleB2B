@@ -1,0 +1,68 @@
+<div class="row">
+  <div class="col-lg-12 col-xs-12">
+    <ol class="breadcrumb">
+      <li><a href="<%= root_path %>">Inicio</a></li>
+      <li>Banners</li>
+    </ol>
+  </div>
+  <div class="col-lg-6 col-xs-12 bot-space no-pad">
+    <h1 class="bold title-section">
+      Banners promocionales
+    </h1>
+  </div>
+  <div class="col-lg-6 text-right no-pad bot-space">
+    <%= link_to 'Crear Banner', new_banner_path , id: 'new-banner', class: 'btn btn-miele top-space' %>
+  </div>
+</div>
+<% if @banners.size > 0 %>
+<div id="banners">
+  <div class="row hidden-xs hidden-sm header-black text-left-imp">
+    <div class="col-lg-12">
+      <div class="row">
+       <div class="col-lg-3 col-md-3">
+        Desktop
+      </div>
+      <div class="col-lg-2 col-md-2">
+        Mobile
+      </div>
+      <div class="col-lg-4 col-md-4">
+        URL
+      </div>
+      <div class="col-lg-1 col-md-1">
+        Fecha Inicio
+      </div>
+      <div class="col-lg-1 col-md-1">
+        Fecha término
+      </div>
+      <div class="col-lg-1 text-center-left col-md-1">
+        Acciones
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row table-border">
+  <% @banners.each do |banner| %>
+  <%= render partial: 'banners/banner_card', locals: {banner: banner} %>
+  <% end %>
+</div>
+<div class="row">
+  <div class="col-md-5 col-xs-12 up-down-mar">
+    <% page = params[:page] ? params[:page].to_i : 0 
+    start = (page*10 + 1)
+    %>
+    <% if @items > 0 %>
+    <% if @items < 10 %>
+    <br>
+    Mostrando registros del 1 al <%= @items %> de un total de <%= @items %> banners.
+    <% else %>
+    <br>
+    Mostrando registros del <%= start.to_s %> al <% (start + 9).to_s %> de un total de <%= @items %> banners.
+    <% end %>
+    <% end %>
+  </div>
+  <div class="col-md-7 col-xs-12 pull-right text-right">
+    <%= will_paginate @banners, renderer: BootstrapPagination::Rails %>
+  </div>
+</div>
+</div>
+<% end %>

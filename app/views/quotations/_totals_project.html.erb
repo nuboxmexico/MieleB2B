@@ -1,0 +1,282 @@
+<div class="no-top bot-space">
+  <h5>Detalle del pago</h5>
+  <div class="sub-total-cart"></div>
+
+  <% quotation.quotation_products.order(created_at: :asc).each do |product| %>
+    <div class="row product-detail-list text-light" id="product-list-<%= product.id%>"> 
+      <div class="col-xs-7 text-light"> 
+        <div class="col-xs-2 no-sides-all">
+          <span class="quantity-counter"><%= "#{product.quantity} x" %></span> 
+        </div>
+        <div class="col-xs-10 no-sides-all">
+          <span class="name-product-second-step"><%= product.name %></span>
+        </div>
+      </div>
+      <div class="col-xs-5 text-right">
+        <% if current_user.sale_channel.try(:name) == "Proyectos" %> 
+        <span <%= "id=cart-item-cost-#{product.id}" %> class="currency-change" data-currency="uf" >
+          <%= number_with_delimiter((product.price * product.quantity).round(2)) %>
+        </span>
+        <%else%>
+        <span <%= "id=cart-item-cost-#{product.id}" %> class="currency-change" data-currency="uf" >
+          <%= number_with_delimiter((product.price * product.quantity).round()) %>
+        </span>
+        <%end%>
+      </div>
+    </div>
+    <br>
+  <% end %>
+
+
+  <div id="installation-disclaimer">
+  </div>
+  <div class="sub-total-cart"></div>
+  
+  
+  <div class="row text-light">
+  
+    <!--
+    <div id="products_price">
+      <div class="col-xs-7">
+        <span id="label_products_price">Productos</span> 
+      </div> 
+      <div class="col-xs-5 text-right">
+        <span id="quotation-products-price" class="currency-change" data-currency="uf">
+          <%= number_with_delimiter(quotation.total_cost.round(2)) %>
+        </span>
+      </div>
+    </div>
+    -->
+
+    <div id="quotation_total_margen-<%= quotation.id %>"> 
+      <div id="label_total_margen" class="col-xs-7">
+        <span>Porcentaje de margen</span>
+      </div>
+      <div class="col-xs-5 text-right">
+        <%= number_with_delimiter(quotation.margen_cost.round(2)) %> %
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sub-total-cart mtop-1"></div>
+
+  <div class="row text-light">
+    
+    <div id="sub_total_quotation">
+      <div class="col-xs-7">
+        <span>Sub Total</span> 
+      </div>
+      <div class="col-xs-5 text-right">
+        <span id="quotation-subtotal-price" class="currency-change" data-currency="uf" >
+          <%= number_with_delimiter((quotation.total_cost).round(2)) %>
+        </span>
+      </div>
+    </div>
+
+    <div id="quotation_iva-<%= quotation.id %>"> 
+      <div id="label_iva" class="col-xs-7">
+        <span>IVA</span>
+      </div>
+      <div class="col-xs-5 text-right">
+          <span id="quotation_iva_uf" class="currency-change" data-currency="uf" >
+            <%= number_with_delimiter((quotation.total_cost * 0.19).round(2)) %>
+          </span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sub-total-cart"></div>
+
+  <div class="row text-light">
+    <div id="show_installation_price">
+      <div class="col-xs-7">
+        <span id="label_installation_price"></span> 
+      </div> 
+      <div class="col-xs-5 text-right">
+        <span id="quotation-installation-price" class="currency-change" data-currency="uf" >
+        </span>
+      </div>
+    </div>
+
+    <div id="show_dispatch_price">
+      <div class="col-xs-7">
+        <span id="label_dispatch_price"></span> 
+      </div> 
+      <div class="col-xs-5 text-right">
+        <span id="quotation-dispatch-price" class="currency-change" data-currency="uf" >
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="sub-total-cart mtop-1"></div>
+    
+  <h4 id="quotation-total-cost" class="text-right no-bot-margin currency-change" data-currency="uf">
+    <%= number_with_delimiter(quotation.total_per_pay.round(2) ) %>
+  </h4>
+  <h5 class="text-right mar-bot-mobile min-text <%= quotation.pay_percent == 100 ? 'hidden' : 'hidden'%>" <%= "id=quotation-deb-#{quotation.id}" %> >
+    Saldo: <span class="currency-change" data-currency="uf"> <%= current_user.is_project_manager? ? number_with_delimiter((quotation.total - quotation.total_per_pay).round(2)) : number_with_delimiter((quotation.total - quotation.total_per_pay).round()) %> </span>
+  </h5>
+    
+   
+</div>
+
+
+<script>
+
+// Glosa Proyectos
+
+var quotationId = <%= quotation.id %>;
+
+async function updateDispatchCost(){
+	var commune = '<%= Commune.find(quotation.dispatch_commune_id).region.name %>';
+
+    await $.ajax({
+      url: "/quotation/get_dispatch_cost_show",
+      type : 'post',
+      data: { 
+        commune: commune,
+        quotation_id: parseInt(quotationId)
+        }
+      }).done(function (data) {
+        data[0] = data[0].toFixed(2);
+        data[1] = data[1].toFixed(2);
+        if (data[1] != 0){
+          document.getElementById("label_dispatch_price").innerHTML = "Despacho (IVA incl.) ("+data[1]+"% Descuento)";
+          document.getElementById("quotation-dispatch-price").innerHTML = data[0].toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        else{
+          document.getElementById("label_dispatch_price").innerHTML = "Despacho (IVA incl.)";
+          document.getElementById("quotation-dispatch-price").innerHTML = data[0].toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        $("#show_dispatch_price").removeClass("hidden");
+            
+        setDispatchValueInDB(quotationId, data[0]);
+        return data[0]
+  	})
+}
+
+var total_cost = <%=quotation.total_cost%>
+
+async function updateGlosa(){
+	var i = 0
+	var total = 0
+	// var unit_real_states = <%=quotation.unit_real_states.to_json.html_safe%>
+
+	await $.ajax(
+		{
+			url: `/quotations/${quotationId}/unit_real_states`,
+			type : 'get'
+		}).done(function (data) {
+			unit_real_states = data;
+
+			var len_unit_real_states = unit_real_states.length
+			if (len_unit_real_states == 0){
+				$("#show_installation_price").addClass("hidden");
+				return 0;
+			} else if (len_unit_real_states > 0) {
+				$("#show_installation_price").removeClass("hidden");
+			}
+			while(i<len_unit_real_states){
+				total = total + unit_real_states[i].total_value
+				i++
+			}
+			var discount_percentage = getDiscount(total_cost)
+			if (discount_percentage !=0){
+				$("#show_installation_price").removeClass("hidden");
+				document.getElementById("label_installation_price").innerHTML = "Instalación (IVA incl.) ("+discount_percentage+"% Descuento)";
+				total = ( total - ( total * (discount_percentage/100) )).toFixed(2)
+				document.getElementById("quotation-installation-price").innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+			}
+			else{
+        total = total.toFixed(2);
+				document.getElementById("label_installation_price").innerHTML = "Instalación (IVA incl.)";
+				document.getElementById("quotation-installation-price").innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+			}
+
+			setInstallationValueInDB(quotationId, total);
+
+		})
+
+	return total
+}
+
+var projectInstallationDiscounts = <%= quotation.project_installation_discounts.to_json.html_safe %>
+
+function getDiscount(total){
+	var discount_percentage = 0
+	var i =0
+	while (i<projectInstallationDiscounts.length){
+		if (total >= projectInstallationDiscounts[i].min_amount && total <= projectInstallationDiscounts[i].max_amount){
+			discount_percentage = projectInstallationDiscounts[i].discount_percentage;
+			break;
+		}
+		i++;
+	}
+	return discount_percentage.toFixed(2);
+}
+
+
+async function updateSubTotal() {
+	await updateDispatchCost();
+	await updateGlosa();
+
+	var installation_cost = document.getElementById("quotation-installation-price").innerHTML;
+	var dispatch_cost = document.getElementById("quotation-dispatch-price").innerHTML;
+
+	if (installation_cost && dispatch_cost) {
+		var subTtotal = Number(total_cost);
+		subTtotal = Number(subTtotal).toFixed(2);
+		document.getElementById("quotation-subtotal-price").innerHTML = subTtotal.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		
+		var iva = (subTtotal * 0.19).toFixed(2);
+		document.getElementById("quotation_iva_uf").innerHTML = iva.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+		
+    var total = (Number(subTtotal) + Number(iva) + Number(dispatch_cost.replace(/,/g, '.')) + Number(installation_cost.replace(/,/g, '.'))).toFixed(2);
+    document.getElementById("quotation-total-cost").innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    updateTotalInDB(quotationId, total);
+	}
+}
+
+updateSubTotal();
+
+function setDispatchValueInDB(quotationId, dispValue) {
+	$.ajax({
+    url: "/quotation/set_dispatch_value",
+    type : 'post',
+    data: { 
+      quotation_id: parseInt(quotationId),
+      dispatch_value: dispValue
+    }
+    }).done(function (data) {
+  	})
+}
+
+function setInstallationValueInDB(quotationId, instValue) {
+	$.ajax({
+    url: "/quotation/set_installation_value",
+    type : 'post',
+    data: { 
+      quotation_id: parseInt(quotationId),
+      installation_value: instValue
+    }
+    }).done(function (data) {
+  	})
+}
+
+function updateTotalInDB (quotationId, totalValue) {
+  $.ajax({
+    url: `/quotation/${quotationId}/update_total_from_view`,
+    type : 'patch',
+    data: {
+      total_value: totalValue
+    }
+    }).done(function (data) {
+  	})
+}
+
+</script>

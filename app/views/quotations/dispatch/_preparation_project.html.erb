@@ -1,0 +1,79 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a  class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id %>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4 class="dispatch-group-subtitle">
+        Grupo de envío N°<%= dispatch_group_counter + 1 %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    <div class="collapse" id="<%= id %>" data-type="dispatch">      
+      <% dispatch_group.dispatch_guides.each do |dispatch_guide| %>
+        <%= link_to dispatch_guide.document.url(:original), class: 'btn btn-miele mini-top-space download-guide', target: "_blank" do %>
+          <i class="fa fa-file-image"></i> <%= truncate(dispatch_guide.document_file_name, length: 15) %>
+        <% end %>
+        <% if can? :destroy, DispatchGuide and @quotation.post_in_preparation_status? %>
+          <%= link_to dispatch_guide_path(dispatch_guide), method: :delete, class: "btn btn-delete no-loader", data: { 
+              confirm: '¿Estás seguro de eliminar el archivo '+dispatch_guide.document_file_name+'?',
+              'confirm-button-text': 'Eliminar',
+              'cancel-button-text': 'Cancelar'
+            }  do %>
+             <i class="fa fa-times"></i>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      
+        <div class="row">
+          <div class="col-xs-12 col-md-4">
+           
+            <div class="form-group">
+              <label class="title-input" for="dispatch_group_new_dispatch_date">Fecha de despacho</label>
+              <input class="field-bordered inlineb date-picker" id="dispatch_group_new_dispatch_date" type="text" required>
+            </div>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group actions-container text-right">
+              <a onClick= "delete_cart_preparation(<%=dispatch_group.id%>)" class="btn btn-flat" data-new="<%= dispatch_group.new_record? %>">
+                Eliminar
+              </a>
+              
+             <a  class="btn btn-miele save-dispatch" onclick="createDispatch(<%=@quotation.id%>)">
+                Guardar nuevo
+              </a>         
+            </div>
+          </div>
+        </div>
+  
+
+
+  </div>
+</div>
+
+<script>
+  $('#exampleModal').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+  })
+
+  function createDispatch(quotation_id){
+    var data = {
+       dispatch_group: {
+         dispatch_date: document.getElementById('dispatch_group_new_dispatch_date').value,
+         quotation_id: quotation_id
+       }
+     }
+    $.ajax({
+            url: "/dispatch_groups",
+            type : 'post',
+            data: data
+        }).done(function (data) {
+             document.getElementById('new_dispatch_group_button').style.display = "";
+              $("#new_dispatch_group_box").empty();
+              $( "#dispatch-groups-project-container" ).load(window.location.href + " #dispatch-groups-project-container" );
+    })
+  }
+
+</script>

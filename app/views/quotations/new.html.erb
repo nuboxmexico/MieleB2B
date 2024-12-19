@@ -1,0 +1,728 @@
+<script>
+  <% if Product.where(id: @cart.cart_items.pluck(:product_id)).where(built_in: true).size > 0 %>
+  var start_calendar = moment('<%= (Date.today + 60.days).strftime("%d/%m/%Y") %>', 'DD/MM/YYYY');
+  <% else %>
+  var start_calendar = moment();
+  <% end %>
+</script>
+<div class="row">
+  <div id="to_back_button_1" class="col-xs-12 top-both">
+    <%= link_to '<i class="fa fa-chevron-left"></i>Volver'.html_safe, cart_path, class: 'btn-goback top-space' %>
+  </div>
+  <div id="to_back_button_2" class="col-xs-12 top-both">
+    <a role="button" tabindex="0" onclick="hiddeInastalationAndDispatch()" class="btn-goback top-space">
+      <i class="fa fa-chevron-left"></i>Volver
+    </a>
+  </div>
+  <div class="col-xs-12 bot-space no-left">
+    <h1 class="bold">Nueva cotización</h1>
+  </div>
+
+  <%= form_for @quotation, html: { class: 'bform'} do |form| %>
+  <div class="col-lg-12 col-xs-12 no-right no-left">
+    <div class="card-shadow">
+      <div class="card-shadow-head">
+        <div class="row">
+          <div class="col-sm-2 col-xs-6">
+            <p class="title-data"><b>Fecha</b></p>
+            <p class="text-data"><%= Time.now.strftime('%d/%m/%Y') %></p>
+          </div>
+          <div class="col-sm-2 col-xs-6">
+            <p class="title-data"><b>ID Rol</b></p>
+            <p class="text-data"><%= current_user.miele_role.try(:code) %></p>
+          </div>
+          <div class="col-sm-2 col-xs-6">
+            <p class="title-data"><b>Nombre Completo</b></p>
+            <p class="text-data"><%= current_user.try(:fullname)%></p>
+          </div>
+          <div class="col-sm-2 col-xs-6">
+            <p class="title-data"><b>Rol</b></p>
+            <p class="text-data"><%= current_user.try(:role_name)%></p>
+          </div>
+          <div class="col-sm-2 col-xs-6">
+            <p class="title-data"><b>Correo Contacto</b></p>
+            <p class="text-data"><%= current_user.try(:email)%></p>
+          </div>
+          <div class="col-sm-2 col-xs-6">
+            <p class="title-data"><b>Teléfono Contacto</b></p>
+            <p class="text-data"><%= current_user.try(:phone)%></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="form-project"> 
+    <div class="col-lg-8 col-xs-12 no-pad bot-space">
+      <div class="box-cart-left pad-box no-right-box" onchange="validateCommune()">
+        <%= render quotation_form_by_role, form: form %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- MI ZONA!!!!!!!!!!!!!!!1111 -->
+  <div id="my-zone">
+    <div id="instalation-dispatch" style="display: none;">
+      <div class="col-lg-8 col-xs-12 no-pad bot-space">
+        <div class="box-cart-left pad-box no-right-box">
+          <%= render 'quotations/checkout/instalation_box'%>
+        </div>
+        <!-- Unidades inmobiliarias -->
+        <div id="instalation-div" >
+          <div id="new_link_button">
+            <br>
+            <%= render 'quotations/checkout/new_link' %>
+          </div>
+        <br>
+          <div id="all_new_unit_real_state" value="0">
+          </div>
+          <div id="all_unit_real_state" value="0">
+            <%if @quotation.unit_real_states.length > 0%>
+              <% @quotation.unit_real_states.order(id: :desc).each_with_index do |unit_real_state, counter| %>
+                <%= render partial: 'quotations/checkout/unit_real_state_created', locals: {project_installation_values: @project_installation_values ,unit_real_state: unit_real_state, submit_label: 'Guardar', id: "unit_real_state-tab-#{counter}"} %>
+              <% end %>
+            <%end%>
+          </div>
+        </div>
+        <!---<div class="box-cart-left pad-box no-right-box">
+          <%= render 'quotations/checkout/dispatch_box'%>
+        </div>-->
+        <!-- Grupos de envío -->
+        <br>
+        <p class="title-box-checkout dispatch-group-title">Grupos de envío</p>
+        <br>
+        <div id="dispatch-groups-project-container">
+          <%if @quotation.dispatch_groups.count > 0%>
+            <% @quotation.dispatch_groups.order(id: :asc).each_with_index do |dispatch_group, counter| %>
+              <%= render partial: 'quotations/dispatch/dispatched_project', locals: { cart: @cart, dispatch_group: dispatch_group, submit_label: 'Guardar', dispatch_group_counter: counter, dispatch_group_iteration_last: (@quotation.dispatch_groups.count - 1) == counter, id: "dispatch-in-dispatch-tab-#{counter}"} %>
+            <% end %>
+          <%end%>
+        </div>
+        <div id="new_dispatch_group_box">
+        </div>
+        <!-- Modal -->
+        <div>
+          <%= render 'quotations/dispatch/modal_dispatch'%>
+        </div>
+        <div id="new_dispatch_group_button">
+          <%= render 'quotations/dispatch/new_link_project' %>
+        </div>
+      </div>
+    </div>
+  <!-- FIN DE MI ZONAAAAAAAAAAA22222222222 -->
+
+  </div>
+<!-- TOTAL -->
+  <div class="col-lg-4 col-xs-12 no-pad">
+    <%= render 'totals', currency: params[:currency] %>
+    <div class="row top-space text-right bot-space">
+      <%if current_user.sale_channel.try(:name) == "Proyectos"%>
+        <div class="col-xs-12">
+          <div id="btn-submit" style="display:none;">
+            <%= button_tag(disabled: true, type: "submit", id: "submit-quotation", class: 'btn btn-miele') do %>
+            Generar
+            <% end %>
+          </div>
+          <div>
+            <button  disabled id="btn-continue" type="button" onclick="showInastalationAndDispatch()" class="btn btn-miele">Continuar</button>
+          </div>
+        </div>
+      <%else%>
+        <div class="col-xs-12">
+          <div>
+            <%= button_tag(type: "submit", id: "submit-quotation", class: 'btn btn-miele', disabled: true) do %>
+            Generar
+            <% end %>
+          </div>
+        </div>
+      <%end%>
+    </div>
+  </div>
+
+ <% end %> 
+</div>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+    $("form").keypress(function(e) {
+        if (e.which == 13) {
+            return false;
+        }
+    });
+  });
+  $("#submit-quotation").attr("disabled", true)
+  $("#show_installation_price").addClass("hidden")
+  $("#show_dispatch_price").addClass("hidden")
+  document.getElementById("to_back_button_2").style.display = "none";
+  let tot = <%=@total_cost%>
+  tot = Math.round((tot + Number.EPSILON) * 100) / 100;
+  // document.getElementById("quotation-subtotal-price-<%= @cart.id %>").innerHTML = tot.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  // document.getElementById("cart-total-cost-<%= @cart.id %>").innerHTML = tot.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+</script>
+</div>
+
+<% if current_user.is_project? %>
+  <script>
+    var quotationId = <%= @quotation.id %>;
+  </script>
+<% end %>
+
+<script type="text/javascript">
+  var projectDispatchRules = <%=@dispatch_rules.to_json.html_safe%>
+  var projectInstallationDiscounts = <%=@project_installation_discounts.to_json.html_safe%>
+  var unit_real_states = <%=@quotation.unit_real_states.to_json.html_safe%>
+  var total_cost = <%=@total_cost%>
+  var dispatch_cost = 0
+  var dispatch_cost_total = 0
+  var installation_cost=0
+  var cantidad = 0
+  var isProject = <%= current_user.is_project_manager? %>;
+  var payPercent = <%= @cart.pay_percent %>;
+  var cartId = <%= @cart.id %>;
+
+  function deleteUnitAux(){
+      document.getElementById('add_unit_real_state_project').style.display = "";
+        $("#all_new_unit_real_state").empty();
+  }
+
+  function setIdModal(dispatch_group_id){
+    var modal = document.getElementById("modal")
+    modal.value = dispatch_group_id
+  }
+
+  function delete_cart(dispatch_group_id, cart_id){
+        $.ajax({
+            url: "/dispatch_groups/delete_dispatch_group_project",
+            type : 'post',
+            data: { dispatch_group_id: dispatch_group_id,
+                    cart_id: cart_id 
+            }
+        }).done(function (data) {
+            $( "#dispatch-groups-project-container" ).load(window.location.href + " #dispatch-groups-project-container" );
+            document.getElementById('add-dispatch-group-project').style.display = "";
+            updateDispatchCost()
+        })
+    }
+  function eliminateAux(aux_id, cart_id){
+        $.ajax({
+            url: "/dispatch_groups/delete_aux",
+            type : 'post',
+            data: { aux_id: aux_id,
+                    cart_id: cart_id
+            }
+        }).done(function (data) {
+          updateDispatchCost()
+          $( "#dispatch-groups-project-container" ).load(window.location.href + " #dispatch-groups-project-container" );
+            
+        })
+    }
+
+  function delete_cart_preparation(id){
+    document.getElementById('new_dispatch_group_button').style.display = "";
+    $("#new_dispatch_group_box").empty();
+  }
+
+  function setDisabledProject2(){
+    setTimeout(function(){
+      document.getElementById('new_dispatch_group_button').style.display = "";
+      $("#new_dispatch_group_box").empty();
+      $( "#dispatch-groups-project-container" ).load(window.location.href + " #dispatch-groups-project-container" );
+    },50);
+  }
+  function updateDispatchQuantity(id, total_quantity){
+        var quantity = parseInt(document.getElementById("quantity_cart_item_"+id).value)
+        document.getElementById("dispatch_quantity_cart_item_"+id).innerHTML = (total_quantity-quantity) + " por asignar";
+    }
+    function addProducts(length){
+        var i = 0
+        var checks = document.getElementsByClassName("check_cart_item")
+        var quantities_value = document.getElementsByClassName("quantity_cart_item")
+        var modal = document.getElementById("modal")
+        var dispatch_group_id = modal.value
+        var ids = []
+        var quantities = []
+        while ( i < length) {
+            if (checks[i].checked){
+                ids.push(checks[i].value)
+                quantities.push(quantities_value[i].value)
+            }
+            i++
+        }
+        $.ajax({
+            url: "/dispatch_groups/update_dispatch_quantity",
+            type : 'post',
+            data: {
+                id: dispatch_group_id, 
+                cart_items_id: ids,
+                quantities: quantities
+            }
+        }).done(function (data) {
+        $( "#dispatch-groups-project-container" ).load(window.location.href + " #dispatch-groups-project-container" );
+        updateDispatchCost()
+        })
+    }
+
+  function createUnit(quotation_id){
+    if (validateInputsNewRealState()){
+      var data = {
+        unit_real_state: {
+          name: document.getElementById('name_unit').value,
+          quantity: document.getElementById('quantity_unit').value,
+          products_quantity: document.getElementById('products_quantity_unit').value,
+          quotation_id: quotation_id,
+          is_rm: isRm()
+        }
+      }
+      $.ajax({
+              url: "/unit_real_states",
+              type : 'post',
+              data: data
+          }).done(function (data) {
+              $("#all_new_unit_real_state").empty(); 
+              document.getElementById('add_unit_real_state_project').style.display = "";
+            $( "#all_unit_real_state" ).load(window.location.href + " #all_unit_real_state" );
+            updateGlosa(data)
+            var installation_cost = updateGlosa(data)
+          updateSubTotal(installation_cost, 0)
+          updatePendingProducts(data)
+          //actualizar los productos pendientes
+          //actualizar la glosa
+          setTotalUnits();
+      })
+    }
+  }
+
+  function deleteUnit(id){
+        $.ajax({
+                url: "/unit_real_states/"+id,
+                type : 'delete'
+                }).done(function (data) {
+                $( "#all_unit_real_state" ).load(window.location.href + " #all_unit_real_state" );
+                updateGlosa(data)
+                //var installation_cost = updateGlosa(data)
+                //updateSubTotal(installation_cost, 0)
+                updatePendingProducts(data)
+                setTotalUnits();
+            })
+    }
+  
+    function updateUnit(id){
+        var data = {
+        unit_real_state: {
+            name: document.getElementById('name_unit_'+id).value,
+            quantity: document.getElementById('quantity_unit_'+id).value,
+            products_quantity: document.getElementById('products_quantity_unit_'+id).value,
+            is_rm: isRm()
+            }
+        }
+        $.ajax({
+                url: "/unit_real_states/"+id,
+                type : 'patch',
+                data: data
+            }).done(function (data) {
+            $( "#all_unit_real_state" ).load(window.location.href + " #all_unit_real_state" );
+            updateGlosa(data)
+            //var installation_cost = updateGlosa(data)
+           // updateSubTotal(installation_cost, 0)
+            updatePendingProducts(data)
+            setTotalUnits();
+        })
+    }
+
+  function setDisabledProject(){
+    document.getElementById('new_dispatch_group_button').style.display = "none";
+  }
+
+  function setInstalationCheck(instalation_check){
+    $.ajax({
+                url: "/set_instalation_check/",
+                type : 'patch',
+                data: {
+                  instalation_check: instalation_check,
+                  id: quotationId
+                }
+            }).done(function (data) {
+        })
+  }
+
+  function test(){
+        if(document.getElementById("cbox2").checked){
+            document.getElementById("instalation-div").style.display = "none";
+            document.getElementById("no_install").style.display = "";
+            document.getElementById("yes_install").style.display = "none";
+            document.getElementById("label_installation_price").innerHTML = "Instalación";
+            document.getElementById("quotation-installation-price").innerHTML = "0";
+            $("#show_installation_price").css('display', 'none');
+            validateGenerateButton2();
+            setInstalationCheck()
+        }
+        else{
+            document.getElementById("instalation-div").style.display = "";
+            document.getElementById("no_install").style.display = "none";
+            document.getElementById("yes_install").style.display = "";
+            $("#show_installation_price").css('display', '');            
+            validateGenerateButton2();
+        }
+        
+        $.ajax(
+          {
+            url: `/quotations/${quotationId}/unit_real_states`,
+            type : 'get'
+          }).done(function (data) {
+            unit_real_states = data;
+            updateGlosa(unit_real_states);
+          })
+
+        setInstalationCheck(document.getElementById("cbox2").checked);
+    }
+
+
+
+
+
+  function isRm(){
+                var commune_title = document.getElementById("select2-dispatch-commune-select-for-project-container").title;
+                if(commune_title.search("Metropolitana")!=-1){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+  function getDiscount(total){
+        var discount_percentage = 0
+        var i =0
+        while (i<projectInstallationDiscounts.length){
+            if (total >= projectInstallationDiscounts[i].min_amount && total <= projectInstallationDiscounts[i].max_amount){
+                discount_percentage = projectInstallationDiscounts[i].discount_percentage;
+                break;
+            }
+            i++;
+        }
+        return discount_percentage.toFixed(2);
+    }
+
+    function updateSubTotal(){
+      installation_cost = document.getElementById("quotation-installation-price").innerHTML
+      dispatch_cost = document.getElementById("quotation-dispatch-price").innerHTML
+      var subTtotal = Number(total_cost) + Number(dispatch_cost.replace(/,/g, '.')) + Number(installation_cost.replace(/,/g, '.'))
+      subTtotal = Number(subTtotal).toFixed(2)
+      document.getElementById("quotation-subtotal-price").innerHTML = subTtotal.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      var advance = (subTtotal * Number(payPercent) / 100).toFixed(2);
+      var balance = (subTtotal - advance).toFixed(2);
+      if (isProject) { 
+        document.getElementById("cart-total-cost").innerHTML = `Adelanto (Neto): UF ${advance.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+        const balanceElem = document.querySelector(`#cart-deb-${cartId}`)
+        if (balanceElem) {
+          balanceElem.innerHTML = `Saldo (Neto): UF ${balance.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+        }
+      } else {
+        document.getElementById("cart-total-cost").innerHTML = subTtotal.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+    }
+
+     function updateGlosa(unit_real_states){
+        var i = 0;
+        var total = 0;
+        var len_unit_real_states = unit_real_states.length;
+        if (len_unit_real_states == 0){
+          $("#show_installation_price").addClass("hidden");
+          return 0;
+        } else if (len_unit_real_states > 0) {
+          $("#show_installation_price").removeClass("hidden");
+        }
+        while(i<len_unit_real_states){
+            total = total + unit_real_states[i].total_value;
+            i++;
+        }
+        var discount_percentage = getDiscount(total_cost);
+        if (discount_percentage != 0 ) {
+            $("#show_installation_price").removeClass("hidden");
+            document.getElementById("label_installation_price").innerHTML = "Instalación ("+discount_percentage+"% Descuento)";
+            total = (total - (total * (discount_percentage/100))).toFixed(2);
+            document.getElementById("quotation-installation-price").innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        else {
+            total = total.toFixed(2);
+            document.getElementById("label_installation_price").innerHTML = "Instalación";
+            document.getElementById("quotation-installation-price").innerHTML = total.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        updateSubTotal()
+        return total
+    }
+    
+    function updatePendingProducts(unit_real_states){
+            var i = 0
+            var total_pending = 0;
+            while (i < unit_real_states.length){
+                total_pending = total_pending+ (unit_real_states[i].quantity * unit_real_states[i].products_quantity)
+                i++
+            }
+            var pending = parseInt(document.getElementById("span_installation_products").innerHTML) - total_pending;
+            document.getElementById("span_pending_products").innerHTML = pending;
+    }
+
+    function validateGenerateButton2(){
+      if(document.getElementById("cbox2").checked){
+         $("#submit-quotation").attr("disabled", false);
+      }
+      else{
+          var i = 0
+          var total = 0; 
+          let val = document.getElementById('u_tot').value;
+          while (i < unit_real_states.length){
+              var total_i = document.getElementById("quantity_unit_"+(unit_real_states[i].id));
+              if (total_i){
+                  total_i = parseInt(total_i.value);
+                  if (!Number.isNaN(total_i)){
+                      total = total + total_i
+                  }
+              }
+              i = i+1
+          }
+          if (parseInt(val) ==  total) {
+            $("#submit-quotation").attr("disabled", false);
+          }
+          else {
+            $("#submit-quotation").attr("disabled", true);
+          }
+      }
+    }
+  
+  function update_unit_value(){
+    var i = 0
+    var project_percentage = 0
+    var commune_title = (document.getElementById("select2-dispatch-commune-select-for-project-container").title).split(',');
+    while (i<projectDispatchRules.length){
+            if (commune_title[1].substring(1) == projectDispatchRules[i].region_name && total_cost>=parseInt(projectDispatchRules[i].min_amount) && total_cost<=parseInt(projectDispatchRules[i].max_amount)){
+                project_percentage = projectDispatchRules[i].project_percentage
+            }
+        i =i+1
+    }
+    var final = Math.round(total_cost*(project_percentage/100))
+    dispatch_cost = final
+    //document.getElementById("span_unit_value").innerHTML = "$ "+ final.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    validateGenerateButton2();
+  }
+
+   
+   function validateCommune(){
+    //var myJsArray = <%=raw @communes_for_select%>;
+    //console.log(document.getElementById("dispatch-commune-select-for-project").value); //id de la comuna
+     var commune = document.getElementById("dispatch-commune-select-for-project") && document.getElementById("dispatch-commune-select-for-project").value;
+
+     if (commune){
+       if( document.getElementById("btn-continue") )
+       {
+         document.getElementById("btn-continue").disabled = false;
+
+       }else{
+
+         document.getElementById("submit-quotation").disabled = false;
+         
+       }
+     }
+     else {
+       if( document.getElementById("btn-continue") )
+        {
+         document.getElementById("btn-continue").disabled = true;
+        }else{
+
+         document.getElementById("submit-quotation").disabled = false;
+         
+       }
+     }
+  }
+  
+  function updateDispatchCost(){
+
+    let commune = document.getElementById("select2-dispatch-commune-select-for-project-container").title
+    commune = commune.split(',')
+    commune = commune[1].substring(1)
+    $.ajax({
+      url: "/quotation/get_dispatch_cost",
+      type : 'post',
+      dataType: "json",
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify({ commune: commune})
+    }).done(function (data) {
+      
+      let dispatch_cost = data[0].toFixed(2);
+      let percentage_discount_dispatch = data[1].toFixed(2);
+      let dispatch_group_count = data[2]
+
+      if (dispatch_group_count == 0){  $("#show_dispatch_price").addClass("hidden"); return } // Validacion para no mostrar precio del despacho cuando no se tiene grupos de envio.
+
+      if (percentage_discount_dispatch != 0){
+        document.getElementById("label_dispatch_price").innerHTML = "Despacho ("+percentage_discount_dispatch+"% Descuento)";
+        document.getElementById("quotation-dispatch-price").innerHTML = dispatch_cost.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+      else{
+          document.getElementById("label_dispatch_price").innerHTML = "Despacho";
+          document.getElementById("quotation-dispatch-price").innerHTML = dispatch_cost.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+      $("#show_dispatch_price").removeClass("hidden");
+      updateSubTotal()
+      return dispatch_cost
+    })
+  }
+
+  function updateDispatch(quotation_id, dispatch_group_id){
+    var data = {
+      dispatch_group: {
+        dispatch_date: document.getElementById('dispatch_group_dispatch_date_'+dispatch_group_id).value, 
+        quotation_id: quotation_id
+      }
+    }
+    $.ajax({
+            url: "/dispatch_groups/"+dispatch_group_id,
+            type : 'patch',
+            data: data
+        }).done(function (data) {
+        document.getElementById('new_dispatch_group_button').style.display = "";
+        $("#new_dispatch_group_box").empty();
+        $( "#dispatch-groups-project-container" ).load(window.location.href + " #dispatch-groups-project-container" );
+        updateDispatchCost()
+    })
+  }
+
+  function showInastalationAndDispatch(){
+    //unit_real_states.map(function(unit_real_state){setInstalationValues(unit_real_state)});
+    update_unit_value();
+    test();
+    document.getElementById("btn-continue").style.display = "none";
+    document.getElementById("form-project").style.display = "none";
+    document.getElementById("btn-submit").style.display = "";
+    document.getElementById("instalation-dispatch").style.display = "";
+    document.getElementById("submit-quotation").disabled = true;
+    document.getElementById("to_back_button_2").style.display = "";
+    document.getElementById("to_back_button_1").style.display = "none";
+    updateGlosa(unit_real_states)
+    updateDispatchCost()
+    //updateSubTotal(installation_cost, dispatch_cost)
+    updatePendingProducts(unit_real_states)
+    
+  }
+
+  function hiddeInastalationAndDispatch(){
+    document.getElementById("btn-continue").style.display = "";
+    document.getElementById("form-project").style.display = "";
+    document.getElementById("btn-submit").style.display = "none";
+    document.getElementById("instalation-dispatch").style.display = "none";
+    document.getElementById("submit-quotation").disabled = false;
+    document.getElementById("to_back_button_2").style.display = "none";
+    document.getElementById("to_back_button_1").style.display = "";
+  }
+
+  $(document).ready(function(){
+    $('#quotation_estimated_dispatch_date').datetimepicker({
+      format      : 'DD/MM/YYYY',
+      minDate: start_calendar,
+      locale: 'es'
+    });
+    $('#quotation_installation_date').datetimepicker({
+      format      : 'DD/MM/YYYY',
+      minDate: start_calendar.add(3, 'days'),
+      locale: 'es'
+    });
+    $('#quotation_retirement_date').datetimepicker({
+      format      : 'DD/MM/YYYY',
+      minDate: moment(),
+      locale: 'es'
+    });
+    $("#quotation_estimated_dispatch_date").on("dp.change", function (e) {
+      $('#quotation_installation_date').data("DateTimePicker").minDate(e.date.add((is_rm ? 3 : 5), 'days'));
+    });
+  });
+
+  $('#quotation_dispatch_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  $('#quotation_personal_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  $('#quotation_instalation_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  $('#quotation_billing_commune_id').select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  $("#quotation_partner_referred_id").select2({ language: { noResults:function(){ return "No se encontraron resultados" } } });
+  
+  function ValidateSelec2(field) {
+    if ($('#quotation_' + field + '_commune_id').val() ==  "") {
+      $('#submit-quotation').prop("disabled", true);
+      $('#' + field + '-commune-content').find('.selec2-error').addClass('show');
+      $('#' + field + '-commune-content').children('.form-group').addClass('has-error');
+      $('#' + field + '-commune-content').children('.form-group').removeClass('has-success');
+    } 
+    else {
+      $('#' + field + '-commune-content').find('.selec2-error').removeClass('show');
+      $('#' + field + '-commune-content').children('.form-group').addClass('has-success');
+      $('#' + field + '-commune-content').children('.form-group').removeClass('has-error');
+      $('#submit-quotation').prop("disabled", false);
+    }
+  }
+
+  $(".bform").change(function(){
+    ValidateSelec2('dispatch');
+    ValidateSelec2('personal');
+    ValidateSelec2('instalation');
+    if($("#document-type").val() == 'factura'){
+      ValidateSelec2('billing');
+    }
+    if($(this).valid() && ($('.bform').find('.has-error').length == 0)){
+      $('#submit-quotation').prop("disabled", false);
+    } else {
+      $('#submit-quotation').prop("disabled", true);
+    }
+  });
+
+  $(".bform").submit(function(e){
+    ValidateSelec2('dispatch');
+    ValidateSelec2('personal');
+    ValidateSelec2('instalation');
+    if($("#document-type").val() == 'factura'){
+      ValidateSelec2('billing');
+    }
+    if ($('.bform').valid() && ($('.bform').find('.has-error').length == 0)) {
+    } else {
+     $('#submit-quotation').prop("disabled", true);
+     e.preventDefault();
+   }
+ });
+ validateCommune();
+
+function setTotalUnits() {
+  const inputTotal = document.querySelector("#u_tot");
+
+  $.ajax(
+    {
+      url: `/quotations/${quotationId}/unit_real_states`,
+      type : 'get'
+    }).done(function (data) {
+      let totalUnit = 0;
+      if (data.length > 0) {
+        data.forEach((unit) => {
+          totalUnit += unit.quantity;
+        });
+      }
+      inputTotal.value = totalUnit;
+      validateMinReq();
+    })
+}
+
+function validateMinReq() {
+  const inputTotal = document.querySelector("#u_tot");
+  const minReqMessage = document.querySelector("#min_req_message");
+  const inputNumber = Number(inputTotal.value);
+
+  if (inputNumber >= 6) {
+    minReqMessage.innerHTML = "";
+    setTimeout(() => {
+      $("#submit-quotation").attr("disabled", false);
+      $('#submit-quotation').prop("disabled", false);
+    }, 350);
+  } else if (inputNumber < 6) {
+    minReqMessage.innerHTML = "La cantidad m&iacute;nima de unidades inmobiliarias es 6";
+    setTimeout(() => {
+      $("#submit-quotation").attr("disabled", true);
+      $('#submit-quotation').prop("disabled", true);
+    }, 350);
+  }
+}
+
+</script>

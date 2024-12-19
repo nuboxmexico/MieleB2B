@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="resumen-quotation-box text-center">
+      <h2>¡Cotización Creada!</h2>
+      <h4>
+        Cotización ID <%= @quotation.code %> válida hasta el <%= (@quotation.created_at + 30.days).strftime('%d/%m/%Y') %> ha sido ingresada de forma exitosa. En breves minutos recibirá un correo a <b><%= @quotation.email %></b> con la cotización e información de forma de pago.
+      </h4>
+      <div class="resumen-quotation-btn">
+        <%= link_to "Nueva cotización", cart_path       , class: "btn-quotation-flat-invert" %>
+        <%= link_to "Finalizar"       , quotations_path , class: "btn-quotation" %>
+      </div>
+    </div>
+  </div>
+</div>

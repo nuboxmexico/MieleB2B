@@ -1,0 +1,22 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'Usuarios') do |sheet|
+  headers = ['Email','Nombre','Apellido Paterno','Apellido Materno','Rol','Canal','ID Rol','Tienda','Centro Costo','Teléfono','Jornada','Borrar Rol']
+  sheet.add_row headers
+  
+  @users.each do |user|
+    user.custom_roles.each do |custom_r|
+      sheet.add_row [user.try(:email),
+       user.try(:name),
+       user.try(:lastname),
+       user.try(:second_lastname),
+       custom_r.try(:role).try(:name),
+       (custom_r.manager? or custom_r.seller?) ? custom_r.try(:sale_channel).try(:name) : '',
+       user.try(:miele_role).try(:code),
+       user.try(:shop),
+       custom_r.try(:cost_center).try(:code),
+       user.try(:phone),
+       user.try(:workday), ''], types: [:string,:string,:string,:string,:string,:string,:string,:string,:string,:string,:string, :string]
+     end
+   end
+ end

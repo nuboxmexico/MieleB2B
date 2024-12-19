@@ -1,0 +1,17 @@
+<div class="container hidden-xs">
+	<ul class="progressbar">
+		<% @quotation.steps.each do |step| %>
+		<li  class="<%= step_class(step[1], current_step(@quotation)) %>"><a href="#"><%= step[0] %></a></li>
+		<% end %>
+	</ul>
+</div>
+
+<div class="container hidden-lg hidden-md hidden-sm">
+	<ul class="progressbar">
+		<% @quotation.steps.each do |step| %>
+		<% if (step[1] - current_step(@quotation)).abs <= 1 or ((step[1] - current_step(@quotation)).abs == 2 and ((current_step(@quotation) == @quotation.steps.last[1]) or current_step(@quotation) == @quotation.steps.first[1])) or ((step[1] - current_step(@quotation)).abs == 3 and @quotation.get_state == 'Enviada' and @quotation.quotation_products.where(available: true, dispatch: false).size == 0) %>
+			<li  class="<%= step_class(step[1], current_step(@quotation)) %>"><a href="#"><%= step[0] %></a></li>
+		<% end %>
+		<% end %>
+	</ul>
+</div>

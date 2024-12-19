@@ -1,0 +1,199 @@
+<!-- Config Unit Real State Modal -->
+<div class="modal fade" id="configUnitRealStateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelConfigUnit" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" id="modalConfigUnit" value="">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 0px !important;">
+                <h5 class="modal-title" id="exampleModalLabelConfigUnit">Agregar productos</h5>
+            </div>
+            <div class="modal-body" id="body_ConfigUnit">
+
+                <input name="unit_real_state_id" type="text" id="modalConfigUnitRealState" value="" hidden/>
+
+                <div class="row">
+                    <div class="col-xs-12 col-md-1 text-center">
+                        <p class="title-input">
+                            
+                        </p>
+                    </div>
+                    <div class="col-xs-12 col-md-5 text-center">
+                        <p class="title-input">
+                            Nombre
+                        </p>
+                    </div>
+                    <div class="col-xs-12 col-md-2 text-center">
+                        <p class="title-input">
+                            TNR
+                        </p>
+                    </div>
+                    <div class="col-xs-12 col-md-2 text-center">
+                        <p class="title-input">
+                            Cantidad
+                        </p>
+                    </div>
+                    <div class="col-xs-12 col-md-2 text-center">
+                        <p class="title-input">
+                            Cant. por asignar
+                        </p>
+                    </div>
+                </div>
+
+                <div class="line-row" style="border-bottom: 1px solid #EEEEEE !important;"></div>
+                <br />
+
+                <% @quotation.quotation_products.where(dispatch: true, instalation: true).each do |p, index| %>
+                    <div class="row">
+                        <div class="col-xs-12 col-md-1 text-center">
+                            <div class="checkbox" style="margin-top: 0px;">
+                                <label class="activation-tnr">
+                                    <input type="checkbox" id="checkbox_<%=p.id%>" class="check-item input-checkBox check_cart_item checkboxes" value="<%= p.id %>" required="required">
+                                    <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-5">
+                            <p><%= p.name %></p>                            
+                        </div>
+
+                        <div class="col-xs-12 col-md-2 text-center table-item-span">
+                            <p><%= p.sku %></p>
+                        </div>
+                        <div class="col-xs-12 col-md-2 text-center table-item-span">
+                            <input class="input-real_state current_quantity" style="width: 60%; padding-left: 20px !important; padding-right: 10px !important;" type="number" id="currentquantity_<%=p.id%>" min="0" max="<%= (p.quantity_assigned.nil? || p.quantity_assigned == 0) ? p.quantity : (p.quantity - p.quantity_assigned) %>" value="" onchange="">
+                        </div>
+                        <div class="col-xs-12 col-md-2 text-center table-item-span">
+                            <span class="all_to_assign" id="toassign_<%=p.id%>"><%= (p.quantity_assigned.nil? || p.quantity_assigned == 0) ? p.quantity : (p.quantity - p.quantity_assigned) %> por asignar</span>
+                        </div>
+                    </div>
+                <% end %>
+
+            <br>
+            <div class="line-row" style="border-bottom: 1px solid #EEEEEE !important;"></div>
+
+
+            </div>
+            <div class="modal-footer" style="border-top: 0px !important; display: flex;">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-miele" data-dismiss="modal" onclick="createOrUpdate()">Agregar productos</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$('#configUnitRealStateModal').on('show.bs.modal', function(e) {
+    var unitRealStateId = $(e.relatedTarget).data('unit_real_state-id');
+    $(e.currentTarget).find('input[name="unit_real_state_id"]').val(unitRealStateId);
+
+    // Setting initial or current quantity of each product in real unit state
+    if (parseInt(unitRealStateId) === 0) {
+        const currentQuantityElems = document.querySelectorAll('.current_quantity');
+        currentQuantityElems.forEach((elem) => {
+            elem.value = 0;
+        });
+    } else {
+        const currentQuantElemArr = document.querySelectorAll('.current_quantity');
+        currentQuantElemArr.forEach((elem) => {
+            const htmlId = elem.id;
+            const quotProdId = parseInt(htmlId.split('_')[1]);
+            const checkBoxElem = document.querySelector(`#checkbox_${quotProdId}`);
+
+            fetch(`${window.location.origin}/get_current_quantity/?urs=${parseInt(unitRealStateId)}&qp=${quotProdId}`)
+            .then(response => response.json())
+            .then(data => {
+                elem.value = data.quantity;
+                if (data.quantity === 0) {
+                    checkBoxElem.checked = false;
+                } else if (data.quantity > 0) {
+                    checkBoxElem.checked = true;
+                }
+            })
+            .catch(error => console.log('Error: ', error));
+        } );
+
+        const allToAssignElemArr = document.querySelectorAll('.all_to_assign');
+        allToAssignElemArr.forEach((elem) => {
+            const htmlId = elem.id;
+            const quotProdId = parseInt(htmlId.split('_')[1]);
+
+            fetch(`${window.location.origin}/get_updated_to_assign_quantity/${quotProdId}`)
+            .then(response => response.json())
+            .then(data => {
+                elem.innerHTML = `${data.quantity} por asignar`;
+                const maxElem = document.querySelector(`#currentquantity_${quotProdId}`);
+                maxElem.max = data.quantity;
+            })
+            .catch(error => console.log('Error: ', error));
+        });
+
+    }
+
+});
+
+const createOrUpdate = () => {
+    const unitIdElem = document.querySelector('#modalConfigUnitRealState');
+    const unitId = parseInt(unitIdElem.value);
+
+    let isMinorOrEqualToMax = true;
+
+    const dataToSend = { config_unit_id: unitId, products: [] };
+
+    const currentQuantElemArr = document.querySelectorAll('.current_quantity');
+    currentQuantElemArr.forEach((elem) => {
+        const htmlId = elem.id;
+        const quotProdId = parseInt(htmlId.split('_')[1]);
+        const quotProdQuantity = parseInt(elem.value);
+        const quotProdMax = parseInt(elem.max);
+
+        if (quotProdQuantity > quotProdMax) {
+            isMinorOrEqualToMax = false;
+        }
+
+        if (quotProdQuantity > 0) {
+            dataToSend.products.push({id: quotProdId, quantity: quotProdQuantity });
+        }
+    });
+
+    if (isMinorOrEqualToMax) {
+        $.ajax({
+        url: "/create_or_update",
+        type : 'post',
+        data: dataToSend
+        }).done(function (data) {
+        })
+
+    } else {
+        swal({
+            title: "Cantidad de productos incorrecta",
+            text: 'No es posible agregar más productos que los disponibles.',
+            type: "warning",
+            showCancelButton: false,
+            confirmButtonText: "Cerrar",
+            cancelButtonText: "Cancelar"
+        });
+    }   
+}
+
+const checkboxes = document.querySelectorAll('.checkboxes');
+checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("click", (event) => {
+        const numberElem = document.querySelector(`#currentquantity_${event.currentTarget.id.split('_')[1]}`);
+        if (event.currentTarget.checked === false) {            
+            numberElem.value = 0; 
+        }
+    });
+});
+
+const numberInputs = document.querySelectorAll('.current_quantity');
+numberInputs.forEach((numIn) => {
+    numIn.addEventListener("change", (event) => {
+        const checkElem = document.querySelector(`#checkbox_${event.currentTarget.id.split('_')[1]}`);
+        if (parseInt(event.currentTarget.value) === 0) {            
+            checkElem.checked = false; 
+        } else {
+            checkElem.checked = true;
+        }
+    });
+});
+
+</script>

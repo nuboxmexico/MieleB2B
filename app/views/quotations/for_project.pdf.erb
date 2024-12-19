@@ -1,0 +1,552 @@
+<style type="text/css">
+  .quotation-for-project {
+    margin-left: -35px;
+    margin-right: -35px;
+  }
+
+  img.full-page {
+    width: 100%;
+    height: 20.75cm;
+  }
+
+  .cover {
+    overflow: hidden;
+    height: 100vh;
+  }
+  .cover img {
+    height: 20.75cm;
+  }
+
+  .quotation-info {
+    padding-bottom: 40px;
+    padding-left: 50px;
+  }
+  .quotation-info .customers {
+    margin-top: 30%;
+  }
+
+  .sales-manager-data {
+    height: 20.64cm;
+  }
+
+  .sales-manager-data .image {
+    overflow: hidden;
+  }
+  .sales-manager-data .image img {
+    height: 20.75cm;
+  }
+
+  .sales-manager-data .data {
+    padding-left: 100px;
+  }
+  .sales-manager-data .data .text-center {
+    margin-left: -50px;
+  }
+  .sales-manager-data .data h1 {
+    margin-top: 100px;
+  }
+  .sales-manager-data .data h3 {
+    margin-bottom: 100px;
+  }
+  .sales-manager-data .data p {
+    margin-bottom: 10px;
+  }
+  .sales-manager-data .data p img {
+    width: 20px;
+    margin-right: 20px;
+  }
+  .sales-manager-data .data .data-footer {
+    margin-top: 200px;
+  }
+
+  .products-detail {
+    padding-top: 50px;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+  .products-detail table {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .products-detail table td, .products-detail table th {
+    border: 1px solid #000;
+    padding: 5px 20px;
+  }
+  .products-detail table tbody .price {
+    text-align: right;
+  }
+  .products-detail table tbody .quantity {
+    text-align: center;
+  }
+  .products-detail table tbody .no-border {
+    border: none;
+  }
+
+  .products-detail .footer div {
+    margin-top: 70px;
+    width: 40%;
+    display: inline-block;
+  }
+  .products-detail .quotation-code {
+  }
+  .products-detail .quotation-code p {
+    padding: 10px 20px;
+    border: 2px solid #000;
+    display: inline;
+  }
+
+  .products-detail .quotation-code span {
+    padding: 10px 20px;
+    margin-top: 10px;
+    display: block;
+  }    
+
+  .products-container .product .image {
+    margin-top: 10px;
+    text-align: center;
+  }
+  .products-container .product .image img {
+    padding-left: 80px;
+    padding-right: 80px;
+    max-width: 90%;
+  }
+  .centered {
+    margin: auto auto;
+  }
+  .products-container .product .data {
+    padding-top: 50px;
+    padding-right: 40px;
+    padding-left: 40px;
+    background-color: #F6F6F6;
+    height: 20.75cm;
+  }
+  .products-container .product .data h1 {
+    margin-bottom: 10px;
+  }
+  .products-container .product .data .sku {
+    margin-bottom: 50px;
+  }
+  .products-container .product .data label {
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .products-container .product .data .description {
+    text-align: justify;
+  }
+
+  .sale-conditions {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+  .sale-conditions h1 {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  .sale-conditions .condition {
+    padding: 20px 30px;
+  }
+  .sale-conditions .condition li {
+    color: #262626;
+    font-size: 20px;
+    list-style: none;
+  }
+  .sale-conditions .condition li::before {
+    content: "\2022";
+    color: #8C0314;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  .sale-conditions .condition p {
+    text-align: justify;
+  }
+
+  .signature {
+    margin-top: 0px;
+    background-color: #F6F6F6;
+    padding-top: 50px;
+    padding-bottom: 20px;
+    margin-left: -50px;
+    margin-right: -50px;
+  }
+  .signature .container {
+    max-width: 200px;
+    padding-top: 20px;
+    margin: 0 auto;
+    border-top: 1px solid #262626;
+  }
+  .signature .container .role {
+  }
+  .signature .container .name {
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+
+  .mtop-5 {
+    margin-top: 50px !important;
+  }
+  .title-box {
+    position: absolute;
+    top: 400px;
+    left: 40px;
+  }
+  .title-font {
+    font-size: 60px;
+  }
+  th {
+    background: #000;
+    color: #fff;
+    font-weight: 900;
+  }
+  .gray-cell {
+    background: #F6F6F6;
+    color: #000;
+    font-weight: bold;
+  }
+  .float-right {
+    float: right;
+  }
+  .mleft-5 {
+    margin-left: 50px;
+  }
+</style>
+
+<div class="quotation-for-project">
+  
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_cover.jpg", class: 'full-page' %>
+  
+    <div class="title-box">
+      <h1 class="title-font">Propuesta Proyecto <%= @quotation.project_name %></h1>
+
+      <% month_names = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" ] %>
+      <% month_number = @quotation.created_at.strftime('%m').to_i %>
+      <% month = month_names[(month_number - 1)] %>
+      
+      <h3 class="mtop-5">Giselle González | <%= "#{month} #{@quotation.created_at.strftime('%Y')}" %></h3>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_about_miele.png", class: 'full-page' %>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_references_1.jpg", class: 'full-page' %>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_references_2.jpg", class: 'full-page' %>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_references_3.jpg", class: 'full-page' %>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="quotation-info">
+    <div class="text-center">
+      <%= wicked_pdf_image_tag asset_url "logo-mini.png", class: "logo-miele" %>
+    </div>
+
+    <div class="contact-data">
+      <div class="project row">
+        <div class="col-xs-6">
+          <h1 class="miele-text mtop-5">COTIZACIÓN</h1>
+          <h1 class="miele-text"><%= @quotation.real_state_name.try(:upcase) %></h1>
+          
+          <h3 class="mtop-5"><strong><%= @quotation.project_name.try(:upcase) %></strong></h1>
+          <!--
+          <h1><%= @quotation.created_at.strftime('%d.%m.%y') %></h1>
+          -->
+        
+          <div class="customers">
+            <h4><%= "#{@quotation.name} #{@quotation.lastname} #{@quotation.second_lastname}" %></h4>
+            <h4><%= mail_to @quotation.email %></h4>        
+          </div>
+        
+        </div>
+
+        <div class="col-xs-6">
+          <br /><br /><br /><br />
+          <%= wicked_pdf_image_tag asset_url 'project_pdf/info_customer_img.jpg', class: 'img-responsive' %>
+        </div>
+      
+      </div>
+
+      
+    </div>
+  </div>
+
+  <!--
+  <div class="page-break"></div>
+
+  <div class="sales-manager-data row">
+    <div class="image col-xs-6">
+      <%= wicked_pdf_image_tag "project_pdf/sales-contact.jpg" %>
+    </div>
+
+    <div class="data col-xs-6">
+      <div class="text-center">
+        <%= wicked_pdf_image_tag "logo.png", class: "logo-miele" %>
+      </div>
+
+      <h1>Cristóbal Lifschitz</h1>
+      <h3>Head of Key Accounts & Project</h3>
+
+      <p>
+        <%= wicked_pdf_image_tag "project_pdf/icon-phone.svg" %>
+        + 56-2 2 957 0044
+      </p>
+      <p>
+        <%= wicked_pdf_image_tag "project_pdf/icon-fax.svg" %>
+        56-2 2 957 0079
+      </p>
+      <p>
+        <%= wicked_pdf_image_tag "project_pdf/icon-mail.svg" %>
+        cristobal.lifschitz@miele.com 
+      </p>
+      <p>
+        <%= wicked_pdf_image_tag "project_pdf/icon-web-asset.svg" %>
+        www.miele.cl 
+      </p>
+      <p>
+        <%= wicked_pdf_image_tag "project_pdf/icon-web-asset.svg" %>
+        www.miele-project-business.com
+      </p>
+      <p>
+        <%= wicked_pdf_image_tag "project_pdf/icon-map.svg" %>
+        Av. Nueva Costanera 4055, Santiago de Chile
+      </p>
+
+      <div class="data-footer">Miele Electrodomésticos Ltda.</div>
+    </div>
+  </div>
+  -->
+
+  <div class="page-break"></div>
+
+  <div class="text-center">
+      <%= wicked_pdf_image_tag asset_url "logo-mini.png", class: "logo-miele" %>
+  </div>
+
+  <% @batched_items.each_with_index do |batch, index| %>
+    <div class="products-detail">
+      <div class="header row">
+        <div class="col-xs-4 text-left">
+          <!--
+          <label>Proyecto (Página <%= index + 1 %> de <%= @batched_items.size %>)</label>
+          -->
+          <h2 class="miele-text"><strong>Proyecto <%= @quotation.project_name %></strong></h2>
+          <h3><strong><%= @quotation.real_state_name %></strong></h3>
+        </div>
+
+        <div class="col-xs-4 text-center">
+          <h3 class="mtop-3"><strong>Propuesta Selección Kit</strong></h3>
+        </div>
+
+        <div class="col-xs-4 text-right">
+          <div class="quotation-code">
+            <p><strong><%= @quotation.code.truncate(50) %></strong></p>
+            <span>UF <%= @quotation.created_at.strftime('%d/%m/%Y') %>: $<%= number_with_delimiter @quotation.uf_day %></span>
+          </div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Cantidad</th>
+            <th>Descripción</th>
+            <th>Valor unitario de lista (UF)</th>
+            <th>Valor unitario <%= @quotation.project_name.to_s.truncate(15) %> (UF)</th>
+            <th>Valor total <%= @quotation.project_name.to_s.truncate(15) %> (UF)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr></tr>
+          <% batch.each do |item| %>
+            <tr>
+              <td><%= item.sku %></td>
+              <td class="quantity"><%= item.quantity %></td>
+              <td><%= item.product.name.truncate(50) %></td>
+              <td class="price"><%= number_with_delimiter(euro_to_UF(item.product.price_eur).round(2)) %></td> 
+              <td class="price"><%= number_with_delimiter item.price.round(2) %></td>
+              <td class="price"><%= number_with_delimiter item.total_price.round(2) %></td>
+            </tr>
+          <% end %>
+          <% if index == @batched_items.size - 1 %>
+            <!--
+            <tr>
+              <td colspan="2" class="no-border"></td>
+              <td colspan="3">Productos</td>
+              <td class="price"><%= number_with_delimiter @quotation.total_cost.round(2) %></td>
+            </tr>
+            -->
+            <tr>
+              <td colspan="2" class="no-border"></td>
+              <td colspan="3" class="gray-cell">Neto</td>
+              <td class="price gray-cell"><%= number_with_delimiter @quotation.total_cost.round(2) %></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="no-border"></td>
+              <td colspan="3" class="gray-cell">IVA</td>
+              <td class="price gray-cell"><%= number_with_delimiter (@quotation.total_cost * 0.19).round(2) %></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="no-border"></td>
+              <td colspan="3">Instalación (IVA incl.)</td>
+              <td class="price"><%= number_with_delimiter @quotation.installation_value.round(2) %></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="no-border"></td>
+              <td colspan="3">Despacho (IVA incl.)</td>
+              <td class="price"><%= number_with_delimiter @quotation.dispatch_value.round(2) %></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="no-border"></td>
+              <td colspan="3" class="gray-cell">Total</td>
+              <td class="price gray-cell"><%= number_with_delimiter @quotation.total.round(2) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      
+      <div class="row">
+        <div class="col-xs-9"></div>
+        <div class="col-xs-3">
+          <div class="float-right">
+            <p><small><strong>Giselle González Arabia<br />
+            Project Business Manager<br />
+            Tel: +56 9 65969348<br />
+            giselle.gonzalez@miele.com<br />
+            www.miele.cl<br />
+            www.miele-project-business.com
+            </strong></small></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-break"></div>
+        
+    </div>
+  <% end %>
+
+  <!-- <div class="page-break"></div> -->
+
+  <div class="products-container">
+    <% @quotation.products.each do |product| %>
+      <div class="product row">
+        <div class="image col-xs-7">
+          <div class="centered">
+            <% if product.images.first %>
+              <%= wicked_pdf_image_tag asset_url product.images.first.image.url(:original), class: 'img-responsive' %>
+            <% else %>
+              <%= wicked_pdf_image_tag asset_url 'product.png', class: 'img-responsive' %>
+            <% end %>
+          </div>
+        </div>
+        <div class="data col-xs-5">
+          <h1><%= product.name %></h1>
+          <p class="sku">TNR <%= product.sku %></p>
+
+          <label>Descripción</label>
+          <p class="description"><%= simple_format(product.description.try(:html_safe)) %></p>
+          <!--
+          <p class="description"><%= simple_format(product.features.try(:html_safe)) %></p>
+          <p class="description"><%= simple_format(product.technical_specs.try(:html_safe)) %></p>
+          -->
+        </div>
+      </div>
+      
+      <div class="page-break"></div>
+    <% end %>
+  </div>
+
+  <div class="page-break"></div>
+  
+  <!--
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_conditions.jpg", class: 'full-page' %>
+  </div>
+  -->
+
+  <div class="sale-conditions">
+    <div class="text-center">
+      <%= wicked_pdf_image_tag asset_url "logo-mini.png", class: "logo-miele" %>
+    </div>
+
+    <div class="row">
+      <div class="condition col-xs-12">
+        <h3>Condiciones generales</h3>
+
+        <li>Cláusulas de precios</li>
+        <p>
+          Validez de cotización: 30 días.
+        </p>
+
+        <li>Entrega</li>
+        <p>
+          Entrega mínima 180 días desde la recepción de la Orden de Compra validada por la Gerencia de Proyectos de Miele Chile, un anticipo equivalente al <%= @quotation.pay_percent %>% del total de la compra y/o, en el caso de que se requiera, firmado el contrato de prestación de servicios referente a despacho e instalación de los artefactos. Entrega en un plazo máximo 270 días desde la fecha de recepción de la Orden de Compra y/o el contrato de prestación de servicios referente a despacho e instalación de los artefactos.
+        </p>
+
+        <li>Garantía</li>
+        <p>
+          La garantía de los productos será de dos años, contra todo defecto de fabricación y/o fallas en condiciones normales de operación, sin cargo de repuestos con falla de fabricación comprobada. Siempre y cuando se haga una mantención programada anual con nuestro Servicio Técnico.
+        </p>
+        <p>
+          NOTA: La vigencia de la garantía rige a contar de la fecha de firma del acta de recepción de la vivienda por parte del propietario.
+        </p>
+
+        <li>Despacho e instalación</li>
+        <p>
+          La instalación y despacho no está incluida en el valor de los artefactos y se cotiza como un servicio aparte (DI0001)
+        </p>
+
+        <li>Términos de pago</li>
+        <p>
+          Contra Recepción de Factura posterior a la recepción los productos en la obra.
+        </p>
+
+        <li>Depósito directo</li>
+        <p class="mleft-5">
+          Miele Electrodomésticos Ltda<br />
+          No Cuenta: 970254021<br />
+          Scotiabank
+        </p>
+      </div>
+    </div>
+    
+    <div class="signature text-center">
+      <div class="container">
+        <p class="name">Giselle González</p>
+        <p class="role">Project Business Manager</p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="page-break"></div>
+  
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_prelast.jpg", class: 'full-page' %>
+  </div>
+
+  <div class="page-break"></div>
+  
+  <div class="cover">
+    <%= wicked_pdf_image_tag asset_url "project_pdf/new_last.jpg", class: 'full-page' %>
+  </div>
+
+
+</div>

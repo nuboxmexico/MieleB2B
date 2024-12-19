@@ -1,0 +1,278 @@
+<div class="quotation-box padding-box text-left">
+	<div class="row">
+		<div class="col-md-12 col-xs-12 text-left">
+			<p class="bold secondary-text">Activación</p>
+		</div>
+	</div>
+	
+	<div class="row hidden-xs hidden-sm hidden-md border-retail-product-title">
+		<div class="col-lg-2 col-xs-12">
+			Nombre
+		</div>
+		<div class="col-lg-1 col-xs-12 text-center">
+			SKU
+		</div>
+		<div class="col-lg-1 col-xs-12 text-center">
+			TNR
+		</div>
+		<div class="col-lg-1 col-xs-12 text-center">
+			Cantidad
+		</div>
+		<div class="col-lg-2 col-xs-12 text-center">
+			Tienda
+		</div>
+		<div class="col-lg-1 col-xs-12 text-center">
+			Empaques
+		</div>
+		<div class="col-lg-2 col-xs-12 text-center">
+			Precio unitario
+		</div>
+		<div class="col-lg-2 col-xs-12 text-center">
+			Total
+		</div>
+	</div>
+	<% if can? :update_quantities, @quotation %>
+		<%= form_tag update_quantities_path(@quotation), method: :post do %>
+			<% @quotation.quotation_products.each do |prod| %>
+				<%= fields_for "quotation_product[]", prod do |quotation_product_fields| %>
+					<div class="row border-retail-product">
+						<div class="col-lg-2 col-xs-12">
+							<span class="hidden-lg">Nombre: </span><%= prod.name %>
+						</div>
+						<div class="col-lg-1 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">SKU: </span><%= RetailProduct.find_by(retail: @quotation.retail, product: prod.product).try(:tnr) %>
+						</div>
+						<div class="col-lg-1 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">TNR: </span><%= prod.product.sku%>
+						</div>
+						<div class="col-lg-1 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">Cantidad: </span><%= quotation_product_fields.number_field :quantity, max: prod.max_quantity, min: 1, class: 'quantity-field less-width text-center', data: {'price' => prod.price } %>
+						</div>
+						<div class="col-lg-2 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">Tienda: </span><%= prod.try(:branch_name) ? prod.try(:branch_name) : '-' %>
+						</div>
+						<div class="col-lg-1 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">Empaques: </span><%= prod.try(:packing) ? prod.try(:packing) : '-' %>
+						</div>
+						<div class="col-lg-2 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">Precio Unitario: </span><b><%= number_to_currency(prod.price) %></b>
+						</div>
+						<div class="col-lg-2 col-xs-12 text-center-left-retail">
+							<span class="hidden-lg">Total: </span><b><%= number_to_currency(prod.price * prod.quantity) %></b>
+						</div>
+					</div>
+				<% end %>
+			<% end %>
+			<div class="row top-both">
+				<div class="col-lg-4 col-lg-offset-8 col-md-5 col-md-offset-7 col-xs-12">
+					<div class="row detail-quotation">
+						<div class="col-md-6 col-xs-6">
+							<p>Sub Total:        </p>
+						</div>
+						<div class="col-md-6 col-xs-6 text-right">
+							<p id="subtotal"><%= number_to_currency(@quotation.total_cost) %></p>
+						</div>
+					</div>
+					<% if @quotation.try(:dispatch_value).to_i > 0 %>
+					<div class="row detail-quotation">
+						<div class="col-md-6 col-xs-6">
+							<p>Despacho</p>
+						</div>
+						<div class="col-md-6 col-xs-6 text-right">
+							<p><%= number_to_currency(@quotation.dispatch_value) %></p>
+						</div>
+					</div>
+					<% end %>
+					<div class="row detail-quotation">
+						<div class="col-md-6 col-xs-6">
+							<p class="total-quotation bold">Total Neto</p>
+						</div>
+						<div class="col-md-6 col-xs-6 text-right">
+							<p class="total-quotation" id="total"><%= number_to_currency(@quotation.total_retail) %></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row top-both">
+				<div class="pull-right">
+					<button type="submit" class="btn btn-miele" id="save_quantities">Guardar Cambios</button>
+				</div>
+			</div>
+			<script>
+				$(".quantity-field").change(function(){
+					var dispatch = <%= @quotation.try(:dispatch_value).to_i %>;
+					var total = 0;
+					$(".quantity-field").each(function(obj){
+						total += ($(this).data('price') * $(this).val());
+					});
+					$("#subtotal").text('$ '+total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1."));
+					total += dispatch;
+					$("#total").text('$ '+total.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1."));
+				})
+			</script>
+		<% end %>
+	<% else %>
+		<% @quotation.quotation_products.each do |prod| %>
+			<div class="row border-retail-product">
+				<div class="col-lg-2 col-xs-12">
+					<span class="hidden-lg">Nombre: </span><%= prod.name %>
+				</div>
+				<div class="col-lg-1 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">SKU: </span><%= RetailProduct.find_by(retail: @quotation.retail, product: prod.product).try(:tnr) %>
+				</div>
+				<div class="col-lg-1 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">TNR: </span><%= prod.product.sku%>
+				</div>
+				<div class="col-lg-1 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">Cantidad: </span><%= prod.quantity%>
+				</div>
+				<div class="col-lg-2 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">Tienda: </span><%= prod.try(:branch_name) ? prod.try(:branch_name) : '-' %>
+				</div>
+				<div class="col-lg-1 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">Empaques: </span><%= prod.try(:packing) ? prod.try(:packing) : '-' %>
+				</div>
+				<div class="col-lg-2 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">Precio Unitario: </span><b><%= number_to_currency(prod.price) %></b>
+				</div>
+				<div class="col-lg-2 col-xs-12 text-center-left-retail">
+					<span class="hidden-lg">Total: </span><b><%= number_to_currency(prod.price * prod.quantity) %></b>
+				</div>
+			</div>
+		<% end %>
+		<div class="row top-both">
+			<div class="col-lg-4 col-lg-offset-8 col-md-5 col-md-offset-7 col-xs-12 bot-detail">
+				<div class="row detail-quotation">
+					<div class="col-md-6 col-xs-6">
+						<p>Sub Total: </p>
+					</div>
+					<div class="col-md-6 col-xs-6 text-right">
+						<p><%= number_to_currency(@quotation.total_cost) %></p>
+					</div>
+				</div>
+				<% if @quotation.try(:dispatch_value).to_i > 0 %>
+				<div class="row detail-quotation">
+					<div class="col-md-6 col-xs-6">
+						<p>Despacho</p>
+					</div>
+					<div class="col-md-6 col-xs-6 text-right">
+						<p><%= number_to_currency(@quotation.dispatch_value) %></p>
+					</div>
+				</div>
+				<% end %>
+				<div class="row detail-quotation">
+					<div class="col-md-6 col-xs-6">
+						<p class="total-quotation bold">Total Neto</p>
+					</div>
+					<div class="col-md-6 col-xs-6 text-right">
+						<p class="total-quotation"><%= number_to_currency(@quotation.total_retail) %></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	<% end %>
+
+	<% if can? :activate_retail, @quotation %>
+		<div class="line-row-info"></div>
+		<div class="row">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Información</p>
+			</div>
+		</div>
+		<%= form_tag activate_retail_path(@quotation), method: :post, multipart: true, id: 'activate-retail-form' do %>
+			<div class="row top-both">
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<label for="billing_documents[]" class="title-input">Carga OC</label>
+					<div class="file-field input-field">
+						<div class="file-drop-area dashed-border">
+							<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+							<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+							<input type="file" name="billing_documents[]" multiple="true"  accept="image/jpeg, image/png, application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" id="billing_documents" class="file-input">
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12">
+					<label class="title-input" for="agreed_dispatch_date">Fecha Pactada Despacho</label>
+					<input required="required" class="form-control field-bordered" placeholder="DD/MM/AAAA" onkeydown="return false;" value="<%= @quotation.try(:agreed_dispatch_date).try(:strftime, "%d/%m/%Y") %>" type="text" name="agreed_dispatch_date" id="agreed_dispatch_date" data-bv-field="agreed_dispatch_date">
+				</div>
+			</div>
+			<div class="row top-both">
+				<div class="pull-right">
+					<button type="submit" class="btn btn-miele" id="send-retail-activation">Activar</button>
+				</div>
+			</div>
+		<% end %>
+		<script>
+			$(document).ready(function(){
+				$('#agreed_dispatch_date').daterangepicker({
+					singleDatePicker   : true,
+					showDropdowns      : true,
+					autoUpdateInput    : true,
+					drops              : "up",
+					applyButtonClasses : "btn btn-small",
+					cancelClass        : "btn btn-flat btn-small",
+					minDate: moment(),
+					locale: {
+						format      : 'DD/MM/YYYY',
+						applyLabel  : "Aplicar",
+						cancelLabel : "Limpiar",
+						daysOfWeek  : [
+						"Do",
+						"Lu",
+						"Ma",
+						"Mi",
+						"Ju",
+						"Vi",
+						"Sa"
+						],
+						monthNames  : [
+						"Enero",
+						"Febrero",
+						"Marzo",
+						"Abril",
+						"Mayo",
+						"Junio",
+						"Julio",
+						"Agosto",
+						"Septiembre",
+						"Octubre",
+						"Noviembre",
+						"Diciembre"
+						]
+					}
+				});
+			});
+		</script>
+	<% else %>
+		<div class="line-row-info"></div>
+		<div class="row top-separation-data">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Información</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+				<p class="bold title-input">Comprobantes de pago</p>
+				<% if @quotation.billing_documents.size > 0 %>
+					<% @quotation.billing_documents.each do |bill_doc| %>
+						<%= link_to bill_doc.document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+							<i class="fa fa-file-image"></i> <%= truncate(bill_doc.document_file_name, length: 15) %>
+						<% end %>
+						<% if can? :destroy, bill_doc and can_delete_docs(@quotation) %>
+						 <%= link_to billing_document_path(bill_doc), method: :delete, class: "btn btn-delete no-loader space-btn", data: 
+            			{ confirm: '¿Estás seguro de eliminar el archivo '+bill_doc.document_file_name+'?',
+            			'confirm-button-text': 'Eliminar',
+            			'cancel-button-text': 'Cancelar'}  do %>
+            				<i class="fa fa-times"></i>
+            			<% end %>
+            			<% end %>
+					<% end %>
+				<% end %>
+			</div>
+			<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+				<p class="bold title-input">Fecha Pactada Despacho</p>
+				<p><%= @quotation.try(:agreed_dispatch_date).try(:strftime, "%d/%m/%Y") %></p>
+			</div>
+		</div>
+	<% end %>
+</div>

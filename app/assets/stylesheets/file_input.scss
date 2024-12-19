@@ -1,0 +1,71 @@
+@import "variables";
+
+
+.file-drop-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: auto;
+  max-width: 100%;
+  padding: 25px 0px;
+  border: 2px solid $grey-light;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 0px;
+  transition: 0.2s;
+  color: $brand-secondary;
+  &.is-active {
+    background-color: #f6f6f6;
+  }
+}
+
+.fake-btn {
+  flex-shrink: 0;
+  border-radius: 5px;
+  text-transform: capitalize!important;
+}
+
+.file-msg {
+  padding-left: 10px;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+@media(max-width: 768px){
+  .file-drop-area {
+    width: 100%;
+  }
+
+  .file-msg {
+    font-size: 10px;
+  }
+}
+
+.file-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  opacity: 0;
+  &:focus {
+    outline: none;
+  }
+}
+
+.btn-input-file{
+  padding: 5px 15px!important;
+  margin-left: 10px;
+}
+
+
+@media(max-width : 700px) {
+  .file-drop-area {
+    display: inline-block;
+  } 
+}
+
+.top-both-30{
+  margin-top: 30px;
+}

@@ -1,0 +1,11 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'Destinatarios') do |sheet|
+  headers = ['Proceso','Correo']
+  sheet.add_row headers
+  
+  @addressees.each do |addressee|
+    sheet.add_row [addressee.process,
+                   addressee.user.email], types: [:string,:string]
+  end
+end

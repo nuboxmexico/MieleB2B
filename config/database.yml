@@ -1,0 +1,32 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  username: root
+  password: root
+  timeout: 1000
+
+development:
+  <<: *default
+  host: 44.201.192.191
+  database: mieleb2b
+
+# test:
+#   <<: *default
+#   host: postgres
+#   database: db/miele_test
+
+# staging:
+#   <<: *default
+#   host: localhost
+#   database: db/miele_staging
+
+# preproduction:
+#   <<: *default
+#   host: localhost
+#   database: db/miele_preproduction
+
+# production:
+#   <<: *default
+#   host: mieleb2b.ckkrydfyhuxz.us-east-1.rds.amazonaws.com
+#   database: db/miele_production

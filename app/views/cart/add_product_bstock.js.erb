@@ -1,0 +1,13 @@
+<% if @success == true  %>
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Producto agregado con éxito');
+$("#bstock_id option[value='<%= @bstock.id %>']").remove();
+if($('#bstock_id option').length == 0){
+	$("#form-add-bstock").addClass("hidden");
+}
+$("#bstock_id").trigger("change");
+<% else %>
+$(".toast-bottom-right-custom").remove();
+toastr['error']('Solo puedes cotizar productos B-Stock con otros del mismo tipo.');
+<% end %>
+$("#items-in-cart").text("<%= current_user.cart_products %>");

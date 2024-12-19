@@ -1,0 +1,17 @@
+<p>
+	Se ha ingresado un nuevo método de pago a la cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %>.
+</p>
+<ul>
+	<li>Método de pago: <%= @payment.payment_type.capitalize %></li>
+	<li>Monto pagado: <%= number_to_currency(@payment.ammount) %></li>
+</ul>
+
+<% if @quotation.payments.completed.sum(:ammount) > @quotation.total/2 %>
+	<p>
+		Puedes ver todo el detalle de las observaciones y archivos adjuntos en la pestaña "Finanzas" de tu cotización <%= link_to 'aquí.', quotation_url(@quotation) %>
+	</p>
+<% else %>
+	<p>
+		Estimado Cliente: sus pagos ingresados aún no alcanzan el 50% del total. Para cualquier información, por favor dirígete a tu vendedor o vendedora.
+	</p>
+<% end %>

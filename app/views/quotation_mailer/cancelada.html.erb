@@ -1,0 +1,8 @@
+<p>
+	Estimado(a) <%= @quotation.name %>, 
+</p>
+<p>
+	La cotización <%= @quotation.code %> creada el <%= @quotation.created_at.strftime("%d/%m/%Y") %> ha sido cancelada. No sigue siendo válida.
+
+	Si desea solicitar más información, o realizar una nueva cotización se debe contactar con su asesor de ventas <%= @quotation.user.fullname %>, correo <%= @quotation.user.email %>.
+</p>

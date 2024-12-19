@@ -1,0 +1,18 @@
+<p>
+	Una o más cotizaciones tienen fecha pactada de instalación dentro de los siguientes 5 días hábiles.
+</p>
+<% @quotations.each do |quotation| %>
+<p>
+	<b><%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %></b>
+</p>
+<p>Nombre cliente: <%= quotation.customer_name %></p>
+<p>Comuna: <%= quotation.try(:instalation_commune).try(:name_with_region) %></p>
+<p>Fecha pactada de instalación: <%= quotation.installation_date.strftime("%d/%m/%Y") %></p>
+<ul>
+	<% quotation.quotation_products.where(available: true, instalation: true).each do |item| %> 
+	<li><%= "<b>#{item.product.sku}</b> #{item.product.name}".html_safe %> </li>
+	<% end %>
+</ul>
+<p>Para ver el detalle de la cotización ingresa <%= link_to 'acá.', quotation_url(quotation) %></p>
+<hr>
+<% end %>

@@ -1,0 +1,158 @@
+<style>
+	.select2-selection__choice{
+		display: none!important;
+	}
+</style>
+<div class="row top-space">
+	<div class="col-lg-12 col-sm-12 col-xs-12">
+		<% if current_user.manager? or current_user.administrator? %>
+		<ol class="breadcrumb">
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<li>Business Units</li>
+		</ol>
+		<% end %>
+	</div>
+	<div class="col-lg-6 col-sm-12 col-xs-12">
+		<h1><b>Conoce nuestra línea de productos</b></h1>
+	</div>
+	<div class="col-lg-3 col-lg-offset-3 col-sm-12 col-xs-12 searcher-div no-right-padding">
+		<div class="select2-miele select2-simple-border">
+			<%= form_tag(search_products_path, method: :get) do %>
+				<%= select_tag :search_products, {}, autofocus: true, onchange: "add_p($(this).val())", multiple: false, class:'inlineb' %>
+				<span class="input-group-addon inlineb right-search"><i class="fa fa-search"></i></span>
+			<% end %>
+		</div>
+	</div>
+</div>
+
+<div class="row top-space bot-space">
+	<div class="col-lg-6 col-xs-12">
+		<div class="row">
+			<div class="col-xs-12">
+				<%= link_to products_path(business_unit: 'Cocción') do %>
+				<div class="business-unit-card">
+					<span class="black-card-name">Cocción</span>
+					<%= image_tag("business_units/Cocción_#{(rand(5)+1).to_s}.jpg", class:'first-type-bu') %>
+				</div>
+				<% end %>
+			</div>
+			<div class="col-xs-12">
+				<%= link_to products_path(business_unit: 'Lavado') do %>
+				<div class="business-unit-card">
+					<span class="black-card-name">Lavado</span>
+					<%= image_tag("business_units/Lavado_#{(rand(5)+1).to_s}.jpg", class:'first-type-bu') %>
+				</div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-6 col-xs-12">
+		<%= link_to products_path(business_unit: 'Refrigeración') do %>
+		<div class="business-unit-card">
+			<span class="black-card-name">Refrigeración</span>
+			<%= image_tag("business_units/Refrigeración_#{(rand(5)+1).to_s}.jpg", class:'second-type-bu') %>
+		</div>
+		<% end %>
+	</div>
+	<div class="col-lg-3 col-xs-12">
+		<%= link_to products_path(business_unit: 'Lavavajillas') do %>
+		<div class="business-unit-card">
+			<span class="black-card-name">Lavavajillas</span>
+			<%= image_tag("business_units/Lavavajilla_#{(rand(5)+1).to_s}.jpg", class:'third-type-bu') %>
+		</div>
+		<% end %>
+	</div>
+	<div class="col-lg-3 col-xs-12">
+		<%= link_to products_path(business_unit: 'SDA') do %>
+		<div class="business-unit-card">
+			<span class="black-card-name">SDA</span>
+			<%= image_tag("business_units/SDA_#{(rand(2)+1).to_s}.jpg", class:'third-type-bu') %>
+		</div>
+		<% end %>
+	</div>
+	<div class="col-lg-3 col-xs-12">
+		<%= link_to products_path(business_unit: 'Servicios') do %>
+		<div class="business-unit-card">
+			<span class="black-card-name">Servicios</span>
+			<%= image_tag("business_units/Servicios_#{(rand(5)+1).to_s}.jpg", class:'third-type-bu') %>
+		</div>
+		<% end %>
+	</div>
+	<div class="col-lg-3 col-xs-12">
+		<%= link_to products_path(business_unit: 'PAI') do %>
+		<div class="business-unit-card">
+			<span class="black-card-name">PAI</span>
+			<%= image_tag("business_units/PAI_#{(rand(5)+1).to_s}.jpg", class:'third-type-bu') %>
+		</div>
+		<% end %>
+	</div>
+	<% if current_user.administrator? %>
+		<div class="col-lg-3 col-xs-12">
+			<%= link_to products_path(business_unit: 'Sin categorizacion') do %>
+			<div class="business-unit-card">
+				<span class="black-card-name">Sin categorizacion</span>
+				<%= image_tag("business_units/sin_categorizacion.png", class:'third-type-bu') %>
+			</div>
+			<% end %>
+		</div>
+	<%end%>
+</div>
+
+<script>
+	$('#search_products').select2({
+		minimumInputLength: 3,
+		minimumResultsForSearch: 10,
+		placeholder: " Buscar",
+		language: {
+			errorLoading:function(){ return "Buscando..." },
+			inputTooLong:function(e){var t=e.input.length-e.maximum,n="Por favor, elimine "+t+" car";return t==1?n+="ácter":n+="acteres",n},
+			inputTooShort:function(e){var t=e.minimum-e.input.length,n="Por favor, introduce "+t+" car";return t==1?n+="ácter":n+="acteres",n},
+			loadingMore:function(){return"Cargando más resultados"},
+			maximumSelected:function(e){var t="Solo puede seleccionar "+e.maximum+" elemento";return e.maximum!=1&&(t+="s"),t},
+			noResults:function(){return"No se encontraron resultados"},
+			searching:function(){return"Buscando.."}
+		},
+		ajax: {
+			url: '<%= "/search.json" %>',
+			dataType: "json",
+			type: "GET",
+			data: function (params) {
+				var queryParameters = {
+					search_product: params.term
+				}
+				return queryParameters;
+			},
+			processResults: function (data) {
+				return {
+					results: $.map(data, function (item) {
+						return {
+							text: item.name,
+							html: 
+							'<div class="row select2-row" onclick="add_p("'+item.sku+'")">'
+							+  '<div class="col-lg-3 select2-img">'
+							+    '<img alt="producto" class="responsive-img" src="'+item.image_url+'">'
+							+  '</div>'
+							+  '<div class="col-lg-9 selec2-descriptions">' 
+							+    '<p><b>'   + item.name            + '</b></p>'
+							+    '<p>TNR: ' + item.sku             + '</p>'  
+							+    '<p>'      + (item.discount ? '<span class="old-price strikediag">'+item.price_formatted+'</span><span class="new-price pt14">'+item.discount_price+'</span>' : item.price_formatted) + '</p>'  
+							+  '</div>'
+							+'</div>'
+							,
+							id: item.sku
+						}
+					})
+				};
+			}
+		},
+		escapeMarkup: function(markup) {
+			return markup;
+		},
+		templateResult: function(data) {
+			return data.html;
+		},
+		templateSelection: function(data) {
+			return data.text;
+		}
+	});
+</script>

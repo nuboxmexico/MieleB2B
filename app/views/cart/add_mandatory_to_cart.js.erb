@@ -1,0 +1,22 @@
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Producto mandatorio agregado con éxito. <%= @pipe ? "Visita requerida para cotizar ductos." : "" %>');
+<% @mandatory_products.each do |item| %>
+  <% if @updated_items.include?(item) %>
+    $(".cart-quantity-<%= item.id.to_s %>").html("<%= item.quantity.to_s %>");
+  <% else %>
+    $("#card<%= @parent.id %>").after("<%= escape_javascript render(partial: 'cart/cart_item', locals: {product: item, counter: @cart.cart_items.count}) %>");
+  <% end %>
+<% end %>
+
+<% if @added_service %>
+  $("#card<%= @parent.id %>").after("<%= escape_javascript render(partial: 'cart/cart_item', locals: {product: @cart.cart_items.find_by(product: @service), counter: @cart.cart_items.count}) %>");
+<% end %>
+
+<% if @linked %>
+  $(".order-<%= @parent.order_item %>").removeClass("mandatory-alert");
+  $(".order-<%= @parent.order_item %>").removeClass("normal-alert");
+  $(".order-<%= @parent.order_item %>").addClass("linked-alert");
+  $("#row<%= @parent.id %>").click();
+<% end %>
+
+<%= render :partial => 'cart/update_totals.js.erb' %>

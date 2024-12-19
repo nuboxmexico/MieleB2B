@@ -1,0 +1,78 @@
+<div class="quotation-box padding-box text-left">
+  <div class="row dispatch-group-container" data-type="dispatch">
+    <a class="collapse-dispatch-group-link" role="button" data-toggle="collapse" href="#<%= id + "to_project_user"%>" aria-expanded="false" aria-controls="<%= id %>">
+      <h4 class="dispatch-group-subtitle">
+        Envío #<%= dispatch_group_counter + 1 %>
+        <%= get_state_label(dispatch_group.state, 'full') %>
+        <i class="fa fa-chevron-down"></i>
+      </h4>
+    </a>
+
+    <div class="collapse" id="<%= id + "to_project_user"%>" data-type="dispatch">
+      <% if params[:new_dispatch_group] and dispatch_group_iteration_last %>
+        <div class="alert alert-warning alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          Se a creado un nuevo grupo de envío ya que aún faltan unidades para completar el pedido inicial
+        </div>
+      <% end %>
+
+      <%= form_for dispatch_group, html: {multipart: true} do |f| %>
+        <div class="row">
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :installation_date, 'Fecha estimada Instalación', class: 'title-input' %>
+              <%= f.text_field :installation_date, class: 'field-bordered inlineb date-picker', value: (dispatch_group.installation_date.strftime('%d/%m/%Y') if dispatch_group.installation_date), required: true, placeholder: 'DD/MM/AAAA' %>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+              <%= f.label :dispatch_date, 'Fecha de despacho', class: 'title-input' %>
+              <%= f.text_field :dispatch_date, class: 'field-bordered inlineb date-picker', value: (dispatch_group.dispatch_date.strftime('%d/%m/%Y') if dispatch_group.dispatch_date) %>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group">
+              <%= f.fields_for :notes, dispatch_group.notes.dispatch.last do |note_form| %>
+                <%= note_form.label :observation, 'Observaciones', class: 'title-input' %>
+                <%= note_form.text_area :observation, class: 'field-bordered full-width padding-text-area' %>
+                <%= note_form.hidden_field :user_id, value: current_user.id %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="products-container">
+          <div class="row">
+            <div class="col-xs-12">
+              <h5>Productos</h5>
+            </div>
+            <%= f.fields_for :product_in_dispatch_groups, dispatch_group.products_in_dispatch.order(product_id: :asc) do |item_form| %>
+              <div class="col-xs-12 col-md-4">
+                <div class="product">
+                  <%= item_form.label :quantity, item_form.object.product.name_and_sku %>
+                  <%= item_form.number_field :quantity, min: 0, max: item_form.object.quantity %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group actions-container text-right">
+              <% if @can_destroy_dispatch_group %>
+                <button class="btn btn-flat fake-destroy-dispatch-group">
+                  Eliminar
+                </button>
+                <%= link_to 'Eliminar', dispatch_group, method: :delete, class: 'btn btn-flat destroy-dispatch-group hidden' %>
+              <% end %>
+              <%= f.submit submit_label, class: 'btn btn-miele save-dispatch' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

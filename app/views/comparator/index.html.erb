@@ -1,0 +1,91 @@
+<% @size_cols = (@comparator.products.size == 2  ? 'col-lg-6 col-md-6 col-sm-6 extra-padding' : 'col-lg-4 col-md-4 col-sm-4 extra-padding') %>
+<div class="row row-content fix-bot">
+	<div class="col-md-12 col-xs-12">
+		<%= link_to '<i class="fa fa-chevron-left"></i>Volver'.html_safe, back_and_empty_comparator_path, class: 'btn-goback top-space' %>
+	</div>
+	<div class="col-md-6 col-xs-12">
+		<h1 class="bold no-bot no-top">Comparador </h1>
+	</div>
+</div>
+<% if @comparator.products.size > 1%>
+<div class="hidden-xs">
+	<%= render 'product_resume', products: @comparator.products %>
+	<div class="row">
+		<% @comparator.products.each do |product| %>
+		<div class="<%= @size_cols%> hidden-xs">
+			<div class="product-box text-center">
+				<%= image_tag(product.get_product_photo, alt: 'producto', class: 'comparator-img') %>
+				<p class="product-name-comp"><%= product.name %></p>
+				<p class="product-sku-comp">TNR <%= product.sku %></p>
+				<%= check_offer_comparator(product).html_safe %>
+				<% if product.can_supply? %>
+				<%= link_to 'Cotizar', add_product_to_cart_path(product), class: "btn btn-miele extra-pad-button", method: :post, remote: true %>
+				<% else %>
+				<p class="available-soon">Próximamente disponible</p>
+				<% end %>
+			</div>
+		</div>
+		<% end %>
+	</div>
+	<% @comparator.products.last.comparable_attributes.each do |comparable_attr| %>
+	<div class="row">
+		<% @comparator.products.each do |prod| %>
+		<div class="<%= @size_cols%> hidden-xs text-center">
+			<div class="separator-pad">
+				<p><%= comparable_attr.try(:name) %></p>
+				<p class="pt24"><%= prod.product_attributes.find_by(comparable_attribute: comparable_attr).try(:value) %></p>
+			</div>
+		</div>
+		<% end %>
+	</div>
+	<% end %>
+</div>
+<% comparables = @comparator.products.last.comparable_attributes %>
+<div class="multiple-items row hidden-lg hidden-sm hidden-md">
+	<% @comparator.products.each do |product| %>
+	<div class="pad-mobile-comparator">
+		<div class="product-box text-center">
+			<p class="text-center">
+				<%= image_tag(product.get_product_photo, alt: 'producto', class: 'comparator-img') %>
+			</p>
+			<p class="product-name-comp"><%= product.name %></p>
+			<p class="product-sku-comp">TNR <%= product.sku %></p>
+			<%= check_offer_comparator(product).html_safe %>
+			<% if product.can_supply? %>
+			<%= link_to 'Cotizar', add_product_to_cart_path(product), class: "btn btn-miele extra-pad-button", method: :post, remote: true %>
+			<% else %>
+			<p class="available-soon">Próximamente disponible</p>
+			<% end %>
+		</div>
+		<% comparables.each do |comparable| %>
+		<div class="separator-pad text-center">
+			<p class="pt-14-11"><%= comparable.try(:name) %></p>
+			<p class="pt24"><%= product.product_attributes.find_by(comparable_attribute: comparable).try(:value) %></p>
+		</div>
+		<% end %>
+	</div>
+	<% end %>
+</div>
+
+<script>
+	$(document).ready(function(){
+		homologateBoxHeights('.product-box');
+	});
+	$(document).resize(function(){
+		homologateBoxHeights('.product-box');
+	});
+	$('.multiple-items').slick({
+		slidesToShow: 2,
+		slidesToScroll: 2,
+		dots: true,
+		arrows: true,
+		nextArrow: '<button class="slick-next slick-arrow" aria-label="Next" type="button" style="display: block;"><i class="fa fa-angle-right"></i></button>',
+		prevArrow: '<button class="slick-prev slick-arrow" aria-label="Previous" type="button" style="display: block;"><i class="fa fa-angle-left"></i></button>' 
+	});	
+</script>
+
+<% else %>
+<div class="row text-center">
+	<h3>¡No tienes suficientes productos para comparar!</h3>
+</div>
+<% end %>

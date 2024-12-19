@@ -1,0 +1,85 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" id="modal" value="">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Agregar productos</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body" id="modal_body">
+                <div class=" row">
+                    <div class="col-xs-12 col-md-6 text-center">
+                    <p class="title-input">
+                        Nombre
+                    </p>
+                    </div>
+                    <div class="col-xs-12  col-md-2 text-center">
+                    <p class="title-input">
+                        TNR
+                    </p>
+                    </div>
+                    <div class="col-xs-12 col-md-2 text-center">
+                    <p class="title-input">
+                        Cantidad
+                    </p>
+                    </div>
+                    <div class="col-xs-12 col-md-2 text-center">
+                    <p class="title-input">
+                        Cant. por asignar
+                    </p>
+                    </div>
+                </div>
+                    <% @dispatch_products.each do |p,index| %>
+                        <div class=" row">
+                            <div class="col-xs-12 col-md-6">
+                                <div class="checkbox">
+                                <label class="activation-tnr">
+                                    <input type="checkbox" class="check-item input-checkBox check_cart_item" value="<%= p.id %>" required="required">
+                                    <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+                                    <span class="table-item-span"><%= p.name %></span>
+                                </label>
+                                </div>  
+                            </div>
+                            <div class="col-xs-12 col-md-2 text-center table-item-span">
+                                <p><%= p.product.sku %></p>
+                            </div>
+                            <div id="div_input_quantity" class="col-xs-12 col-md-2 text-center table-item-span">
+                                <input class="quantity_cart_item" value="0" type="number" id="quantity_cart_item_<%=p.id%>" min="0" max="<%=p.quantity - p.dispatch_quantity %>" onchange="updateDispatchQuantity(<%=p.id%>, <%=p.quantity - p.dispatch_quantity %>)">
+                            </div>
+                            <div class="col-xs-12 col-md-2 text-center table-item-span">
+                                <span id="dispatch_quantity_cart_item_<%=p.id%>"><%=p.quantity - p.dispatch_quantity %> por asignar</span>
+                            </div>
+                        </div>
+                    <% end %>
+
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="resetInputs()">Cancelar</button>
+            <button type="button" class="btn btn-miele" data-dismiss="modal" onclick="addProducts(<%=@dispatch_products.length%>)">Agregar productos</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function resetInputs(){
+        var inputs = $(".quantity_cart_item")
+        var i = 0
+        while(i < inputs.length){
+            inputs[i].value = 0
+            i = i+1
+        }
+        $( "#modal_body" ).load(window.location.href + " #modal_body" );       
+    }
+
+    $('body').click(function (event) 
+{
+   if(!$(event.target).closest('#exampleModal.modal.fade').length && !$(event.target).is('#exampleModal.modal.fade')) {
+     resetInputs();
+   }     
+});
+
+
+</script>

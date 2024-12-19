@@ -1,0 +1,9 @@
+<p>
+    Estimado/a Manager Proyectos:
+</p>
+<p>
+    El pago que ingres&oacute; en la <%= @quotation.code %> por el monto de UF <%= number_with_delimiter(@payment.ammount.round(2)) %> fue aprobado por Manager Finanzas <%= @user.list_fullname %>.
+</p>
+<p>
+    Puede revisar el avance de esta cotizaci&oacute;n <%= @quotation.code %> en el siguiente <%= link_to 'link', quotation_url(@quotation) %>.
+</p>

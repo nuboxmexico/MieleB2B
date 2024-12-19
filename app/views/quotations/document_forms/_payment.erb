@@ -1,0 +1,27 @@
+<div class="line-row-info "></div>
+<div class="row top-both">
+  <div class="col-md-12 col-xs-12 text-left">
+    <p class="bold secondary-text">Documentos</p>
+  </div>
+</div>
+<%= form_tag load_billing_documents_path(quotation), method: :post, multipart: true, id: 'load-billing-documents-form' do %>
+  <div class="row top-both">
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 top-mobile">
+      <label for="payment_documents[]" class="title-input">Boleta / Factura</label>
+      <div class="file-field input-field">
+        <div class="file-drop-area dashed-border">
+          <span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+          <span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+          <input type="file" name="payment_documents[]" multiple="true"  accept="image/jpeg, image/png, application/pdf" id="payment_documents" class="file-input">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-md-offset-6 col-xs-12 top-space text-right">
+      <p class="top-mobile">
+        <button type="submit" class="btn btn-miele" id="send-billing-documents">Guardar</button>
+      </p>
+    </div>
+  </div>
+<% end %>

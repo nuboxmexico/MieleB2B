@@ -1,0 +1,164 @@
+<aside class="main-sidebar">
+	<section class="sidebar top-panel">
+		<div class="user-panel">
+			<div class="pull-left image">
+				<%= image_tag('face-24pxBlanco.svg', alt: 'avatar', class:'mini-top-space')%>    
+			</div>
+			<div class="pull-left info">
+			
+				<p class="white-text"><%= current_user.try(:name) %></p>
+				<% if current_user.custom_roles.size > 1 %>
+				<p class="margin-logout"><%= link_to '<span> Cambiar de usuario <i class="fa fa-exchange-alt"></i></span>'.html_safe, change_role_path %></p>
+				<% end %>
+				<p class="margin-logout"><%= link_to 'Cerrar Sesión', destroy_user_session_path, method: :delete, class: 'sign-out' %></p>
+				<p class="white-text"><%= "#{current_user.role.try(:name)} #{((current_user.manager? or current_user.seller?) ? current_user.try(:sale_channel).try(:name).to_s : '' )}" %></p>
+			</div>
+		</div>
+		<ul class="sidebar-menu tree">
+			<li class="treeview">
+				<a class="border-nav" href="#">
+					<i class="fa fa-calculator"></i>
+					<span>Cotizaciones</span>
+					<span class="pull-right-container">
+						<i class="fa fa-chevron-right pull-right"></i>
+					</span>
+				</a>
+				<ul class="treeview-menu">
+					<% if can? :business_units, Product %>
+					<li><%= link_to '
+					<i class="fa fa-shopping-bag"></i>
+					<span>Business Units</span>'.html_safe, business_units_path %>
+				</li>
+				<% end %>
+				<% if current_user.is_retail? %>
+				<% Retail.where(active:true).order('name ASC').each do |retail| %>
+				<li>
+					<%= link_to "<i class='fa fa-store'></i><span> #{retail.name}</span>".html_safe, quotations_path(retail: retail.name) %>
+				</li>
+				<% end %>
+				<li>
+					<%= link_to '<i class="fa fa-store"></i><span>Ver todas</span>'.html_safe, quotations_path %>
+				</li>
+				<% else %>
+				<% if can? :index, Quotation %>
+				<li>
+					<%= link_to '<i class="fa fa-comments-dollar"></i><span>Ver todas</span>'.html_safe, quotations_path %>
+				</li>
+				<% end %>
+				<% end %>
+			</ul>
+		</li>
+		<% if can? :index, User or can? :upload_info, DataUpload or can? :load_miele_roles, DataUpload or can? :index, PromotionalCode or can? :index, Banner or can? :bstock, Product %>
+			<li class="treeview">
+				<a class="border-nav" href="#">
+					<i class="fa fa-tasks"></i>
+					<span>Administración</span>
+					<span class="pull-right-container">
+						<i class="fa fa-chevron-right pull-right"></i>
+					</span>
+				</a>
+				<ul class="treeview-menu">
+					<% if can? :index, User %>
+					<li class="treeview">
+						<a class="border-nav" href="<%= users_path %>">
+							<i class="fa fa-users"></i>
+							<span>Usuarios</span>
+						</a>
+					</li>
+					<% end %>
+
+					<% if can? :upload_info, DataUpload or can? :load_miele_roles, DataUpload %>
+					<li class="treeview">
+						<a class="border-nav" href="<%= upload_info_path %>">
+							<i class="fa fa-upload"></i>
+							<span>Carga de datos</span>
+						</a>
+					</li>
+					<% end %>
+					<% if can? :index, PromotionalCode %>
+					<li class="treeview">
+						<a class="border-nav" href="<%= promotional_codes_path %>">
+							<i class="fa fa-tags"></i>
+							<span>Códigos de descuento</span>
+						</a>
+					</li>
+					<% end %>
+					<% if can? :index, Banner %>
+					<li class="treeview">
+						<a class="border-nav" href="<%= banners_path %>">
+							<i class="fa fa-camera"></i>
+							<span>Publicidad Miele</span>
+						</a>
+					</li>
+					<% end %>
+					<% if can? :bstock, Product %>
+					<li class="treeview">
+						<a class="border-nav" href="<%= bstocks_path %>">
+							<i class="fa fa-box-open"></i>
+							<span>B-Stock</span>
+						</a>
+					</li>
+					<% end %>
+				</ul>
+			</li>
+			<% if can? :manage, Lead %>
+				<li class="treeview" id="leads-section">
+					<a class="border-nav" href="#">
+						<i class="fas fa-receipt"></i>
+						<span>Leads</span>
+						<span class="pull-right-container">
+							<i class="fa fa-chevron-right pull-right"></i>
+						</span>
+					</a>
+					<ul class="treeview-menu">
+						<li class="treeview">
+							<%= link_to leads_path, class: 'border-nav', id: 'leads-index' do %>
+								<i class="fa fa-list"></i>
+								<span>Ver todos</span>
+							<% end %>
+						</li>
+						<li class="treeview">
+							<%= link_to new_lead_path, class: 'border-nav' do %>
+								<i class="fa fa-plus"></i>
+								<span>Nuevo Lead</span>
+							<% end %>
+						</li>
+					</ul>
+				</li>
+			<% end %>
+			<% if (current_user.administrator? or current_user.is_manager_inventory? or current_user.is_finance_manager?) %>
+				<li class="treeview">
+					<a class="border-nav" href="https://oferus.atlassian.net/servicedesk/customer/portal/39" target="_blank">
+						<i class="fa fa-question-circle"></i>
+						<span>Mesa de Ayuda</span>
+					</a>
+				</li>
+			<% end %>
+		<% end %>
+	</ul>
+</section>
+<section class="sidebar bottom-panel">
+	<ul class="sidebar-menu text-center">
+		<li class="header sidebar-item"><a href="https://www.miele.cl" target="_blank">www.miele.cl</a></li>
+		<li class="header sidebar-item">+56 2 2957 0000</li>
+		<li class="header sidebar-item"><b>Version</b> <%= Rails.configuration.version.gsub('v', '') %>1.0.0</li>
+	</ul>
+</section>
+</aside>
+<% if request.original_url.include?('/products') %>
+<script>
+	$(".sidebar-toggle").click(function(){
+		if($(".sidebar-mini").hasClass('sidebar-collapse')){
+			$(".product-item").removeClass("col-lg-3");
+			$(".product-item").addClass("col-lg-4");
+			$(".searcher-div").removeClass("col-lg-5 col-lg-offset-7");
+			$(".searcher-div").addClass("col-lg-3 col-lg-offset-9");
+		} else {
+			$(".product-item").removeClass("col-lg-4");
+			$(".product-item").addClass("col-lg-3");
+			$(".searcher-div").removeClass("col-lg-3 col-lg-offset-9");
+			$(".searcher-div").addClass("col-lg-5 col-lg-offset-7");
+		}
+	});
+</script>
+<% end %>

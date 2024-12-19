@@ -1,0 +1,100 @@
+<div class="row row-content no-bot">
+	<div class="col-lg-12">
+		<ol class="breadcrumb">
+			<li><a href="<%= root_path %>">Inicio</a></li>
+			<li>Códigos de Descuento</li>
+		</ol>
+	</div>
+	<div class="col-lg-6 bot-space no-pad">
+		<h1 class="bold title-section">
+			Códigos de descuento
+		</h1>
+	</div>
+	<div class="col-lg-6 title-section bot-space no-pad">
+		<%= link_to 'Crear código', new_promotional_code_path , id: 'new-code', class: 'btn-in-title top-mobile pull-right' %>
+	</div>
+</div>
+<% if @codes.size > 0 %>
+<div class="row hidden-xs hidden-sm header-black text-center">
+	<div class="col-md-1">
+		<b>Nombre</b>
+	</div>
+	<div class="col-md-1">
+		<b>Código</b>
+	</div>
+	<div class="col-md-1">
+		<b>Descuento</b>
+	</div>
+	<div class="col-md-3">
+		<b>Descripción</b>
+	</div>
+	<div class="col-md-1">
+		<b>Inicio</b>
+	</div>
+	<div class="col-md-1">
+		<b>Fin</b>
+	</div>
+	<div class="col-md-2">
+		<b>Canales</b>
+	</div>
+	<div class="col-md-1">
+		<b>Usos</b>
+	</div>
+	<div class="col-md-1">
+		<b>Tipo</b>
+	</div>	
+</div>
+
+<div class="row table-border">
+	<% @codes.each do |code| %>
+	<div class="row <%= @codes.last == code ? 'no-line' : ''%> ">
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Nombre: </span></b><%= code.try(:name) ? code.try(:name) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Código: </span></b><%= code.try(:code) ? code.try(:code) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Descuento: </span></b><%= code.try(:percent) ? code.try(:percent) : '<span class="miele-text">Sin información</span>'.html_safe %>%
+		</div>
+		<div class="col-md-3 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Descripción: </span></b><%= code.try(:description) ? code.try(:description) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Inicio: </span></b><%= code.try(:start_date) ? code.try(:start_date).strftime('%d/%m/%Y') : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Fin: </span></b><%= code.try(:end_date) ? code.try(:end_date).strftime('%d/%m/%Y') : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-2 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Canales: </span></b><%= code.sale_channels.size > 0 ? code.sale_channels.pluck(:name).join(', ') : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Usos: </span></b><%= code.try(:use_limit) ? (code.try(:use_limit) == -1 ? 'Ilimitado'.html_safe : code.try(:use_limit)) : '<span class="miele-text">Sin información</span>'.html_safe %>
+		</div>
+		<div class="col-md-1 col-xs-12">
+			<b><span class="hidden-lg hidden-md">Tipo: </span></b><%= code.is_for_product ? 'Productos' : 'Despacho' %>
+		</div>
+	</div>
+	<% end %>
+</div>
+<% page = params[:page] ? params[:page].to_i : 0 
+start = (page*10 + 1)
+%>
+<div class="row">
+	<div class="col-md-5 col-xs-12 up-down-mar">
+		<% if @items > 0 %>
+		<% if @items < 10 %>
+		<br>
+		Mostrando registros del 1 al <%= @items.to_s %> de un total de <%= @items.to_s %> códigos.
+		<% else %>
+		<br>
+		Mostrando registros del <%= start.to_s %> al <% (start + 9).to_s %> de un total de <%= @items.to_s %> códigos.
+		<% end %>
+		<% end %>
+	</div>
+	<div class="col-md-7 col-xs-12 pull-right text-right">
+		<%= will_paginate @codes, renderer: BootstrapPagination::Rails %>
+	</div>
+</div>
+<% end %>

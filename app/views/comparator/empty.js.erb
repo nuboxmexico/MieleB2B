@@ -1,0 +1,8 @@
+$(".toast-bottom-right-custom").remove();
+<% if @success %>
+  toastr['info']('Se borró la actual selección de productos a comparar.');
+  $(".check-item").prop('checked', false);
+  $(".comparator-card").remove();
+<% else %>
+  toastr['error']("No se ha podido eliminar la selección de productos a comparar");
+<% end %>

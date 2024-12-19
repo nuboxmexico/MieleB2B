@@ -1,0 +1,303 @@
+<% if can? :update, @quotation %>
+	<% can_approve = (current_user.is_finance_manager? or (@quotation.payments.completed.where(payment_type: 'webpay').size == @quotation.payments.completed.size and current_user.is_finance?)) %>
+
+	<div class="quotation-box padding-box text-left">
+		<div class="row">
+			<div class="col-md-12 col-xs-12 text-left">
+				<p class="bold secondary-text">Información</p>
+			</div>
+		</div>
+		<div class="line-row-info"></div>
+		<%= form_for @quotation, html: {multipart: true, id: 'quotation-finances-form'} do |f| %>
+			<div class="row padding-row">
+				<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+					<p class="bold title-input">Tipo de Documento</p>
+					<p class="content-input"><%= @quotation.document_type.try(:capitalize) %></p>
+				</div>
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+					<%= f.label :so_code, 'SO',  class:'bold title-input' %>
+					<p>
+						<%= f.text_field :so_code, class: "field-bordered", required: (@quotation.paid_ammount == 100) ,placeholder: "Escriba aquí", value: @quotation.so_code %>
+						<label id="quotation_so_code-error-out" class="error-out <%= (@quotation.paid_ammount == '100' ? '' : 'hidden') %>" for="quotation_so_code">Este campo es obligatorio.</label>
+					</p>
+				</div>
+			</div>
+			<div class="row padding-row">
+				<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 top-both">
+					<label for="credit_note_documents[]" class="title-input">Documento Nota de Crédito</label>
+					<div class="file-field input-field">
+						<div class="file-drop-area dashed-border">
+							<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+							<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+							<input type="file" name="credit_note_documents[]" multiple="true" id="credit_note_documents" class="file-input" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf">
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-both">
+					<%= f.label :credit_note, 'Nota de crédito',  class:'bold title-input' %>
+					<p>
+						<%= f.text_field :credit_note, class: "field-bordered", placeholder: "Escriba aquí", value: @quotation.credit_note %>
+					</p>
+				</div>
+			</div>
+			<div class="line-row-info"></div>
+			<div class="row">
+				<div class="col-md-12 col-xs-12 text-left top-both">
+					<p class="bold secondary-text">Validación de pago</p>
+				</div>
+			</div>
+			<div class="row padding-row">
+				<div class="col-lg-4 col-md-5 col-sm-12 col-xs-12">
+					<p><%= f.label :paid_ammount, "Cantidad Pagada", class:'bold title-input' %></p>
+					<p>
+						<% if @quotation.for_project? %>
+							<label class="radio-inline radio-button" id="paid_50">
+								<input type="radio" name="quotation[paid_ammount]" value="<%= @quotation.pay_percent %>" <%= @quotation.paid_ammount >= @quotation.pay_percent ? 'checked' : '' %>>
+								<span class="label-visible">
+									<span class="fake-radiobutton"></span>
+										<%= @quotation.pay_percent %>%
+								</span>
+							</label>
+						<% else %>
+							<label class="radio-inline radio-button" id="paid_50">
+								<input type="radio" name="quotation[paid_ammount]" value="50" <%= @quotation.paid_ammount == 50 ? 'checked' : '' %>>
+								<span class="label-visible">
+									<span class="fake-radiobutton"></span>
+									50%
+								</span>
+							</label>
+						<% end %>
+						<label class="radio-inline radio-button" id="paid_100">
+							<input type="radio" name="quotation[paid_ammount]" value="100" <%= @quotation.paid_ammount == 100 ? 'checked' : '' %>>
+							<span class="label-visible">
+								<span class="fake-radiobutton"></span>
+									100%
+							</span>
+						</label>
+					</p>
+				</div>
+				<div class="col-lg-3 col-md-6 col-xs-12 top-space text-right">
+					<% if @quotation.for_project? %>
+						<p class="top-mobile">
+							<button type="submit" class="btn btn-miele" id="save_changes">Guardar <span class="hidden-xs">Cambios</span></button>
+							<%= f.submit 'Enviar', class: 'btn btn-miele', id: 'send-info-billing', disabled: !(@quotation.paid_ammount >= @quotation.pay_percent and @can_approve)  %>
+						</p>
+					<% else %>
+						<p class="top-mobile">
+							<button type="submit" class="btn btn-miele" id="save_changes">Guardar <span class="hidden-xs">Cambios</span></button>
+							<%= f.submit 'Enviar', class: 'btn btn-miele', id: 'send-info-billing', disabled: !(@quotation.paid_ammount == 100 and @can_approve)  %>
+						</p>
+					<% end %>
+				</div>
+			</div>
+			<div id="hidden-info"></div>
+		<% end %>
+		<% if @quotation.document_type == 'factura' %>
+			<div class="line-row-info"></div>
+			<div class="row padding-row top-separation-data">
+				<div class="col-md-12 col-xs-12 text-left">
+					<p class="bold secondary-text">Datos de Facturación</p>
+				</div>
+			</div>
+			<div class="row padding-row">
+				<div class="col-md-4 col-xs-12">
+					<p class="bold title-input">Razón Social</p>
+					<p class="content-input"><%= @quotation.try(:business_name) %></p>
+				</div>
+				<div class="col-md-4 col-xs-12">
+					<p class="bold title-input">Giro Comercial</p>
+					<p class="content-input"><%= @quotation.try(:business_sector) %></p>
+				</div>
+				<div class="col-md-2 col-xs-12">
+					<p class="bold title-input">RUT Empresa</p>
+					<p class="content-input"><%= @quotation.try(:business_rut) %></p>
+				</div>
+			</div>
+			<div class="row padding-row">
+				<div class="col-md-4 col-xs-12">
+					<p class="bold title-input">Dirección Facturación</p>
+					<p class="content-input"><%= @quotation.try(:billing_address) %></p>
+				</div>
+				<div class="col-md-2 col-xs-12">
+					<p class="bold title-input">Nº</p>
+					<p class="content-input"><%= @quotation.try(:billing_address_number) %></p>
+				</div>
+				<div class="col-md-2 col-xs-12">
+					<p class="bold title-input">Depto</p>
+					<p class="content-input"><%= @quotation.try(:billing_dpto_number) %></p>
+				</div>
+				<div class="col-md-4 col-xs-12">
+					<p class="bold title-input">Comuna</p>
+					<p class="content-input"><%= @quotation.try(:billing_commune).try(:name_with_region) %></p>
+				</div>
+			</div>
+		<% end %>
+		<%= render 'quotations/credit_notes' %>
+		
+		<% if @quotation.payments.where(state: 'complete').any? %>
+			<%= render 'quotations/payments' %>
+		<% end %>
+	</div>
+
+	<script>
+		var can_approve = <%= @can_approve %>;
+
+		$("#paid_50").click(function(){
+			$("#send-info-billing").attr("disabled", true);
+			$('input[name="quotation[paid_ammount]"]').val("50");
+			$("#quotation_so_code-error-out").addClass('hidden');
+		});
+		$("#paid_100").click(function(){
+			$("#quotation_so_code").attr("required", true);
+			$('input[name="quotation[paid_ammount]"]').val("100");
+			if($("#quotation_so_code").val() != ''){
+				if(can_approve){
+					$("#send-info-billing").attr("disabled", false);
+				}
+			} else {
+				$("#quotation_so_code-error-out").removeClass('hidden');
+			}
+		});
+
+		$("#send-info-billing").click(function(event){
+			event.preventDefault();
+			$("#hidden-info").html('<input type="hidden" name="change_state" value="true">');
+			$("#quotation-finances-form").submit();
+		});
+
+		$("#quotation_so_code").change(function(){
+			if($(this).val() == ''){
+				if($('input[name="quotation[paid_ammount]"]').val() == '100'){
+					$("#send-info-billing").attr("disabled", true);
+					$("#quotation_so_code-error-out").removeClass('hidden');
+				} else {
+					$("#send-info-billing").attr("disabled", true);
+				}
+			} else {
+				$("#quotation_so_code-error-out").addClass('hidden');
+				if(can_approve){
+					$("#send-info-billing").attr("disabled", false);
+				}
+			}
+		})
+	</script>
+
+<% else %>
+	<div class="quotation-box padding-box text-left">
+		<div class="row">
+			<div class="row padding-row">
+				<div class="col-md-12 col-xs-12 text-left">
+					<p class="secondary-text bold">Información</p>
+					<div class="row padding-row">
+						<div class="col-md-4 col-xs-12">
+							<p class="bold title-input">Tipo de Documento</p>
+							<p class="content-input"><%= @quotation.document_type.try(:capitalize) %></p>
+						</div>
+						<div class="col-md-3 col-xs-12">
+							<p class="bold title-input">Total Pagado</p>
+							<% if @quotation.for_project? %>
+								<p class="content-input"><%= ((@quotation.payments.completed.sum(:ammount) / (@quotation.total) ).round(3))*100 %> %</p>
+							<% else %>
+								<p class="content-input"><%= @quotation.try(:paid_ammount)%> %</p>
+							<% end %>
+						</div>
+						<%if !(current_user.is_finance? || current_user.is_finance_manager?) %>
+							<div class="col-md-3 col-xs-12">
+								<p class="bold title-input">SO</p>
+								<p class="content-input"><%= @quotation.try(:so_code)%></p>
+							</div>
+							<div class="col-md-3 col-xs-12">
+								<p class="bold title-input">Nota de crédito</p>
+								<p class="content-input"><%= @quotation.try(:credit_note)%></p>
+							</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<% if current_user.is_finance? || current_user.is_finance_manager? %>
+				<%= form_for(@quotation, html: {multipart: true}) do |f| %>
+					<div class="line-row-info"></div>
+					<div class="row">
+						<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 top-both">
+							<%= f.label :so_code, 'SO',  class:'bold title-input' %>
+							<p>
+								<%= f.text_field :so_code, class: "field-bordered", required: (@quotation.paid_ammount == '100' ? true : false) ,placeholder: "Escriba aquí", value: @quotation.so_code %>
+								<label id="quotation_so_code-error-out" class="error-out <%= (@quotation.paid_ammount == '100' ? '' : 'hidden') %>" for="quotation_so_code">Este campo es obligatorio.</label>
+							</p>
+						</div>
+					</div>
+					<div class="line-row-info"></div>
+					<div class="row">
+						<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 top-both">
+							<label for="credit_note_documents[]" class="title-input">Documento Nota de Crédito</label>
+							<div class="file-field input-field">
+								<div class="file-drop-area dashed-border">
+									<span class="btn btn-miele-gray btn-input-file">Elegir archivos</span>
+									<span class="file-msg hidden-xs">o arrastra y deja aquí los archivos</span>
+									<input type="file" name="credit_note_documents[]" multiple="true" id="credit_note_documents" class="file-input" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf">
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-lg-offset-1 col-md-6 col-sm-6 col-xs-12 top-both">
+							<%= f.label :credit_note, 'Nota de crédito',  class:'bold title-input' %>
+							<p>
+								<%= f.text_field :credit_note, class: "field-bordered", placeholder: "Escriba aquí", value: @quotation.credit_note %>
+							</p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-5 col-md-offset-7 col-xs-12 text-right">
+							<p class="">
+								<button type="submit" class="btn btn-miele" id="save_changes">Guardar <span class="hidden-xs">Cambios</span></button>
+							</p>
+						</div>
+					</div>
+				<%end%>
+			<%end%>
+
+			<% if @quotation.document_type == 'factura' %>
+				<div class="row padding-row">
+					<div class="col-md-12 col-xs-12 text-left">
+						<p class="bold secondary-text">Datos de Facturación</p>
+					</div>
+				</div>
+				<div class="row padding-row">
+					<div class="col-md-4 col-xs-12">
+						<p class="bold title-input">Razón Social</p>
+						<p class="content-input"><%= @quotation.try(:business_name) %></p>
+					</div>
+					<div class="col-md-4 col-xs-12">
+						<p class="bold title-input">Giro Comercial</p>
+						<p class="content-input"><%= @quotation.try(:business_sector) %></p>
+					</div>
+					<div class="col-md-2 col-xs-12">
+						<p class="bold title-input">RUT Empresa</p>
+						<p class="content-input"><%= @quotation.try(:business_rut) %></p>
+					</div>
+				</div>
+				<div class="row padding-row">
+					<div class="col-md-4 col-xs-12">
+						<p class="bold title-input">Dirección Facturación</p>
+						<p class="content-input"><%= @quotation.try(:billing_address) %></p>
+					</div>
+					<div class="col-md-2 col-xs-12">
+						<p class="bold title-input">Nº</p>
+						<p class="content-input"><%= @quotation.try(:billing_address_number) %></p>
+					</div>
+					<div class="col-md-2 col-xs-12">
+						<p class="bold title-input">Depto</p>
+						<p class="content-input"><%= @quotation.try(:billing_dpto_number) %></p>
+					</div>
+					<div class="col-md-4 col-xs-12">
+						<p class="bold title-input">Comuna</p>
+						<p class="content-input"><%= @quotation.try(:billing_commune).try(:name_with_region) %></p>
+					</div>
+				</div>
+			<% end %>
+			<%= render 'quotations/credit_notes' %>
+		</div>
+		<% if @quotation.payments.where(state: 'complete').any? %>
+			<%= render 'quotations/payments' %>
+		<% end %>
+	</div>
+<% end %>

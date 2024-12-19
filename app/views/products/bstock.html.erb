@@ -1,0 +1,114 @@
+<div class="row">
+  <div class="col-lg-7 col-sm-6 col-xs-12 no-left">
+   <ol class="breadcrumb">
+    <% if current_user.manager? or current_user.administrator? %>
+    <li><a href="<%= root_path %>">Inicio</a></li>
+    <% end %>
+    <li id="badge-space">B-Stock</li>
+  </ol>
+</div>
+</div>
+<div class="row">
+  <div class="col-xs-12 no-left">
+    <h1 class="title-section bold">
+      Productos B-Stock
+    </h1>
+  </div>
+</div>
+<%= form_tag delete_product_path, id: 'delete-form' do %>
+<div class="row">
+  <div class="col-lg-2 col-lg-offset-10 col-xs-12 text-right bot-space no-right-button">
+    <button type="submit" class="btn btn-miele" id="sent-bstocks" disabled>Eliminar</button>
+  </div>
+</div>
+<div class="row header-black text-center">
+  <div class="col-md-2 col-sm-2 col-xs-3">
+    Familia
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-3">
+    Categoría
+  </div>
+  <div class="col-md-1 col-sm-1 col-xs-2">
+
+  </div>
+  <div class="col-md-2 col-sm-2 hidden-xs">
+    Imagen
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-4">
+    Nombre
+  </div>
+  <div class="col-md-2 col-sm-2 hidden-xs">
+    Precio Final
+  </div>
+</div>
+<% @products.each do |bstock| %>
+<div class="row white-row-bstock">
+  <div class="col-md-2 col-sm-2 col-xs-3 family-div">
+    <%= bstock.families.find_by(depth: 0).try(:name) %>
+  </div>
+  <div class="col-md-2 col-sm-2 col-xs-3 bold">
+    <%= bstock.category %>
+  </div>
+  <div class="col-md-1 col-sm-1 col-xs-2">
+    <div class="checkbox">
+      <label class="activation-tnr">
+        <input type="checkbox" class="check-item" name="id[]" value="<%= bstock.id %>">
+        <span class="cr"><i class="cr-icon glyphicon glyphicon-ok"></i></span>
+      </label>
+    </div>
+  </div>
+  <div class="col-md-2 col-sm-2 hidden-xs">
+    <%= image_tag bstock.original_product.get_product_photo, class: 'mini-bstock' if bstock.original_product %>
+  </div>
+  <div class="col-md-3 col-sm-3 col-xs-4">
+    <%= "#{bstock.original_product.try(:name)} - #{bstock.ean} - #{bstock.discount}%" %>
+  </div>
+  <div class="col-md-2 col-sm-2 hidden-xs">
+    <%= number_to_currency(bstock.bstock_price(bstock.original_product)) %>
+  </div>
+</div>
+<% end %>
+<% end %>
+<div class="row">
+  <div class="col-md-5 col-xs-12 up-down-mar">
+    <% page = params[:page] ? params[:page].to_i : 0 
+    start = (page*10 + 1)
+    %>
+    <% if @items > 0 %>
+    <% if @items < 10 %>
+    <br>
+    Mostrando registros del 1 al <%= @items.to_s %> de un total de <%= @items.to_s %> bstocks.
+    <% else %>
+    <br>
+    Mostrando registros del <%= start.to_s %> al <% (start + 9).to_s %> de un total de <%= @items.to_s %> bstocks.
+    <% end %>
+    <% end %>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-7 col-md-offset-5 col-xs-12 pull-right text-right">
+    <%= will_paginate @products, renderer: BootstrapPagination::Rails %>
+  </div>
+</div>
+
+<script>
+  $(".check-item").change(function(){
+    if($('.check-item:checked').length > 0){
+      $('#sent-bstocks').attr('disabled', false);
+    } else {
+      $('#sent-bstocks').attr('disabled', true);
+    }
+  })
+  $('#sent-bstocks').on('click',function(e){
+    e.preventDefault();
+    swal({
+      title: "¿Esta seguro que desea borrar "+$('.check-item:checked').length+" productos B-stock de forma permanente del inventario?",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar"
+    }).then(function (result) {
+      $('#delete-form').submit();
+    });
+  });
+</script>

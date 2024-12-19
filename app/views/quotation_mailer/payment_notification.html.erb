@@ -1,0 +1,26 @@
+<% data = @payment.webpay_data.gsub('[','').gsub(']','').gsub('"','').split(',') %>
+<p>
+	Estimado(a) <%= @quotation.user.fullname %>,
+</p>
+<p>
+	Adjuntamos comprobante electrónico de lo cancelado a través de Webpay correspondiente a un pago de <b><%= number_to_currency(@payment.ammount)%></b> de la cotización <%= @quotation.is_retail? ? @quotation.oc_number : @quotation.code %>
+</p>
+<ul>
+	<li>Código de autorización Transbank: <%= data[4] %></li>
+	<li>Fecha de transacción: <%unless data[7].nil?%>  <%="#{data[7].split('T')[0].gsub('-','/')} #{data[7].split('T')[1].split('.')[0]}"%><% end %></li>
+	<li>
+		Tipo de Pago: <%= 'Débito' if data[5].to_s.strip == 'VD' %>
+		<%= 'Crédito' if data[5].to_s.strip != 'VD' %> 
+	</li>
+	<li>
+		Tipo de Cuota: <%= 'Venta Débito' if data[5].to_s.strip == 'VD' %>
+		<%= 'Sin Cuotas' if data[5].to_s.strip == 'VN' %>
+		<%= 'Cuotas normales' if data[5].to_s.strip == 'VC' %>
+		<%= 'Sin interés' if data[5].to_s.strip == 'SI' %>
+		<%= 'Sin interés' if data[5].to_s.strip == 'S2' %>
+		<%= 'Sin interés' if data[5].to_s.strip == 'NC' %>
+	</li>
+	<li>
+		Número de Cuotas: <%= data[10] %>
+	</li>
+</ul>

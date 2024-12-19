@@ -1,0 +1,21 @@
+<% if @quotation.credit_notes.size > 0 %>
+<div class="line-row-info"></div>
+<div class="row bot-space">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<p class="bold title-input">Notas de crédito</p>
+		<% @quotation.credit_notes.each do |credit_doc| %>
+		<%= link_to credit_doc.document.url(:original), class: 'btn btn-miele space-btn', target: "_blank" do %>
+		<i class="fa fa-file-image"></i> <%= truncate(credit_doc.document_file_name, length: 15) %>
+		<% end %>
+		<% if can? :destroy, CreditNote and can_delete_docs(@quotation) %>
+		<%= link_to credit_note_path(credit_doc), method: :delete, class: "btn btn-delete no-loader space-btn", data: 
+            { confirm: '¿Estás seguro de eliminar el archivo '+credit_doc.document_file_name+'?',
+            'confirm-button-text': 'Eliminar',
+            'cancel-button-text': 'Cancelar'}  do %>
+            <i class="fa fa-times"></i>
+            <% end %>
+        <% end %>
+		<% end %>
+	</div>
+</div>
+<% end %>

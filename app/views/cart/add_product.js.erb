@@ -1,0 +1,15 @@
+<% if @cant_add_again == true %>
+$(".toast-bottom-right-custom").remove();
+toastr['error']('Ya haz agregado este servicio.');
+<% else %>
+<% if @success == true  %>
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Producto agregado con éxito');
+$("#search_products").val("");
+$("#search_products").trigger("change");
+<% else %>
+$(".toast-bottom-right-custom").remove();
+toastr['error']('No es posible agregar el producto junto a otros de tipo B-Stock.');
+<% end %>
+$("#items-in-cart").text("<%= current_user.cart_products %>");
+<% end %>

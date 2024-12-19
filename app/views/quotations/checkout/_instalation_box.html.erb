@@ -1,0 +1,62 @@
+<div class="">
+
+    <div class="row">
+        <div class="col-md-9 col-xs-12 text-left">
+            <p class="title-box-checkout">Instalación</p>
+        </div>
+        <div class="col-md-3 col-xs-12 text-right">
+            <input onchange="test()" type="checkbox" id="cbox2" value="second_checkbox"> <label for="cbox2">Sin instalación</label>
+        </div>
+    </div>
+    <div id="no_install" class="row" style="display:none;">
+        <div class="col-md-12 col-xs-12 text-left">
+            <h1>SOLICITAR A MIELE TEXTO</h1>
+        </div>
+    </div>
+    <div id="yes_install">
+        <div class="row">
+            <div class="col-md-12 col-xs-12 text-left">
+                <br>
+                <p class="sub-title-box-checkout">Ingrese Cantidad de Unidades Inmobiliarias del Proyecto</p>
+                <br>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <p class="title-input-black-checkout">Unidades Inmobiliarias Totales</p>
+                            <% total_units = 0 %>
+                            <% @quotation.unit_real_states.each { |u| total_units += u.quantity unless u.quantity.nil? } %>
+                            <input class="input-big-checkout" min="0" onblur="validateGenerateButton2()" onchange="validateMinReq()" type="number" name="u_tit" multiple="true" id="u_tot" class="field-bordered" value="<%= total_units %>">
+                            <p id="min_req_message" class="small mtop-1"><%= "La cantidad mínima de unidades inmobiliarias es 6" if total_units < 6 %></p>
+                        </div>
+                    </div>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-xs-12 text-left">
+                <div class="box-color-lightblue-checkout">
+                        <p class="p-box-color-checkout">Productos con instalación: <span id="span_installation_products"><%=@products_instalation_number%></span></p>
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 text-left">
+                <div class="box-color-yellow-checkout">
+                        <p class="p-box-color-checkout">Productos por asignar: <span id="span_pending_products"><%=@products_instalation_number%></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function update_new_link(){
+        // let val = document.getElementById('u_tit').value;
+        // let s= document.getElementById("all_unit_real_state");
+        // cantidad = parseInt(s.getAttribute("value"))
+        // s.setAttribute("value", (cantidad + 1).toString())
+        // if (parseInt(val) <= cantidad){
+        //      $("#new_link_button").addClass("hidden")
+        // }
+        // else{
+        //     $("#new_link_button").removeClass("hidden");
+        // }
+    }
+</script>

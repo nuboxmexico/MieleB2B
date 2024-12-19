@@ -1,0 +1,18 @@
+<div class="row top-login">
+  <div class="col-md-8 col-xs-10 col-md-offset-2 col-xs-offset-1">
+    <%= form_tag find_by_rut_and_code_path, method: :get do %>
+    <h3 class="title-login">BIENVENIDO</h3>
+    <div class="text-left field">
+      <label class="control-label required" for="rut">RUT</label>
+      <%= text_field_tag :rut, nil, required: true, autocomplete: true, oninput: "checkRut(this);" %>
+    </div>
+    <div class="text-left field">
+      <label class="control-label required" for="rut">Código Cotización</label>
+      <%= text_field_tag :code, nil, required: true, autocomplete: true %>
+    </div>
+    <div class="actions top-login">
+      <button type="submit" class="btn btn-flat btn-login">Buscar</button>
+    </div>
+    <% end %>
+  </div>
+</div>

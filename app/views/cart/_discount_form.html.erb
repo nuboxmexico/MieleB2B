@@ -1,0 +1,16 @@
+<div class="flat-indicator box-mini" id="discount-code">
+	<div class="box-flat-indicator">
+		<%= form_tag apply_promotion_path(id: @cart.id, type: @type), remote: true, method: :post do |form| %>
+		<div class="row inlineb">
+			<% if @type == 'product' %>
+			<i class="fa fa-ticket-alt tertiary-color pt20 hidden-xs"></i>
+			<% end %>
+			<input type="text" name="code" class="no-borders width-code" placeholder="Ingresa tu código">
+			<%= button_tag(type: "submit", id: "submit-code", class: 'btn btn-miele') do %>
+			Aplicar
+			<% end %>
+		</div>
+		<div class="row mini-miele-text" id="error-message-coupon"></div>
+		<% end %>
+	</div>
+</div>

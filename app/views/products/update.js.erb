@@ -1,0 +1,13 @@
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Campo actualizado con éxito.');
+$("#<%= @updated %>").html("");
+$("#<%= @updated %>").html('<%= j @product.send(@updated).try(:html_safe) %>');
+$("#<%= @updated %>").removeClass("hidden");
+$("#<%= @updated%>_edit").addClass("hidden");
+$("#<%= @updated%>_icon").html('<i class="fa fa-pen miele-text"></i>');
+
+$("#<%= @updated %>-mobile-info").html("");
+$("#<%= @updated %>-mobile-info").html('<%= j @product.send(@updated).try(:html_safe) %>');
+$("#<%= @updated %>-mobile-info").removeClass("hidden");
+$("#<%= @updated%>_edit_mobile").addClass("hidden");
+$("#<%= @updated%>_icon-mobile").html('<i class="fa fa-pen miele-text"></i>');

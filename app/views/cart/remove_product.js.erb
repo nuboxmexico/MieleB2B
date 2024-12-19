@@ -1,0 +1,37 @@
+$(".toast-bottom-right-custom").remove();
+toastr['info']('Producto eliminado con éxito');
+$("#popup").hide();
+<% if @cart.cart_items.size > 0 %>
+$("#card<%= @removed_id %>").remove();
+$("#product-list-<%= @removed_id%>").remove();
+$("#items-in-cart").text("<%= current_user.cart_products %>");
+
+<%= render :partial => 'cart/update_totals.js.erb' %>
+
+<% else %>
+
+$("#cart-section").html("");
+$(".row-content").remove();
+$("#cart-section").html('<%= j render partial: "cart/empty" %>');
+$("#items-in-cart").text("<%= current_user.cart_products %>");
+
+<% end %>
+
+<% if @products_to_delete and @products_to_delete.any? %>
+<% @products_to_delete.each do |item| %>
+$("#card<%= item %>").remove();
+<% end %>
+<% end %>
+
+<% if @parent %>
+$(".item<%= @parent.id %>").removeClass('linked-alert');
+$(".item<%= @parent.id %>").addClass('mandatory-alert');
+<% if @parent.product_instalation %>
+<% @cart.cart_items.where(product: @parent.product_instalation.products).each do |item| %>
+$(".item<%= item.id %>").removeClass('linked-alert');
+$(".item<%= item.id %>").addClass('normal-alert');
+<% end %>
+<% end %>
+<% end %>
+
+<%= render :partial => 'cart/home_program.js.erb' %>

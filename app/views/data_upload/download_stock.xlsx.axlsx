@@ -1,0 +1,12 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: 'Stock') do |sheet|
+  headers = ['TNR','Stock','Quiebre Stock?']
+  sheet.add_row headers
+  
+  @products.each do |prod|
+    sheet.add_row [prod.sku,
+                   prod.stock,
+                   (prod.stock_break ? 'si' : 'no')], types: [:string,:integer,:string]
+  end
+end
