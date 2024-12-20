@@ -33,3 +33,8 @@ EXPOSE 3000
 
 # Comando para ejecutar el servidor Rails
 CMD ["rails", "server", "-b", "0.0.0.0"]
+
+#EJECUTAR ESTO DE FORMA MANUAL AL CORRER CON DOCKER BUILD
+# sudo docker cp config/version 214e35979ae1:/usr/src/app/config/version
+#touch config/version
+
