@@ -43,5 +43,3 @@ WORKDIR /usr/src
 
 # Copy project code
 COPY . .
-COPY config/version /usr/src/config/version
-
