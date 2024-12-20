@@ -1,45 +1,35 @@
+# Etapa de construcción
 ARG RUBY_VERSION=2.6.10
-
-############################################
-# builder stage
-############################################
 
 FROM ruby:${RUBY_VERSION}
 
 USER root
 
-############################################
-# this section could be different for each project
+# Instalación de dependencias del sistema necesarias
 RUN apt-get update && apt-get install -y \
     wkhtmltopdf \
     qt5-qmake \
-    libqwt-qt5-6 \ 
+    libqwt-qt5-6 \
     g++ libqt5webkit5-dev gstreamer1.0-plugins-base gstreamer1.0-tools gstreamer1.0-x \
+    curl \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-RUN apt-get update
-RUN apt-get install -y nodejs
-# Update bundler
-#RUN gem update --system 3.2.34
+# Instalar bundler
 RUN gem install bundler -v 2.4.22
-############################################
 
-############################################
-# Developement dependencies stage
-############################################
-
+# Copiar los archivos Gemfile y Gemfile.lock
+WORKDIR /usr/src/app
 COPY Gemfile Gemfile.lock ./
-RUN bundle config set without ''
-RUN bundle config set with development test
-RUN git config --global url."https://".insteadOf git://
+
+# Instalar dependencias de Ruby
 RUN bundle install --jobs=4 --retry=3
 
-# ############################################
-# ## Development stage
-# ############################################
-
-WORKDIR /usr/src
-
-# Copy project code
+# Copiar el resto del código
 COPY . .
+
+# Exponer el puerto para Rails
+EXPOSE 3000
+
+# Comando para ejecutar el servidor Rails
+CMD ["rails", "server", "-b", "0.0.0.0"]
